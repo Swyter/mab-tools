@@ -1,0 +1,48 @@
+//------------------------------------------------
+//--- 010 Editor v10.0 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+LittleEndian();
+
+struct
+{
+    char magic[4];
+    int ver;
+    int spr_count;
+    int pad;
+} head;
+
+
+struct
+{
+    uint32 id;
+    uint32 unk  <format=hex>;
+    float c[12];
+    int str_size;
+    char str[str_size];//[0x15];
+    uint32 bb;
+    float scale[4];
+    uint32 cc;
+} spr[head.spr_count] <optimize=false>;
+
+
+uint32 id;
+float ss[id*3];
+
+
+uint32 ido;
+uint32 tt[ido * 5];            
+
+uint32 ide;
+uint32 yy[ide * 5];     
+
+uint32 idu;

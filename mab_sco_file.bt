@@ -1,13 +1,13 @@
 //------------------------------------------------
 //--- 010 Editor v10.0 Binary Template
 //
-//      File: 
-//   Authors: 
-//   Version: 
-//   Purpose: 
-//  Category: 
-// File Mask: 
-//  ID Bytes: 
+//      File: Mount&Blade Scene Object file
+//   Authors: Swyter
+//   Version: 2020.06.17
+//   Purpose: Opens scene files on M&B 1.011 and Warband
+//  Category: Game
+// File Mask: *.sco
+//  ID Bytes: 33 FD FF FF
 //   History: 
 //------------------------------------------------
 
@@ -32,12 +32,15 @@ struct obj
     } type;
 
     uint32 id;
-    uint32 unk  <format=hex>;
-    float c[9];
-    struct 
+    enum <uint32>
     {
-        float x,y,z;    
-    } pos;
+        Const_MB = 0x930F6C4,
+        Const_WB = 0x94AEF80
+    } unk <format=hex>;
+    float mtx_row_a[3]; /* affine matrix */
+    float mtx_row_b[3];
+    float mtx_row_c[3];
+    float pos[3]; /* x, y, z */
     int str_size;
     char str[str_size];
     uint32 entry_no;
@@ -70,7 +73,7 @@ string sceneprop__Read(struct obj &m)
          if (m.type == Prop ||
              m.type == Item ||
              m.type == Plant)   return EnumToString(m.type) + " -- " + m.str;
-    else if (m.type == Entry)   return EnumToString(m.type) + " point number "  + UIntToStr(m.entry_no);
+    else if (m.type == Entry)   return EnumToString(m.type) + " point ["  + UIntToStr(m.entry_no) + "]";
     else if (m.type == Passage) return EnumToString(m.type) + " for menu item " + UIntToStr(m.menu_item_no);
     else                        return EnumToString(m.type);
 };

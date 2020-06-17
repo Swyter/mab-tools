@@ -16,11 +16,11 @@ LittleEndian();
 struct
 {
     char magic[4];
-    int ver;
-    int spr_count;
+    int  version;
+    int  object_count;
 } head <open=true>;
 
-struct spr_t
+struct obj
 {
     enum <uint32> 
     {
@@ -43,7 +43,7 @@ struct spr_t
     uint32 entry_no;
     uint32 menu_item_no;
     float scale[3];
-} spr[head.spr_count] <optimize=false,read=sceneprop__Read>;
+} objects[head.object_count] <optimize=false,read=sceneprop__Read>;
 
 uint32 tag;
 uint32 id;
@@ -60,17 +60,17 @@ uint32 idu;
 
 
 
-string UIntToStr()
-{}
-
-string sceneprop__Read(struct spr_t &m)
+string UIntToStr(unsigned int e)
 {
-    string s_entry; SPrintf(s_entry, "%d\n", m.entry_no);
-    string s_passa; SPrintf(s_passa, "%d\n", m.menu_item_no);
-    if (m.type == Prop || m.type == Item || m.type == Plant)
-        return EnumToString(m.type) + " -- " + m.str;
-    else if (m.type == Entry)
-        return EnumToString(m.type) + " point number " + s_entry;
-    else
-        return EnumToString(m.type) + " for menu item " + s_passa;
+    string s; SPrintf(s, "%d", e); return s;
+}
+
+string sceneprop__Read(struct obj &m)
+{
+         if (m.type == Prop ||
+             m.type == Item ||
+             m.type == Plant)   return EnumToString(m.type) + " -- " + m.str;
+    else if (m.type == Entry)   return EnumToString(m.type) + " point number "  + UIntToStr(m.entry_no);
+    else if (m.type == Passage) return EnumToString(m.type) + " for menu item " + UIntToStr(m.menu_item_no);
+    else                        return EnumToString(m.type);
 };

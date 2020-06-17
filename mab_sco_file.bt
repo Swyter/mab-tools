@@ -37,20 +37,28 @@ struct obj
         Const_MB = 0x930F6C4,
         Const_WB = 0x94AEF80
     } unk <format=hex>;
-    float mtx_row_a[3]; /* affine matrix */
+    float mtx_row_a[3]; /* affine matrix; encodes rotation */
     float mtx_row_b[3];
     float mtx_row_c[3];
-    float pos[3]; /* x, y, z */
+    float pos[3]; /* translation; x, y, z */
     int str_size;
     char str[str_size];
     uint32 entry_no;
     uint32 menu_item_no;
-    float scale[3];
+    float scale[3]; /* scaling multiplier, per axis; x, y, z*/
 } objects[head.object_count] <optimize=false,read=sceneprop__Read>;
+
+
 
 uint32 tag;
 uint32 id;
-float ss[id*3];
+
+struct
+{
+    float a;
+    float b;
+    float height;
+} ss[id];
 
 
 uint32 ido;

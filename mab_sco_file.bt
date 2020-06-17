@@ -92,10 +92,13 @@ struct
         uint32 index;
         uint32 str_size;
         char str[str_size];
-        uint32 elem_ddcount;
-        uint32 elem_count;
-        uint32 elem[elem_count];
-    } block[4];
+        uint32 enabled;
+        if (enabled)
+        {
+            uint32 elem_count;
+            uint32 elem[elem_count];
+        }
+    } block[b] <optimize=false>;
 } thing;
 
 

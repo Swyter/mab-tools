@@ -36,7 +36,12 @@ struct
     uint32 entry_no_a;
     uint32 entry_no_b;
     float scale[3];
-    uint32 cc;
+    enum <uint32> 
+    {
+        Prop = 0,
+        Entry = 1,
+        Item = 2
+    } type;
 } spr[head.spr_count] <optimize=false>;
 
 

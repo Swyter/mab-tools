@@ -18,12 +18,17 @@ struct
     char magic[4];
     int ver;
     int spr_count;
-    int pad;
 } head;
 
-
-struct
+struct spr_t
 {
+    enum <uint32> 
+    {
+        Prop = 0,
+        Entry = 1,
+        Item = 2
+    } type;
+
     uint32 id;
     uint32 unk  <format=hex>;
     float c[9];
@@ -36,15 +41,9 @@ struct
     uint32 entry_no_a;
     uint32 entry_no_b;
     float scale[3];
-    enum <uint32> 
-    {
-        Prop = 0,
-        Entry = 1,
-        Item = 2
-    } type;
-} spr[head.spr_count] <optimize=false>;
+} spr[head.spr_count] <optimize=false,read=sceneprop__Read>;
 
-
+uint32 tag;
 uint32 id;
 float ss[id*3];
 
@@ -56,3 +55,12 @@ uint32 ide;
 uint32 yy[ide * 5];     
 
 uint32 idu;
+
+
+string sceneprop__Read(struct spr_t &m)
+{
+    if (m.type == Prop || m.type == Item)
+        return EnumToString(m.type) + " -- " + m.str;
+    else
+        return EnumToString(m.type) + " ** ";
+};

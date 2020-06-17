@@ -78,7 +78,7 @@ uint32 idu;
 
 
 FSeek(0xe8f5); // tldmod\SceneObj\scn_cair_andros_center.sco
-FSeek(0x83d8); // MountBlade Warband\Modules\Native\SceneObj\scn_town_13_center.sco
+//FSeek(0x83d8); // MountBlade Warband\Modules\Native\SceneObj\scn_town_13_center.sco
 struct
 {
     char magic[4]; /* ¦ÑJÿ */
@@ -95,8 +95,11 @@ struct
         uint32 enabled;
         if (enabled)
         {
+            struct {
+            uint32 elem_thing;
             uint32 elem_count;
-            uint32 elem[elem_count];
+            char elem[elem_count];
+            } blockb[49] <optimize=false>;
         }
     } block[b] <optimize=false>;
 } thing;

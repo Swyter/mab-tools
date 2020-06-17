@@ -41,7 +41,7 @@ struct obj
     float mtx_row_b[3];
     float mtx_row_c[3];
     float pos[3]; /* translation; x, y, z */
-    int str_size;
+    uint32 str_size;
     char str[str_size];
     uint32 entry_no;
     uint32 menu_item_no;
@@ -52,7 +52,6 @@ struct obj
 
 uint32 tag;
 uint32 id;
-
 struct
 {
     float a;
@@ -62,12 +61,43 @@ struct
 
 
 uint32 ido;
-uint32 tt[ido * 5];            
+struct
+{
+    uint32 a;
+    uint32 b;
+    uint32 c;
+    uint32 d;
+    uint32 e;
+} tt[ido];
+
 
 uint32 ide;
-uint32 yy[ide * 5];     
+uint32 yy[ide * 10];     
 
 uint32 idu;
+
+
+FSeek(0xe8f5);
+struct
+{
+    char magic[4]; /* ¦ÑJÿ */
+    uint32 a;
+    uint32 b;
+    uint32 c;
+    uint32 da;
+    uint32 da;
+
+    struct named_block
+    {
+        uint32 str_size;
+        char str[str_size];
+    uint32 a;
+    uint32 b;
+    uint32 c;
+    uint32 da;
+    uint32 da;
+    } block;
+} thing;
 
 
 

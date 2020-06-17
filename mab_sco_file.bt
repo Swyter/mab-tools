@@ -26,11 +26,16 @@ struct
 {
     uint32 id;
     uint32 unk  <format=hex>;
-    float c[12];
+    float c[9];
+    struct 
+    {
+        float x,y,z;    
+    } pos;
     int str_size;
     char str[str_size];//[0x15];
-    uint32 bb;
-    float scale[4];
+    uint32 entry_no_a;
+    uint32 entry_no_b;
+    float scale[3];
     uint32 cc;
 } spr[head.spr_count] <optimize=false>;
 

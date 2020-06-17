@@ -18,15 +18,17 @@ struct
     char magic[4];
     int ver;
     int spr_count;
-} head;
+} head <open=true>;
 
 struct spr_t
 {
     enum <uint32> 
     {
-        Prop = 0,
-        Entry = 1,
-        Item = 2
+        Prop    = 0, /* Scene Prop */
+        Entry   = 1, /* Entry Point */
+        Item    = 2, /* Item Kind */
+        Plant   = 4, /* Flora */
+        Passage = 5
     } type;
 
     uint32 id;
@@ -37,9 +39,9 @@ struct spr_t
         float x,y,z;    
     } pos;
     int str_size;
-    char str[str_size];//[0x15];
-    uint32 entry_no_a;
-    uint32 entry_no_b;
+    char str[str_size];
+    uint32 entry_no;
+    uint32 menu_item_no;
     float scale[3];
 } spr[head.spr_count] <optimize=false,read=sceneprop__Read>;
 
@@ -57,10 +59,18 @@ uint32 yy[ide * 5];
 uint32 idu;
 
 
+
+string UIntToStr()
+{}
+
 string sceneprop__Read(struct spr_t &m)
 {
-    if (m.type == Prop || m.type == Item)
+    string s_entry; SPrintf(s_entry, "%d\n", m.entry_no);
+    string s_passa; SPrintf(s_passa, "%d\n", m.menu_item_no);
+    if (m.type == Prop || m.type == Item || m.type == Plant)
         return EnumToString(m.type) + " -- " + m.str;
+    else if (m.type == Entry)
+        return EnumToString(m.type) + " point number " + s_entry;
     else
-        return EnumToString(m.type) + " ** ";
+        return EnumToString(m.type) + " for menu item " + s_passa;
 };

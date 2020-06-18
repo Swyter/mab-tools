@@ -99,7 +99,7 @@ struct
             uint32 elem_thing;
             uint32 elem_count;
             char elem[elem_count];
-            } blockb[49] <optimize=false>;
+            } blockb[600] <optimize=false>;
         }
     } block[b] <optimize=false>;
 } thing;

@@ -4,7 +4,7 @@
 //      File: Mount&Blade Scene Object file
 //   Authors: Swyter
 //   Version: 2020.06.17
-//   Purpose: Opens scene files on M&B 1.011 and Warband
+//   Purpose: Opens scene files (SceneObj/scn_*.sco) on M&B 1.011 and Warband
 //  Category: Game
 // File Mask: *.sco
 //  ID Bytes: 33 FD FF FF
@@ -15,38 +15,52 @@ LittleEndian();
 
 struct
 {
-    char magic[4];
-    int  version;
-    int  object_count;
-} head <open=true>;
+    char magic[4];      /* swy: '3ýÿÿ', or 33 FD FF FF */
+    int  version;       /* swy: always version 4 */
+    int  object_count;  /* swy: */
+} head <open=true, bgcolor=cDkRed>;
 
 struct obj
 {
-    enum <uint32> 
+    enum <uint32> /* swy: as shown in the edit mode scene editor combobox; same order */
     {
         Prop    = 0, /* Scene Prop */
         Entry   = 1, /* Entry Point */
         Item    = 2, /* Item Kind */
         Plant   = 4, /* Flora */
         Passage = 5
-    } type;
+    } type <bgcolor=cBlue>;
 
+    /* swy: the index from (ID_scene_props.py or ID_items.py) that (hopefully) matches the
+            string constant; depending on the object type */
     uint32 id;
+
+    /* swy: some kind of universal flag that depends on the game version? don't ask me */
     enum <uint32>
     {
         Const_MB = 0x930F6C4,
         Const_WB = 0x94AEF80
     } unk <format=hex>;
-    float mtx_row_a[3]; /* affine matrix; encodes rotation */
+
+    float mtx_row_a[3]; /* affine 3x3 row-major matrix; encodes rotation */
     float mtx_row_b[3];
     float mtx_row_c[3];
+
     float pos[3]; /* translation; x, y, z */
-    uint32 str_size;
-    char str[str_size];
+
+    /* swy: it's set to zero for things without constant; like entry points or passages
+            the constant hopefully should match the ID. Keep in mind that the game
+            doesn't seem to use this string field for retrieving anything, only
+            IDs, so they should be remapped manually after re-shuffling. */
+    uint32 str_size; char str[str_size] <fgcolor=cWhite, bgcolor=cDkBlue>;
+
+    /* swy: as shown in the edit mode scene editor; entry number is used for entry point indexes,
+            while the menu item is used to map passages to city menus */
     uint32 entry_no;
     uint32 menu_item_no;
-    float scale[3]; /* scaling multiplier, per axis; x, y, z*/
-} objects[head.object_count] <optimize=false,read=sceneprop__Read>;
+
+    float scale[3]; /* scaling multiplier, per axis; x, y, z */
+} objects[head.object_count] <optimize=false, read=sceneprop__Read>;
 
 
 

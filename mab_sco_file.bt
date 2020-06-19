@@ -86,7 +86,16 @@ struct
 
 
 uint32 ide;
-uint32 yy[ide * 10];     
+struct
+{
+    uint32 poly_count;
+    struct
+    {
+        uint a,b;
+    } elem[poly_count];
+
+     int a;
+} yy[ide] <optimize=false>;     
 
 uint32 idu;
 

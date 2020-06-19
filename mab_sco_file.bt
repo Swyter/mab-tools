@@ -88,7 +88,7 @@ struct
 uint32 ide;
 struct
 {
-    uint32 poly_count;
+    uint32 poly_count <bgcolor=cDkGreen>;
     struct
     {
         uint a,b;
@@ -106,10 +106,10 @@ FSeek(startof(next_section_rel_offset) + sizeof(int) + next_section_rel_offset);
 struct
 {
     char magic[4] <bgcolor=cDkRed>; /* ¦ÑJÿ / 0xff4ad1a6 / ground_paint_saved_magic */
-    uint32 a;
-    uint32 b;
-    uint32 c;
-    uint32 da;
+    uint32 relative_offset_to_end;
+    uint32 num_layers;
+    uint32 unk_a;
+    uint32 unk_b;
 
     struct named_block
     {
@@ -125,7 +125,7 @@ struct
             char elem[elem_count];
             } blockb[600] <optimize=false>;
         }
-    } block[b] <optimize=false>;
+    } block[num_layers] <optimize=false>;
 } thing;
 
 

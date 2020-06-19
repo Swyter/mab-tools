@@ -8,18 +8,18 @@
 //  Category: Game
 // File Mask: *.sco
 //  ID Bytes: 33 FD FF FF
-//   History: 
 //------------------------------------------------
 
 LittleEndian();
 
 struct
 {
-    char magic[4];      /* swy: '3ýÿÿ', or 33 FD FF FF */
+    char magic[4];      /* swy: '3ýÿÿ', or 33 FD FF FF. seemingly stored as `mnv this, #716` (-717) on Android */
     int  version;       /* swy: always version 4 */
-    int  object_count;  /* swy: */
+    int  object_count;  /* swy: number of scene/mission objects/props that follow */
 } head <open=true, bgcolor=cDkRed>;
 
+/* -- scene objects */
 struct obj
 {
     enum <uint32> /* swy: as shown in the edit mode scene editor combobox; same order */
@@ -40,9 +40,9 @@ struct obj
     {
         Const_MB = 0x930F6C4,
         Const_WB = 0x94AEF80
-    } unk <format=hex>;
+    } unk <format=hex>; /* swy: looking at the Site::save_site_objects() -> Mission_object::write(rglIO_Stream&) function decompilation, it seems to write weird uninitialized stack garbage */
 
-    float mtx_row_a[3]; /* affine 3x3 row-major matrix; encodes rotation */
+    float mtx_row_a[3]; /* affine 3x3 row-major matrix; encodes rotation (rglMat3) */
     float mtx_row_b[3];
     float mtx_row_c[3];
 
@@ -63,8 +63,8 @@ struct obj
 } objects[head.object_count] <optimize=false, read=sceneprop__Read>;
 
 
-
-uint32 tag;
+/* -- ai mesh vertices; probably */
+uint32 next_section_rel_offset;
 uint32 id;
 struct
 {
@@ -90,12 +90,13 @@ uint32 yy[ide * 10];
 
 uint32 idu;
 
-
-FSeek(0xe8f5); // tldmod\SceneObj\scn_cair_andros_center.sco
+/* -- ground layers */
+FSeek(startof(next_section_rel_offset) + sizeof(int) + next_section_rel_offset);
+//FSeek(0xe8f5); // tldmod\SceneObj\scn_cair_andros_center.sco
 //FSeek(0x83d8); // MountBlade Warband\Modules\Native\SceneObj\scn_town_13_center.sco
 struct
 {
-    char magic[4]; /* ¦ÑJÿ */
+    char magic[4] <bgcolor=cDkRed>; /* ¦ÑJÿ / 0xff4ad1a6 / ground_paint_saved_magic */
     uint32 a;
     uint32 b;
     uint32 c;
@@ -105,7 +106,7 @@ struct
     {
         uint32 index;
         uint32 str_size;
-        char str[str_size];
+        char str[str_size] <fgcolor=cWhite, bgcolor=cDkBlue>;
         uint32 enabled;
         if (enabled)
         {

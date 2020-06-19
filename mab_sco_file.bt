@@ -108,8 +108,8 @@ struct
     char magic[4] <bgcolor=cDkRed>; /* ¦ÑJÿ / 0xff4ad1a6 / ground_paint_saved_magic */
     uint32 relative_offset_to_end;
     uint32 num_layers;
-    uint32 unk_a;
-    uint32 unk_b;
+    uint32 size_x;
+    uint32 size_y;
 
     struct named_block
     {
@@ -120,15 +120,25 @@ struct
         if (enabled)
         {
             struct {
-            uint32 elem_thing;
-            uint32 elem_count;
+                uint32 rle;
+                uint32 elem_count;
             char elem[elem_count];
-            } blockb[600] <optimize=false>;
+            } blockb[90] <optimize=false>;
         }
     } block[num_layers] <optimize=false>;
 } thing;
 
-
+// sum of steppe blocks
+// >>> 5041 + 4 + 4
+// 5049
+// >>> (5041 + 4 + 4) / 2.
+// 2524.5
+// >>> 71*71
+// 5041
+// >>> (5041 + 4) / 2.
+// 2522.5
+// >>> math.sqrt(5041 + 4)
+// 71.02816342831905
 
 string UIntToStr(unsigned int e)
 {

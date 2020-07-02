@@ -24,13 +24,42 @@ struct texture
     } elem[object_count] <optimize=false>;
 };
 
+struct material
+{
+    uint object_count;
+
+    struct 
+    {
+        uint mat_name_len;
+        char mat_name[mat_name_len] <bgcolor=cSilver>;
+        int flag;
+
+        uint shader_name_len;
+        char shader_name[shader_name_len] <bgcolor=cSilver>;
+
+        uint texdiffuse_name_len;
+        char texdiffuse_name[texdiffuse_name_len] <bgcolor=cSilver>;
+        uint texa_name_len;
+        char texa_name[texa_name_len] <bgcolor=cSilver>;
+        uint texb_name_len;
+        char texb_name[texb_name_len] <bgcolor=cSilver>;
+        uint texc_name_len;
+        char texc_name[texc_name_len] <bgcolor=cSilver>;
+        uint texd_name_len;
+        char texd_name[texd_name_len] <bgcolor=cSilver>;
+        uint texe_name_len;
+        char texe_name[texe_name_len] <bgcolor=cSilver>;
+        uint thing[3];
+    } elem[object_count] <optimize=false>;
+};
+
 struct mesh
 {
-    uint object_count;  /* swy: number of scene/mission objects/props that follow */
+    uint object_count;
     struct
     {
-        uint32 tag_len;       /* swy: 4 */
-        char tag[tag_len] <bgcolor=cRed>;       /* swy: always version 4 */
+        uint32 tag_len;
+        char tag[tag_len] <bgcolor=cRed>;
         uint32 flag <format=hex>;
         uint mat_name_len;
         char mat_name[mat_name_len] <bgcolor=cSilver>;
@@ -70,11 +99,11 @@ struct mesh
 
 struct body
 {
-    uint object_count;  /* swy: number of scene/mission objects/props that follow */
+    uint object_count;
     struct
     {
-        uint32 tag_len;       /* swy: 4 */
-        char tag[tag_len];       /* swy: always version 4 */
+        uint32 tag_len;
+        char tag[tag_len];
 
         struct body_type
         {
@@ -106,16 +135,17 @@ struct body
     } body[object_count] <optimize=false>;
 };
 
-
+/* swy: iterate over all the posible BRF chunks */
 while (FTell() < FileSize())
 {
     struct brf_section
     {
         uint32 tag_len; char tag[tag_len] <bgcolor=cDkYellow>;
     
-             if (Stricmp(tag, "texture") == 0) struct texture tex <open=true, bgcolor=cDkGreen>;
-        else if (Stricmp(tag, "mesh"   ) == 0) struct mesh    mes <open=true, bgcolor=cDkRed>;
-        else if (Stricmp(tag, "body"   ) == 0) struct body    bod <open=true, bgcolor=cDkBlue>;
-        else if (Stricmp(tag, "end"    ) == 0);
+             if (Stricmp(tag, "texture" ) == 0) struct texture  tex <open=true, bgcolor=cWhite>;
+             if (Stricmp(tag, "material") == 0) struct material mat <open=true, bgcolor=cDkGreen>;
+        else if (Stricmp(tag, "mesh"    ) == 0) struct mesh     mes <open=true, bgcolor=cDkRed>;
+        else if (Stricmp(tag, "body"    ) == 0) struct body     bod <open=true, bgcolor=cDkBlue>;
+        else if (Stricmp(tag, "end"     ) == 0);
     } section <optimize=false>;
 }

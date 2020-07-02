@@ -35,8 +35,15 @@ struct
         struct
         {
             //char a[36 - (4*8)];
-            int thing;
-            int thong;
+            int pos_idx;
+            union
+            {
+              uint color <format=hex>;
+              struct
+              {
+                ubyte r,g,b,a;
+              } components;
+            } rgb;
             float  v, t, i, a, c, n, b;
         } vtx[vtx_cnt];
 

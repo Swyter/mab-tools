@@ -90,7 +90,7 @@ struct mesh
         } pos[pos_cnt];
 
         uint bone_count;
-        if (bone_count)
+        if (bone_count) /* swy: todo; FIXME */
         {
             uint twelve, b;
             struct
@@ -101,7 +101,7 @@ struct mesh
         }
 
         uint extra_frames;
-        if (extra_frames)
+        if (extra_frames) /* swy: todo; FIXME */
         {
             uint time;
             uint pos_cnt_;
@@ -149,9 +149,11 @@ struct skel
         uint32 bone_count; /* swy: humans have 20 bones, while mounts have 28 */
         struct
         {
-            int idx;
+            int parent_idx;
             rgltag bone_name <bgcolor=cSilver>;
-            float quaternion[4 + 9];
+            int flag_zero; /* swy: seems unused, I think :) */
+            float local_transform_matrix[9];
+            float x, z, y;
         } bon[bone_count] <optimize=false>;
     } elem[object_count] <optimize=false, read=read_skl>;
 };
@@ -163,8 +165,8 @@ struct skel_ani
     {
         rgltag mesh_name <bgcolor=cRed>;
         uint32 bone_count; /* swy: humans have 20 bones, while mounts have 28 */
-        struct
-        {
+        struct /* swy: bind/T pose bones, in local space; every bone has a parent bone, */
+        {      /*      except the root, whose parent is (-1). transform relatively and translate. */
             uint32 frames;
             struct
             {

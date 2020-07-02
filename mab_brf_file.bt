@@ -140,6 +140,21 @@ struct mesh
     } elem[object_count] <optimize=false, read=read_mesh>;
 };
 
+struct skel
+{
+    uint object_count;
+    struct skl_t
+    {
+        rgltag mesh_name <bgcolor=cRed>;
+        uint32 bone_count; /* swy: humans have 20 bones, while mounts have 28 */
+        struct
+        {
+            int idx;
+            rgltag bone_name <bgcolor=cSilver>;
+            float quaternion[4 + 9];
+        } bon[bone_count] <optimize=false>;
+    } elem[object_count] <optimize=false, read=read_skl>;
+};
 
 struct skel_ani
 {
@@ -222,6 +237,7 @@ while (FTell() < FileSize())
         else if (Stricmp(tag.s, "shader"       ) == 0) struct shader   sha <open=true, bgcolor=cWhite>;
         else if (Stricmp(tag.s, "material"     ) == 0) struct material mat <open=true, bgcolor=cDkGreen>;
         else if (Stricmp(tag.s, "mesh"         ) == 0) struct mesh     mes <open=true, bgcolor=cDkRed>;
+        else if (Stricmp(tag.s, "skeleton"     ) == 0) struct skel     skl <open=true, bgcolor=cDkRed>;
         else if (Stricmp(tag.s, "skeleton_anim") == 0) struct skel_ani ska <open=true, bgcolor=cDkRed>;
         else if (Stricmp(tag.s, "body"         ) == 0) struct body     bod <open=true, bgcolor=cDkBlue>;
         else if (Stricmp(tag.s, "end"          ) == 0);
@@ -242,6 +258,10 @@ string read_mat(struct mat_t& _thing)
     return "- " + _thing.mat_name.s;
 }
 string read_mesh(struct mesh_t& _thing)
+{
+    return "* " + _thing.mesh_name.s;
+}
+string read_skl(struct skl_t& _thing)
 {
     return "* " + _thing.mesh_name.s;
 }

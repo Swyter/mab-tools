@@ -51,7 +51,7 @@ struct shader
         {
             uint map, color_op, alpha_op, flag;
         }entry[count];
-    } elem[object_count] <optimize=false, read=read_tex>;
+    } elem[object_count] <optimize=false, read=read_sha>;
 };
 
 struct material
@@ -140,6 +140,23 @@ struct mesh
     } elem[object_count] <optimize=false, read=read_mesh>;
 };
 
+
+struct skel_ani
+{
+    uint object_count;
+    struct ska_t
+    {
+        rgltag mesh_name <bgcolor=cRed>;
+        uint32 bone, frames;
+        struct
+        {
+            uint idx;
+            float thia[4];
+        } a[bone * 4];
+        rgltag mat_name <bgcolor=cSilver>;
+    } elem[object_count] <optimize=false, read=read_ska>;
+};
+
 struct body
 {
     uint object_count;
@@ -184,17 +201,22 @@ while (FTell() < FileSize())
     {
         rgltag tag <bgcolor=cDkYellow>;
     
-             if (Stricmp(tag.s, "texture" ) == 0) struct texture  tex <open=true, bgcolor=cWhite>;
-             if (Stricmp(tag.s, "shader"  ) == 0) struct shader   sha <open=true, bgcolor=cWhite>;
-             if (Stricmp(tag.s, "material") == 0) struct material mat <open=true, bgcolor=cDkGreen>;
-        else if (Stricmp(tag.s, "mesh"    ) == 0) struct mesh     mes <open=true, bgcolor=cDkRed>;
-        else if (Stricmp(tag.s, "body"    ) == 0) struct body     bod <open=true, bgcolor=cDkBlue>;
-        else if (Stricmp(tag.s, "end"     ) == 0);
+             if (Stricmp(tag.s, "texture"      ) == 0) struct texture  tex <open=true, bgcolor=cWhite>;
+        else if (Stricmp(tag.s, "shader"       ) == 0) struct shader   sha <open=true, bgcolor=cWhite>;
+        else if (Stricmp(tag.s, "material"     ) == 0) struct material mat <open=true, bgcolor=cDkGreen>;
+        else if (Stricmp(tag.s, "mesh"         ) == 0) struct mesh     mes <open=true, bgcolor=cDkRed>;
+        else if (Stricmp(tag.s, "skeleton_anim") == 0) struct skel_ani ska <open=true, bgcolor=cDkRed>;
+        else if (Stricmp(tag.s, "body"         ) == 0) struct body     bod <open=true, bgcolor=cDkBlue>;
+        else if (Stricmp(tag.s, "end"          ) == 0);
     } section <optimize=false, open=true, read=read_brf>;
 }
 
 
 string read_tex(struct tex_t& _thing)
+{
+    return "- " + _thing.tex_name.s;
+}
+string read_sha(struct sha_t& _thing)
 {
     return "- " + _thing.tex_name.s;
 }
@@ -206,7 +228,10 @@ string read_mesh(struct mesh_t& _thing)
 {
     return "* " + _thing.mesh_name.s;
 }
-
+string read_ska(struct ska_t& _thing)
+{
+    return "* " + _thing.mesh_name.s;
+}
 wstring read_body(struct body_t& _thing)
 {
     return "- " + _thing.body_name.s;

@@ -194,13 +194,17 @@ struct body
             {
                 float radius, x,z,y, x,z,y; uint flag <format=hex>;
             }
-            else if (Stricmp(body_type.s, "manifold") == 0)
+            else if (Stricmp(body_type.s, "face") == 0) /* swy: only ever used in bo_mesh_passage, as far as I know */
             {
-                uint vtx_elem;
-                struct { float xyz[3]; } vtx[vtx_elem];
+                uint vtx_count; struct { float x, z, y; } vtx[vtx_count]; uint flag <format=hex>;
+            }
+            else if (Stricmp(body_type.s, "manifold") == 0) /* swy: admits quad and triangle soups (maybe even arbitrary polygons?) */
+            {
+                uint vtx_count;
+                struct { float x, z, y; } vtx[vtx_count];
 
                 uint poly_elem;
-                struct { int minus_one, unk_zero, vtx_idx_cnt; uint vtx_idx[vtx_idx_cnt]; } poly[poly_elem] <optimize=false>;
+                struct { int minus_one, unk_zero, vtx_count; uint vtx_idx[vtx_count]; } poly[poly_elem] <optimize=false>;
             }
         } body <optimize=false>;
     } elem[object_count] <optimize=false, read=read_body>;

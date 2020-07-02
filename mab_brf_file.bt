@@ -42,14 +42,14 @@ struct shader
     {
         rgltag tex_name <bgcolor=cSilver>;
         uint32 flag <format=hex>;
-        int thing;
-        rgltag technique;
+        uint unk_zero;
+        rgltag technique; /* swy: originally the HLSL technique name in mb.fx, later also mapped to GLShaders/techniques.xml for GLSL program binding on the OpenGL backend used for Linux, macOS and Android */
         uint alt_count; /* swy: alt shader names, used as fallback, generally zero or one */
         struct { rgltag t; } alt[alt_count];
         uint count;
         struct
         {
-            uint map, color_op, alpha_op, flag;
+            int map; uint color_op, alpha_op, flag;
         }entry[count];
     } elem[object_count] <optimize=false, read=read_sha>;
 };
@@ -147,7 +147,7 @@ struct skel_ani
     struct ska_t
     {
         rgltag mesh_name <bgcolor=cRed>;
-        uint32 bone_count;
+        uint32 bone_count; /* swy: humans have 20 bones, while mounts have 24 */
         struct
         {
             uint32 frames;

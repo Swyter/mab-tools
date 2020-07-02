@@ -12,15 +12,25 @@
 
 LittleEndian();
 
+typedef struct
+{
+    uint tag_len;
+    char tag[tag_len];
+} rgltag <read=read_rgltag>;
+
+string read_rgltag(struct rgltag& _thing)
+{
+    return _thing.tag;
+}
+
 struct texture
 {
     uint object_count;
 
     struct 
     {
-        uint tex_name_len;
-        char tex_name[tex_name_len] <bgcolor=cSilver>;
-        int flag;
+        rgltag tex_name <bgcolor=cSilver>;
+        uint32 flag <format=hex>;
     } elem[object_count] <optimize=false>;
 };
 
@@ -30,25 +40,18 @@ struct material
 
     struct 
     {
-        uint mat_name_len;
-        char mat_name[mat_name_len] <bgcolor=cSilver>;
-        int flag;
+        rgltag mat_name <bgcolor=cSilver>;
+        uint32 flag <format=hex>;
 
         uint shader_name_len;
         char shader_name[shader_name_len] <bgcolor=cSilver>;
 
-        uint texdiffuse_name_len;
-        char texdiffuse_name[texdiffuse_name_len] <bgcolor=cSilver>;
-        uint texa_name_len;
-        char texa_name[texa_name_len] <bgcolor=cSilver>;
-        uint texb_name_len;
-        char texb_name[texb_name_len] <bgcolor=cSilver>;
-        uint texc_name_len;
-        char texc_name[texc_name_len] <bgcolor=cSilver>;
-        uint texd_name_len;
-        char texd_name[texd_name_len] <bgcolor=cSilver>;
-        uint texe_name_len;
-        char texe_name[texe_name_len] <bgcolor=cSilver>;
+        rgltag texdiffuse_name <bgcolor=cSilver>;
+        rgltag texa_name;
+        rgltag texb_name;
+        rgltag texc_name;
+        rgltag texd_name;
+        rgltag texe_name;
         uint thing[3];
     } elem[object_count] <optimize=false>;
 };
@@ -58,11 +61,9 @@ struct mesh
     uint object_count;
     struct
     {
-        uint32 tag_len;
-        char tag[tag_len] <bgcolor=cRed>;
+        rgltag tag <bgcolor=cRed>;
         uint32 flag <format=hex>;
-        uint mat_name_len;
-        char mat_name[mat_name_len] <bgcolor=cSilver>;
+        rgltag mat_name <bgcolor=cSilver>;
         uint pos_cnt;
         struct 
         {

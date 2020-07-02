@@ -59,6 +59,13 @@ struct
     } mesh[object_count] <optimize=false>;
 } mesh <open=true, bgcolor=cDkRed>;
 
+
+struct body_sphere
+{
+    float x, y, z;
+    float radius;
+};
+
 struct
 {
     uint32 tag_len;       /* swy: 4 */
@@ -79,11 +86,11 @@ struct
 
                  if (Stricmp(body_type, "capsule") == 0)
             {
-                float lol[7]; int pad;
+                struct body_sphere a, b;
             }
             else if (Stricmp(body_type, "sphere") == 0)
             {
-                float lol[4]; int pad;
+                struct body_sphere a; int pad;
             }
             else if (Stricmp(body_type, "manifold") == 0)
             {

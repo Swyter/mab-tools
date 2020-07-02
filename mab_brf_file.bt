@@ -147,7 +147,7 @@ struct skel_ani
     struct ska_t
     {
         rgltag mesh_name <bgcolor=cRed>;
-        uint32 bone_count; /* swy: humans have 20 bones, while mounts have 24 */
+        uint32 bone_count; /* swy: humans have 20 bones, while mounts have 28 */
         struct
         {
             uint32 frames;
@@ -156,7 +156,7 @@ struct skel_ani
                 uint idx;
                 float quaternion[4];
             } a[frames];
-        } bon[bone_count];
+        } bon[bone_count] <optimize=false>;
 
         struct
         {

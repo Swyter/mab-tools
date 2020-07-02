@@ -23,6 +23,19 @@ string read_rgltag(struct rgltag& _thing)
     return _thing.s;
 }
 
+local uint is_wb_brf = false;
+
+struct rfver
+{
+    enum <uint32>
+    {
+        Warband = 1, /* swy: there's no version zero, Warband introduced the rfver tag at 1, */
+    } res_file_version_tag; /*             and Bannerlord uses a different format altogether. */
+
+    if (res_file_version_tag == Warband)
+        is_wb_brf = true;
+};
+
 struct texture
 {
     uint object_count;
@@ -235,6 +248,7 @@ while (FTell() < FileSize())
     {
         rgltag tag <bgcolor=cDkYellow>;
     
+             if (Stricmp(tag.s, "rfver "       ) == 0) struct rfver    ver <open=true, bgcolor=cWhite>; /* swy: versioning chunk prefixing pseudo-header introduced in Warband */
              if (Stricmp(tag.s, "texture"      ) == 0) struct texture  tex <open=true, bgcolor=cWhite>;
         else if (Stricmp(tag.s, "shader"       ) == 0) struct shader   sha <open=true, bgcolor=cWhite>;
         else if (Stricmp(tag.s, "material"     ) == 0) struct material mat <open=true, bgcolor=cDkGreen>;
@@ -246,7 +260,10 @@ while (FTell() < FileSize())
     } section <optimize=false, open=true, read=read_brf>;
 }
 
-
+string read_ver(struct ver_t& _thing)
+{
+    return "- " + _thing.tex_name.s;
+}
 string read_tex(struct tex_t& _thing)
 {
     return "- " + _thing.tex_name.s;

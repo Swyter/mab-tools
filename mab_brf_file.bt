@@ -27,18 +27,18 @@ struct texture
 {
     uint object_count;
 
-    struct 
+    struct tex_t
     {
         rgltag tex_name <bgcolor=cSilver>;
         uint32 flag <format=hex>;
-    } elem[object_count] <optimize=false>;
+    } elem[object_count] <optimize=false, read=read_tex>;
 };
 
 struct material
 {
     uint object_count;
 
-    struct 
+    struct mat_t
     {
         rgltag mat_name <bgcolor=cSilver>;
         uint32 flag <format=hex>;
@@ -52,7 +52,7 @@ struct material
         rgltag specular;
         float coeff;
         float spec_r, spec_g, spec_b;
-    } elem[object_count] <optimize=false>;
+    } elem[object_count] <optimize=false, read=read_mat>;
 };
 
 struct mesh
@@ -60,7 +60,7 @@ struct mesh
     uint object_count;
     struct mesh_t
     {
-        rgltag tag <bgcolor=cRed>;
+        rgltag mesh_name <bgcolor=cRed>;
         uint32 flag <format=hex>;
         rgltag mat_name <bgcolor=cSilver>;
         uint pos_cnt;
@@ -107,7 +107,7 @@ struct mesh
         {
             int a[3];
         } tri[tri_cnt];
-    } mesh[object_count] <optimize=false, read=read_mesh>;
+    } elem[object_count] <optimize=false, read=read_mesh>;
 };
 
 struct body
@@ -115,7 +115,7 @@ struct body
     uint object_count;
     struct body_t
     {
-        rgltag tag;
+        rgltag body_name;
 
         struct body_type
         {
@@ -143,7 +143,7 @@ struct body
                 struct { int minus_one, unk_zero, vtx_idx_cnt; uint vtx_idx[vtx_idx_cnt]; } poly[poly_elem] <optimize=false>;
             }
         } body <optimize=false>;
-    } body[object_count] <optimize=false, read=read_body>;
+    } elem[object_count] <optimize=false, read=read_body>;
 };
 
 
@@ -163,13 +163,20 @@ while (FTell() < FileSize())
 }
 
 
-
+string read_tex(struct tex_t& _thing)
+{
+    return _thing.tex_name.s;
+}
+string read_mat(struct mat_t& _thing)
+{
+    return _thing.mat_name.s;
+}
 string read_mesh(struct mesh_t& _thing)
 {
-    return _thing.tag.s;
+    return _thing.mesh_name.s;
 }
 
 string read_body(struct body_t& _thing)
 {
-    return _thing.tag.s;
+    return _thing.body_name.s;
 }

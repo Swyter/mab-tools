@@ -3,11 +3,11 @@
 //
 //      File: Mount&Blade Binary Resource File
 //   Authors: Swyter
-//   Version: 2020.07.11
+//   Version: 2020.07.01
 //   Purpose: Opens M&B 1.011 and Warband BRF files (Resource/*.brf)
 //  Category: Game
 // File Mask: *.brf
-//  ID Bytes: 33 FD FF FF
+//  ID Bytes: 
 //------------------------------------------------
 
 LittleEndian();
@@ -58,7 +58,7 @@ struct material
 struct mesh
 {
     uint object_count;
-    struct
+    struct mesh_t
     {
         rgltag tag <bgcolor=cRed>;
         uint32 flag <format=hex>;
@@ -72,7 +72,20 @@ struct mesh
         uint extra_frames;
 
         if (extra_frames)
+        {
             uint time;
+            uint pos_cnt_;
+            struct 
+            {
+                float x, y, z;
+            } pos_[pos_cnt_];
+
+            uint pos_cnt__;
+            struct 
+            {
+                float x, y, z;
+            } pos__[pos_cnt__];
+        }
         uint vtx_cnt;
         struct
         {
@@ -94,13 +107,13 @@ struct mesh
         {
             int a[3];
         } tri[tri_cnt];
-    } mesh[object_count] <optimize=false>;
+    } mesh[object_count] <optimize=false, read=read_mesh>;
 };
 
 struct body
 {
     uint object_count;
-    struct
+    struct body_t
     {
         rgltag tag;
 
@@ -110,7 +123,7 @@ struct body
 
             if      (Stricmp(body_type.s, "composite") == 0)
             {
-                uint composite_cnt;
+                uint composite_cnt; /* swy: recursive thingie; contains a number of other sphere/capsule/manifold items */
                 struct body_type composite[composite_cnt] <optimize=false>;
             }
             else if (Stricmp(body_type.s, "sphere") == 0)
@@ -130,7 +143,7 @@ struct body
                 struct { int minus_one, unk_zero, vtx_idx_cnt; uint vtx_idx[vtx_idx_cnt]; } poly[poly_elem] <optimize=false>;
             }
         } body <optimize=false>;
-    } body[object_count] <optimize=false>;
+    } body[object_count] <optimize=false, read=read_body>;
 };
 
 
@@ -147,4 +160,16 @@ while (FTell() < FileSize())
         else if (Stricmp(tag.s, "body"    ) == 0) struct body     bod <open=true, bgcolor=cDkBlue>;
         else if (Stricmp(tag.s, "end"     ) == 0);
     } section <optimize=false>;
+}
+
+
+
+string read_mesh(struct mesh_t& _thing)
+{
+    return _thing.tag.s;
+}
+
+string read_body(struct body_t& _thing)
+{
+    return _thing.tag.s;
 }

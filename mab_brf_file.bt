@@ -34,9 +34,10 @@ struct
         uint triangle_cnt;
         struct
         {
-            char a[36 - (4*8)];
-
-            float b, v, t, i, a, c, n, b;
+            //char a[36 - (4*8)];
+            int thing;
+            int thong;
+            float  v, t, i, a, c, n, b;
         } triangle[triangle_cnt];
 
         int cnt;

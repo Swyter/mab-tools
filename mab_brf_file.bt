@@ -44,11 +44,12 @@ struct shader
         uint32 flag <format=hex>;
         int thing;
         rgltag technique;
-        uint unk;
+        uint alt_count; /* swy: alt shader names, used as fallback, generally zero or one */
+        struct { rgltag t; } alt[alt_count];
         uint count;
         struct
         {
-            uint a,b,c,d;
+            uint map, color_op, alpha_op, flag;
         }entry[count];
     } elem[object_count] <optimize=false, read=read_tex>;
 };

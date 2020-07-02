@@ -32,10 +32,12 @@ struct
         } pos[pos_cnt];
         uint unk_zero;
         uint extra_frames;
+
+        if (extra_frames)
+            uint time;
         uint vtx_cnt;
         struct
         {
-            //char a[36 - (4*8)];
             int pos_idx;
             union
             {
@@ -46,7 +48,7 @@ struct
               } components;
             } rgb;
             float  n_a, n_b, n_c, x_a, x_b, y_a, y_b;
-        } vtx[vtx_cnt];
+        } vtx[vtx_cnt * (extra_frames + 1)];
 
         int tri_cnt;
 
@@ -55,153 +57,32 @@ struct
             int a[3];
         } tri[tri_cnt];
     } mesh[object_count] <optimize=false>;
-} head <open=true, bgcolor=cDkRed>;
+} mesh <open=true, bgcolor=cDkRed>;
 
-/* -- scene objects */
-struct obj
-{
-    enum <uint32> /* swy: as shown in the edit mode scene editor combobox; same order */
-    {
-        Prop    = 0, /* Scene Prop */
-        Entry   = 1, /* Entry Point */
-        Item    = 2, /* Item Kind */
-        Plant   = 4, /* Flora */
-        Passage = 5
-    } type <bgcolor=cBlue>;
-
-    /* swy: the index from (ID_scene_props.py or ID_items.py) that (hopefully) matches the
-            string constant; depending on the object type */
-    uint32 id;
-
-    /* swy: some kind of universal flag that depends on the game version? don't ask me */
-    enum <uint32>
-    {
-        Const_MB = 0x930F6C4,
-        Const_WB = 0x94AEF80
-    } unk <format=hex>; /* swy: looking at the Site::save_site_objects() -> Mission_object::write(rglIO_Stream&) function decompilation, it seems to write weird uninitialized stack garbage */
-
-    float mtx_row_a[3]; /* affine 3x3 row-major matrix; encodes rotation (rglMat3) */
-    float mtx_row_b[3];
-    float mtx_row_c[3];
-
-    float pos[3]; /* translation; x, y, z */
-
-    /* swy: it's set to zero for things without constant; like entry points or passages
-            the constant hopefully should match the ID. Keep in mind that the game
-            doesn't seem to use this string field for retrieving anything, only
-            IDs, so they should be remapped manually after re-shuffling. */
-    uint32 str_size; char str[str_size] <fgcolor=cWhite, bgcolor=cDkBlue>;
-
-    /* swy: as shown in the edit mode scene editor; entry number is used for entry point indexes,
-            while the menu item is used to map passages to city menus */
-    uint32 entry_no;
-    uint32 menu_item_no;
-
-    float scale[3]; /* scaling multiplier, per axis; x, y, z */
-} objects[head.object_count] <optimize=false, read=sceneprop__Read>;
-
-
-/* -- ai mesh vertices; probably */
-uint32 next_section_rel_offset;
-uint32 id;
 struct
 {
-    float a;
-    float b;
-    float height;
-} ss[id];
+    uint32 tag_len;       /* swy: 4 */
+    char tag[tag_len];       /* swy: always version 4 */
+    int  object_count;  /* swy: number of scene/mission objects/props that follow */
 
-
-uint32 ido;
-struct
-{
-    uint32 a;
-    uint32 b;
-    uint32 c;
-    uint32 d;
-    uint32 e;
-} tt[ido];
-
-
-uint32 ide;
-struct
-{
-    uint32 poly_count <bgcolor=cDkGreen>;
     struct
     {
-        uint a,b;
-    } elem[poly_count];
-
-     int a;
-} yy[ide] <optimize=false>;     
-
-uint32 idu;
-
-/* -- ground layers */
-FSeek(startof(next_section_rel_offset) + sizeof(int) + next_section_rel_offset);
-//FSeek(0xe8f5); // tldmod\SceneObj\scn_cair_andros_center.sco
-//FSeek(0x83d8); // MountBlade Warband\Modules\Native\SceneObj\scn_town_13_center.sco
-struct
-{
-    char magic[4] <bgcolor=cDkRed>; /* ¦ÑJÿ / 0xff4ad1a6 / ground_paint_saved_magic */
-    uint32 relative_offset_to_end;
-    uint32 num_layers;
-    uint32 scene_width;
-    uint32 scene_height;
-
-    local uint block_count = scene_width * scene_height;
-
-    struct named_block
-    {
-        uint32 index;
-        uint32 str_size;
-        char str[str_size] <fgcolor=cWhite, bgcolor=cDkBlue>;
-        uint32 enabled;
-
-        if (enabled)
+        uint32 tag_len;       /* swy: 4 */
+        char tag[tag_len];       /* swy: always version 4 */
+        uint body_type_len;
+        char body_type[body_type_len];
+        uint composite_cnt;
+        struct 
         {
-            local int remaining_blocks = block_count;
-            do {
-            struct
-            {
-                uint32 rle;
-                uint32 elem_count;
+            uint body_type_len;
+            char body_type[body_type_len];
 
-                Printf("remaining_blocks = %u -= (%u + %u == %u)\n", remaining_blocks, rle, elem_count, rle + elem_count);
-    
-                remaining_blocks -= rle + elem_count;
-
-                char elem[elem_count];
-            } blockb[1] <optimize=false>;
-            }while(remaining_blocks > 0);
-
-        }
-    } block[num_layers] <optimize=false>;
-} thing;
-
-// sum of steppe blocks
-// >>> 5041 + 4 + 4
-// 5049
-// >>> (5041 + 4 + 4) / 2.
-// 2524.5
-// >>> 71*71
-// 5041
-// >>> (5041 + 4) / 2.
-// 2522.5
-// >>> math.sqrt(5041 + 4)
-// 71.02816342831905
-
-string UIntToStr(unsigned int e)
-{
-    string s; SPrintf(s, "%d", e); return s;
-}
-
-string sceneprop__Read(struct obj &m)
-{
-         if (m.type == Prop ||
-             m.type == Item ||
-             m.type == Plant)   return EnumToString(m.type) + " -- " + m.str;
-    else if (m.type == Entry)   return EnumToString(m.type) + " point ["  + UIntToStr(m.entry_no) + "]";
-    else if (m.type == Passage) return EnumToString(m.type) + " for menu item " + UIntToStr(m.menu_item_no);
-    else                        return EnumToString(m.type);
-};
+            if (Stricmp(body_type, "capsule") == 0)
+                float lol[8];
+            if (Stricmp(body_type, "sphere") == 0)
+                float lol[8];
+            else
+                float llolol;
+        } composite[composite_cnt] <optimize=false>;
+    } body[object_count] <optimize=false>;
+} body;

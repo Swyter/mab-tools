@@ -14,12 +14,19 @@ LittleEndian();
 
 struct texture
 {
-    int a;
+    uint object_count;
+
+    struct 
+    {
+        uint tex_name_len;
+        char tex_name[tex_name_len] <bgcolor=cSilver>;
+        int flag;
+    } elem[object_count] <optimize=false>;
 };
 
 struct mesh
 {
-    int  object_count;  /* swy: number of scene/mission objects/props that follow */
+    uint object_count;  /* swy: number of scene/mission objects/props that follow */
     struct
     {
         uint32 tag_len;       /* swy: 4 */
@@ -63,7 +70,7 @@ struct mesh
 
 struct body
 {
-    int  object_count;  /* swy: number of scene/mission objects/props that follow */
+    uint object_count;  /* swy: number of scene/mission objects/props that follow */
     struct
     {
         uint32 tag_len;       /* swy: 4 */
@@ -104,12 +111,11 @@ while (FTell() < FileSize())
 {
     struct brf_section
     {
-        uint32 tag_len;
-        char tag[tag_len] <bgcolor=cDkYellow>;
+        uint32 tag_len; char tag[tag_len] <bgcolor=cDkYellow>;
     
-             if (Stricmp(tag, "texture") == 0) struct texture tex;
-        else if (Stricmp(tag, "mesh"   ) == 0) struct mesh mes<open=true, bgcolor=cDkRed>;
-        else if (Stricmp(tag, "body"   ) == 0) struct body bod<open=true, bgcolor=cDkBlue>;
+             if (Stricmp(tag, "texture") == 0) struct texture tex <open=true, bgcolor=cDkGreen>;
+        else if (Stricmp(tag, "mesh"   ) == 0) struct mesh    mes <open=true, bgcolor=cDkRed>;
+        else if (Stricmp(tag, "body"   ) == 0) struct body    bod <open=true, bgcolor=cDkBlue>;
         else if (Stricmp(tag, "end"    ) == 0);
     } section <optimize=false>;
 }

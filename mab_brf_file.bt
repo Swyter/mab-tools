@@ -148,11 +148,16 @@ struct skel_ani
     {
         rgltag mesh_name <bgcolor=cRed>;
         uint32 bone, frames;
+
         struct
         {
-            uint idx;
-            float thia[4];
-        } a[bone * 4];
+            struct
+            {
+                uint idx;
+                float quaternion[4];
+            } a[frames];
+            uint unk;
+        } bon[bone];
         rgltag mat_name <bgcolor=cSilver>;
     } elem[object_count] <optimize=false, read=read_ska>;
 };

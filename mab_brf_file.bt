@@ -15,16 +15,16 @@ LittleEndian();
 struct
 {
     uint32 tag_len;       /* swy: 4 */
-    char tag[tag_len];       /* swy: always version 4 */
+    char tag[tag_len] <bgcolor=cDkYellow>;       /* swy: always version 4 */
     int  object_count;  /* swy: number of scene/mission objects/props that follow */
 
     struct
     {
         uint32 tag_len;       /* swy: 4 */
-        char tag[tag_len];       /* swy: always version 4 */
+        char tag[tag_len] <bgcolor=cRed>;       /* swy: always version 4 */
         uint32 flag <format=hex>;
         uint mat_name_len;
-        char mat_name[mat_name_len];
+        char mat_name[mat_name_len] <bgcolor=cSilver>;
         uint pos_cnt;
         struct 
         {
@@ -60,16 +60,10 @@ struct
 } mesh <open=true, bgcolor=cDkRed>;
 
 
-struct body_sphere
-{
-    float x, y, z;
-    float radius;
-};
-
 struct
 {
     uint32 tag_len;       /* swy: 4 */
-    char tag[tag_len];       /* swy: always version 4 */
+    char tag[tag_len] <bgcolor=cBlue>;       /* swy: always version 4 */
     int  object_count;  /* swy: number of scene/mission objects/props that follow */
 
     struct
@@ -80,7 +74,7 @@ struct
         struct body_type
         {
             uint body_type_len;
-            char body_type[body_type_len];
+            char body_type[body_type_len] <bgcolor=cSilver>;
 
                  if (Stricmp(body_type, "composite") == 0)
             {
@@ -105,4 +99,11 @@ struct
             }
         } body <optimize=false>;
     } body[object_count] <optimize=false>;
-} body;
+} body <open=true, bgcolor=cDkBlue>;
+
+
+struct
+{
+    uint32 tag_len;       /* swy: 4 */
+    char tag[tag_len];       /* swy: always version 4 */
+} end <open=true, bgcolor=cBlack>;

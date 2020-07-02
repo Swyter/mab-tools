@@ -12,12 +12,14 @@
 
 LittleEndian();
 
-struct
+struct texture
 {
-    uint32 tag_len;       /* swy: 4 */
-    char tag[tag_len] <bgcolor=cDkYellow>;       /* swy: always version 4 */
-    int  object_count;  /* swy: number of scene/mission objects/props that follow */
+    int a;
+};
 
+struct mesh
+{
+    int  object_count;  /* swy: number of scene/mission objects/props that follow */
     struct
     {
         uint32 tag_len;       /* swy: 4 */
@@ -57,15 +59,11 @@ struct
             int a[3];
         } tri[tri_cnt];
     } mesh[object_count] <optimize=false>;
-} mesh <open=true, bgcolor=cDkRed>;
+};
 
-
-struct
+struct body
 {
-    uint32 tag_len;       /* swy: 4 */
-    char tag[tag_len] <bgcolor=cBlue>;       /* swy: always version 4 */
     int  object_count;  /* swy: number of scene/mission objects/props that follow */
-
     struct
     {
         uint32 tag_len;       /* swy: 4 */
@@ -99,11 +97,19 @@ struct
             }
         } body <optimize=false>;
     } body[object_count] <optimize=false>;
-} body <open=true, bgcolor=cDkBlue>;
+};
 
 
-struct
+while (FTell() < FileSize())
 {
-    uint32 tag_len;       /* swy: 4 */
-    char tag[tag_len];       /* swy: always version 4 */
-} end <open=true, bgcolor=cBlack>;
+    struct brf_section
+    {
+        uint32 tag_len;
+        char tag[tag_len] <bgcolor=cDkYellow>;
+    
+             if (Stricmp(tag, "texture") == 0) struct texture tex;
+        else if (Stricmp(tag, "mesh"   ) == 0) struct mesh mes<open=true, bgcolor=cDkRed>;
+        else if (Stricmp(tag, "body"   ) == 0) struct body bod<open=true, bgcolor=cDkBlue>;
+        else if (Stricmp(tag, "end"    ) == 0);
+    } section <optimize=false>;
+}

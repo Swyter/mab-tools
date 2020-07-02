@@ -15,12 +15,12 @@ LittleEndian();
 typedef struct
 {
     uint tag_len;
-    char tag[tag_len];
+    char s[tag_len];
 } rgltag <read=read_rgltag>;
 
 string read_rgltag(struct rgltag& _thing)
 {
-    return _thing.tag;
+    return _thing.s;
 }
 
 struct texture
@@ -43,16 +43,15 @@ struct material
         rgltag mat_name <bgcolor=cSilver>;
         uint32 flag <format=hex>;
 
-        uint shader_name_len;
-        char shader_name[shader_name_len] <bgcolor=cSilver>;
+        rgltag shader_name <bgcolor=cSilver>;
 
-        rgltag texdiffuse_name <bgcolor=cSilver>;
-        rgltag texa_name;
-        rgltag texb_name;
-        rgltag texc_name;
-        rgltag texd_name;
-        rgltag texe_name;
-        uint thing[3];
+        rgltag diffuse_a <bgcolor=cSilver>;
+        rgltag diffuse_b;
+        rgltag bump;
+        rgltag environ;
+        rgltag specular;
+        float coeff;
+        float spec_r, spec_g, spec_b;
     } elem[object_count] <optimize=false>;
 };
 
@@ -103,28 +102,26 @@ struct body
     uint object_count;
     struct
     {
-        uint32 tag_len;
-        char tag[tag_len];
+        rgltag tag;
 
         struct body_type
         {
-            uint body_type_len;
-            char body_type[body_type_len] <bgcolor=cSilver>;
+            rgltag body_type <bgcolor=cSilver>;
 
-                 if (Stricmp(body_type, "composite") == 0)
+            if      (Stricmp(body_type.s, "composite") == 0)
             {
                 uint composite_cnt;
                 struct body_type composite[composite_cnt] <optimize=false>;
             }
-            else if (Stricmp(body_type, "sphere") == 0)
+            else if (Stricmp(body_type.s, "sphere") == 0)
             {
                 float radius, x,z,y; uint flag <format=hex>;
             }
-            else if (Stricmp(body_type, "capsule") == 0)
+            else if (Stricmp(body_type.s, "capsule") == 0)
             {
                 float radius, x,z,y, x,z,y; uint flag <format=hex>;
             }
-            else if (Stricmp(body_type, "manifold") == 0)
+            else if (Stricmp(body_type.s, "manifold") == 0)
             {
                 uint vtx_elem;
                 struct { float xyz[3]; } vtx[vtx_elem];
@@ -136,17 +133,18 @@ struct body
     } body[object_count] <optimize=false>;
 };
 
+
 /* swy: iterate over all the posible BRF chunks */
 while (FTell() < FileSize())
 {
     struct brf_section
     {
-        uint32 tag_len; char tag[tag_len] <bgcolor=cDkYellow>;
+        rgltag tag <bgcolor=cDkYellow>;
     
-             if (Stricmp(tag, "texture" ) == 0) struct texture  tex <open=true, bgcolor=cWhite>;
-             if (Stricmp(tag, "material") == 0) struct material mat <open=true, bgcolor=cDkGreen>;
-        else if (Stricmp(tag, "mesh"    ) == 0) struct mesh     mes <open=true, bgcolor=cDkRed>;
-        else if (Stricmp(tag, "body"    ) == 0) struct body     bod <open=true, bgcolor=cDkBlue>;
-        else if (Stricmp(tag, "end"     ) == 0);
+             if (Stricmp(tag.s, "texture" ) == 0) struct texture  tex <open=true, bgcolor=cWhite>;
+             if (Stricmp(tag.s, "material") == 0) struct material mat <open=true, bgcolor=cDkGreen>;
+        else if (Stricmp(tag.s, "mesh"    ) == 0) struct mesh     mes <open=true, bgcolor=cDkRed>;
+        else if (Stricmp(tag.s, "body"    ) == 0) struct body     bod <open=true, bgcolor=cDkBlue>;
+        else if (Stricmp(tag.s, "end"     ) == 0);
     } section <optimize=false>;
 }

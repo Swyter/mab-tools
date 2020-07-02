@@ -34,6 +34,25 @@ struct texture
     } elem[object_count] <optimize=false, read=read_tex>;
 };
 
+struct shader
+{
+    uint object_count;
+
+    struct sha_t
+    {
+        rgltag tex_name <bgcolor=cSilver>;
+        uint32 flag <format=hex>;
+        int thing;
+        rgltag technique;
+        uint unk;
+        uint count;
+        struct
+        {
+            uint a,b,c,d;
+        }entry[count];
+    } elem[object_count] <optimize=false, read=read_tex>;
+};
+
 struct material
 {
     uint object_count;
@@ -68,7 +87,13 @@ struct mesh
         {
             float x, y, z;
         } pos[pos_cnt];
-        uint unk_zero;
+        uint bone_count;
+        uint twelve, b;
+        struct
+        {
+            uint idx;
+            float thing;
+        } bone[bone_count*30];
         uint extra_frames;
 
         if (extra_frames)
@@ -155,6 +180,7 @@ while (FTell() < FileSize())
         rgltag tag <bgcolor=cDkYellow>;
     
              if (Stricmp(tag.s, "texture" ) == 0) struct texture  tex <open=true, bgcolor=cWhite>;
+             if (Stricmp(tag.s, "shader"  ) == 0) struct shader   sha <open=true, bgcolor=cWhite>;
              if (Stricmp(tag.s, "material") == 0) struct material mat <open=true, bgcolor=cDkGreen>;
         else if (Stricmp(tag.s, "mesh"    ) == 0) struct mesh     mes <open=true, bgcolor=cDkRed>;
         else if (Stricmp(tag.s, "body"    ) == 0) struct body     bod <open=true, bgcolor=cDkBlue>;

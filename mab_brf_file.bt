@@ -14,23 +14,24 @@ LittleEndian();
 
 struct
 {
-    uint32 str_count;       /* swy: 4 */
-    char str[str_count];       /* swy: always version 4 */
+    uint32 tag_len;       /* swy: 4 */
+    char tag[tag_len];       /* swy: always version 4 */
     int  object_count;  /* swy: number of scene/mission objects/props that follow */
 
     struct
     {
-        uint32 str_count;       /* swy: 4 */
-        char str[str_count];       /* swy: always version 4 */
-        uint32 flag;
-        uint matstr_len;
-        char matstr[matstr_len];
+        uint32 tag_len;       /* swy: 4 */
+        char tag[tag_len];       /* swy: always version 4 */
+        uint32 flag <format=hex>;
+        uint mat_name_len;
+        char mat_name[mat_name_len];
         uint pos_cnt;
         struct 
         {
             float x, y, z;
         } pos[pos_cnt];
-        uint b[2];
+        uint unk_zero;
+        uint extra_frames;
         uint vtx_cnt;
         struct
         {
@@ -44,7 +45,7 @@ struct
                 ubyte r,g,b,a;
               } components;
             } rgb;
-            float  v, t, i, a, c, n, b;
+            float  n_a, n_b, n_c, x_a, x_b, y_a, y_b;
         } vtx[vtx_cnt];
 
         int tri_cnt;
@@ -53,7 +54,7 @@ struct
         {
             int a[3];
         } tri[tri_cnt];
-    } tri[object_count] <optimize=false>;
+    } mesh[object_count] <optimize=false>;
 } head <open=true, bgcolor=cDkRed>;
 
 /* -- scene objects */

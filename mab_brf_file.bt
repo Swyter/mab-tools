@@ -77,12 +77,17 @@ struct
             uint body_type_len;
             char body_type[body_type_len];
 
-            if (Stricmp(body_type, "capsule") == 0)
+                 if (Stricmp(body_type, "capsule") == 0)
                 float lol[8];
-            if (Stricmp(body_type, "sphere") == 0)
-                float lol[8];
-            else
-                float llolol;
+            else if (Stricmp(body_type, "sphere") == 0)
+                float lol[5];
+            else if (Stricmp(body_type, "manifold") == 0)
+            {
+                uint cnt;
+                struct {float xyz[3];} elem[cnt];
+                uint idx;
+                struct {int minus_one, b, vertices_cnt; int xyz[vertices_cnt];} tt[idx] <optimize=false>;
+            }
         } composite[composite_cnt] <optimize=false>;
     } body[object_count] <optimize=false>;
 } body;

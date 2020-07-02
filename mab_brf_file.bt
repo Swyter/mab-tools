@@ -88,15 +88,19 @@ struct mesh
         {
             float x, y, z;
         } pos[pos_cnt];
-        uint bone_count;
-        uint twelve, b;
-        struct
-        {
-            uint idx;
-            float thing;
-        } bone[bone_count*30];
-        uint extra_frames;
 
+        uint bone_count;
+        if (bone_count)
+        {
+            uint twelve, b;
+            struct
+            {
+                uint idx;
+                float thing;
+            } bone[bone_count*30];
+        }
+
+        uint extra_frames;
         if (extra_frames)
         {
             uint time;
@@ -186,24 +190,28 @@ while (FTell() < FileSize())
         else if (Stricmp(tag.s, "mesh"    ) == 0) struct mesh     mes <open=true, bgcolor=cDkRed>;
         else if (Stricmp(tag.s, "body"    ) == 0) struct body     bod <open=true, bgcolor=cDkBlue>;
         else if (Stricmp(tag.s, "end"     ) == 0);
-    } section <optimize=false>;
+    } section <optimize=false, open=true, read=read_brf>;
 }
 
 
 string read_tex(struct tex_t& _thing)
 {
-    return _thing.tex_name.s;
+    return "- " + _thing.tex_name.s;
 }
 string read_mat(struct mat_t& _thing)
 {
-    return _thing.mat_name.s;
+    return "- " + _thing.mat_name.s;
 }
 string read_mesh(struct mesh_t& _thing)
 {
-    return _thing.mesh_name.s;
+    return "* " + _thing.mesh_name.s;
 }
 
-string read_body(struct body_t& _thing)
+wstring read_body(struct body_t& _thing)
 {
-    return _thing.body_name.s;
+    return "- " + _thing.body_name.s;
+}
+string read_brf(struct brf_section& _thing)
+{
+    return "[" + _thing.tag.s + "]";
 }

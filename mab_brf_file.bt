@@ -78,9 +78,13 @@ struct
             char body_type[body_type_len];
 
                  if (Stricmp(body_type, "capsule") == 0)
-                float lol[8];
+            {
+                float lol[7]; int pad;
+            }
             else if (Stricmp(body_type, "sphere") == 0)
-                float lol[5];
+            {
+                float lol[4]; int pad;
+            }
             else if (Stricmp(body_type, "manifold") == 0)
             {
                 uint cnt;

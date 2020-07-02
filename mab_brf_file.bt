@@ -25,28 +25,28 @@ struct
         uint32 flag;
         uint matstr_len;
         char matstr[matstr_len];
-        uint vtx_cnt;
+        uint pos_cnt;
         struct 
         {
             float x, y, z;
-        }vtx[vtx_cnt];
+        } pos[pos_cnt];
         uint b[2];
-        uint triangle_cnt;
+        uint vtx_cnt;
         struct
         {
             //char a[36 - (4*8)];
             int thing;
             int thong;
             float  v, t, i, a, c, n, b;
-        } triangle[triangle_cnt];
+        } vtx[vtx_cnt];
 
-        int cnt;
+        int tri_cnt;
 
         struct
         {
             int a[3];
-        } thing[cnt];
-    } obj[object_count];
+        } tri[tri_cnt];
+    } tri[object_count] <optimize=false>;
 } head <open=true, bgcolor=cDkRed>;
 
 /* -- scene objects */

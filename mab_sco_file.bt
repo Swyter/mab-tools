@@ -3,6 +3,7 @@
 //
 //      File: Mount&Blade Scene Object file
 //   Authors: Swyter
+//    E-mail: swyterzone+mab@gmail.com
 //   Version: 2020.06.17
 //   Purpose: Opens scene files (SceneObj/scn_*.sco) on M&B 1.011 and Warband
 //  Category: Game
@@ -42,7 +43,7 @@ struct obj
         Const_WB = 0x94AEF80
     } unk <format=hex>; /* swy: looking at the Site::save_site_objects() -> Mission_object::write(rglIO_Stream&) function decompilation, it seems to write weird uninitialized stack garbage */
 
-    float mtx_row_a[3]; /* affine 3x3 row-major matrix; encodes rotation (rglMat3) */
+    float mtx_row_a[3]; /* affine 3x3 row-major matrix; encodes rotation and maybe shearing (rglMat3) */
     float mtx_row_b[3];
     float mtx_row_c[3];
 

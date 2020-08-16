@@ -21,7 +21,7 @@
 //            because they released it very late in the Warband lifecycle, next to the Data part of the
 //            module system and the HLSL shaders in text form, when the community had way better tools.
 //
-//            In the end, I think we all (even they and the modders-turned-authors of the DLCs themselves)
+//            In the end, I think we all (even them and the modders-turned-authors of the DLCs themselves)
 //            ended up using community-provided tools like (first) BRF Edit and then OpenBRF to open and
 //            edit these binary counterparts. But originally they weren't meant for authoring, only
 //            for faster parsing/loading. Weird how that turned out. Thanks, Marco Tarini! :)
@@ -82,7 +82,7 @@ struct shader
         uint unk_zero;
         rgltag technique; /* swy: originally the HLSL technique name in mb.fx, later also mapped to GLShaders/techniques.xml for GLSL program binding on the OpenGL backend used for Linux, macOS and Android */
         uint alt_count;   /* swy: alt shader names; used as fallback and originally shipped as *.pp asm files for low-spec computers, generally zero or one */
-        struct { rgltag t; } alt[alt_count];
+        rgltag alt[alt_count];
         uint count;
         struct
         {
@@ -134,24 +134,27 @@ struct mesh
             {
                 uint idx;
                 float thing;
-            } bone[bone_count*30];
+            } bone[804];
         }
 
         uint extra_frames;
         if (extra_frames) /* swy: todo; FIXME */
         {
-            uint time;
-            uint pos_cnt_;
-            struct 
+                
+            struct vertex_frame
             {
-                float x, y, z;
-            } pos_[pos_cnt_];
-
-            uint pos_cnt__;
-            struct 
-            {
-                float x, y, z;
-            } pos__[pos_cnt__];
+                uint time;
+                uint pos_cnt_;
+                struct 
+                {
+                    float x, y, z;
+                } pos_[pos_cnt_];
+                uint nrm_cnt_;
+                struct 
+                {
+                    float x, y, z;
+                } nrm_[nrm_cnt_];
+            } v[extra_frames] <optimize=false>;
         }
         uint vtx_cnt;
         struct

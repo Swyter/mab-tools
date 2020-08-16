@@ -144,16 +144,16 @@ struct mesh
             struct vertex_frame
             {
                 uint time;
-                uint pos_cnt_;
+                uint pos_cnt;
                 struct 
                 {
                     float x, y, z;
-                } pos_[pos_cnt_];
-                uint nrm_cnt_;
+                } pos_[pos_cnt];
+                uint nrm_cnt;
                 struct 
                 {
                     float x, y, z;
-                } nrm_[nrm_cnt_];
+                } nrm_[nrm_cnt];
             } v[extra_frames] <optimize=false>;
         }
         uint vtx_cnt;
@@ -168,10 +168,16 @@ struct mesh
                 ubyte r,g,b,a;
               } components;
             } rgb;
-            float  n_a, n_b, n_c, x_a, x_b, y_a, y_b;  /* swy: todo; FIXME */
 
-            if (is_wb_brf) { byte a; float pad; }
-        } vtx[vtx_cnt * (extra_frames + 1)];
+            if (!is_wb_brf)
+            {
+                float  n_a, n_b, n_c, x_a, x_b, y_a, y_b;  /* swy: todo; FIXME */
+            }
+            else
+            {
+                byte unk[25]; float f_a, f_b;
+            }
+        } vtx[vtx_cnt];
 
         int tri_cnt;
 

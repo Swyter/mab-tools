@@ -177,7 +177,7 @@ struct mesh
             {
                 byte unk[25]; float f_a, f_b;
             }
-        } vtx[vtx_cnt];
+        } vtx[vtx_cnt] <optimize=false>;
 
         int tri_cnt;
 
@@ -295,6 +295,7 @@ while (FTell() < FileSize())
     } section <optimize=false, open=true, read=read_brf>;
 }
 
+
 string UIntToStr(unsigned int e)
 {
     string s; SPrintf(s, "%d", e); return s;
@@ -318,7 +319,15 @@ string read_mat(struct mat_t& _thing)
 }
 string read_mesh(struct mesh_t& _thing)
 {
-    return "* " + _thing.mesh_name.s + (_thing.extra_frames > 0 ? (" (" + UIntToStr(_thing.extra_frames) + " vertex frames)") : "b");
+    string s =  "* " + _thing.mesh_name.s + "      ";
+
+    if (_thing.extra_frames > 0)
+        SPrintf(s, "%s (%d vertex frames)", s, _thing.extra_frames + 1);
+
+    if (_thing.bone_count > 0)
+        SPrintf(s, "%s (skinned %u)", s, _thing.bone_count); 
+
+    return s;
 }
 wstring read_body(struct body_t& _thing)
 {

@@ -295,6 +295,11 @@ while (FTell() < FileSize())
     } section <optimize=false, open=true, read=read_brf>;
 }
 
+string UIntToStr(unsigned int e)
+{
+    string s; SPrintf(s, "%d", e); return s;
+}
+
 string read_ver(struct ver_t& _thing)
 {
     return "- " + _thing.tex_name.s;
@@ -313,7 +318,11 @@ string read_mat(struct mat_t& _thing)
 }
 string read_mesh(struct mesh_t& _thing)
 {
-    return "* " + _thing.mesh_name.s;
+    return "* " + _thing.mesh_name.s + (_thing.extra_frames > 0 ? (" (" + UIntToStr(_thing.extra_frames) + " vertex frames)") : "b");
+}
+wstring read_body(struct body_t& _thing)
+{
+    return "- " + _thing.body_name.s;
 }
 string read_skl(struct skl_t& _thing)
 {
@@ -322,10 +331,6 @@ string read_skl(struct skl_t& _thing)
 string read_ska(struct ska_t& _thing)
 {
     return "* " + _thing.mesh_name.s;
-}
-wstring read_body(struct body_t& _thing)
-{
-    return "- " + _thing.body_name.s;
 }
 string read_brf(struct brf_section& _thing)
 {

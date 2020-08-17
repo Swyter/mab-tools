@@ -178,7 +178,7 @@ struct mesh
             }
             else
             {
-                byte unk[25]; float f_a, f_b;
+                float thing, a,b,x,y,z; byte one; float f_a, f_b;
             }
         } vtx[vtx_cnt] <optimize=true>;
 

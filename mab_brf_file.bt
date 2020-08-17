@@ -174,11 +174,11 @@ struct mesh
 
             if (!is_wb_brf)
             {
-                float  n_a, n_b, n_c, x_a, x_b, y_a, y_b;  /* swy: todo; FIXME */
+                float  n_a, n_b, n_c, x_a, x_b, u, v;  /* swy: todo; FIXME */
             }
             else
             {
-                float thing, a,b,x,y,z; byte one; float f_a, f_b;
+                float n_a, n_b, n_c, x_a, x_b, z; byte one_or_zero; float u, v;
             }
         } vtx[vtx_cnt] <optimize=true>;
 

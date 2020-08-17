@@ -137,7 +137,7 @@ struct mesh
                     uint idx;
                     float weight; /* swy: amount of normalized influence this bone has over the vertice */
                 } bone[count];
-            } bi[bone_count];
+            } bi[bone_count] <optimize=false>;
         }
 
         uint extra_frames;
@@ -157,7 +157,7 @@ struct mesh
                 {
                     float x, y, z;
                 } nrm_[nrm_cnt];
-            } v[extra_frames];
+            } v[extra_frames] <optimize=true>;
         }
         uint vtx_cnt;
         struct
@@ -180,7 +180,7 @@ struct mesh
             {
                 byte unk[25]; float f_a, f_b;
             }
-        } vtx[vtx_cnt];
+        } vtx[vtx_cnt] <optimize=true>;
 
         int tri_cnt;
 
@@ -322,13 +322,15 @@ string read_mat(struct mat_t& _thing)
 }
 string read_mesh(struct mesh_t& _thing)
 {
-    string s =  "* " + _thing.mesh_name.s + "      ";
+    string s =  "";
+    
+    SPrintf(s, "* %-80s", _thing.mesh_name.s);
 
     if (_thing.extra_frames > 0)
         SPrintf(s, "%s (%d vertex frames)", s, _thing.extra_frames + 1);
 
     if (_thing.bone_count > 0)
-        SPrintf(s, "%s (skinned %u)", s, _thing.bone_count); 
+        SPrintf(s, "%s      (skinned to %u bones)", s, _thing.bone_count); 
 
     return s;
 }

@@ -145,22 +145,22 @@ struct material
                 uint maybe_unused : 1;
                 enum <uint> mat_transp_flags /* swy: more like material blending modes */
                 {
-                    MTF_none,                                   /* swy: always opaque */
-                    MTF_alpha_blend,                            /* Blend              */ /* [ S*a + D*(1-a) ] */
-                    MTF_additive_alpha_blend,                   /* Add (lighten)      */ /* [ S*a + D ]       */
-                    MTF_multiply_darken_blend,                  /* Multiply (darken)  */ /* [ S * D ]         */
-                    MTF_additive_no_alpha_blend,                /* Add, no alpha      */ /* [ S + D ]         */
+                    MTF_opaque,                                    /* swy: always opaque */
+                    MTF_blend_alpha,                               /* Blend              */ /* [ S*a + D*(1-a) ] */
+                    MTF_blend_additive_alpha,                      /* Add (lighten)      */ /* [ S*a + D ]       */
+                    MTF_blend_multiply_darken,                     /* Multiply (darken)  */ /* [ S * D ]         */
+                    MTF_blend_additive_no_alpha,                   /* Add, no alpha      */ /* [ S + D ]         */
                     MTF_undefined,
                     MTF_undefined_b,
-                    MTF_default_blend_when_alpha_less_and_one,  /* Auto  (blend if mat.a<1) */
+                    MTF_default_blend_when_alpha_is_less_than_one, /* Auto  (blend if mat.a<1) */
                 } transparency : 3;
                 uint auto_normalize_normals : 1;
                 enum <uint> mat_alphatest_flags
                 {
                     MAF_none,
-                    MAF_large_margin,  /* transparent when alpha <   8/256 */
-                    MAF_normal_margin, /* transparent when alpha < 136/256 */
-                    MAF_tight_margin,  /* transparent when alpha < 251/256 */
+                    MAF_large_margin,  /* transparent when texture alpha is less than   8/256 => 0.03125f    */
+                    MAF_normal_margin, /* transparent when texture alpha is less than 136/256 => 0.53125f    */
+                    MAF_tight_margin,  /* transparent when texture alpha is less than 251/256 => 0.98046875f */
                 } alpha_test : 2;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;

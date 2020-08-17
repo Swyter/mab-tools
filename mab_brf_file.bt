@@ -134,7 +134,6 @@ struct mesh
                 be 1.0 (e.g. Vertex index 34: (Bone A) 0.25 + (Bone B) 0.75 = 1.0f, this vertex is mostly going to follow
                 bone B while still being nudged a bit by Bone A as each of them move around) */
         uint bone_count;
-
         struct bone_influence
         {
             uint bone_id, count;
@@ -150,7 +149,6 @@ struct mesh
                 this is used for morph targets, from face morphing to moving crowsbows; always limited by the
                 existing number and IDs of the base vertex; we can't add new per-frame UVs or colors */
         uint extra_frames;
-
         struct vertex_frame
         {
             uint time;
@@ -172,7 +170,6 @@ struct mesh
                 vertices can exist at the same position the {x,y,z} positions are saved separately (in the pos array) and
                 indexed in their own array to avoid duplication/redundancies */
         uint vtx_cnt;
-
         struct
         {
             int pos_idx;
@@ -197,7 +194,6 @@ struct mesh
 
         /* swy: a list of triangles; each triangle can index three vertices from the (previous) vtx array */
         int tri_cnt;
-
         struct
         {
             int a[3];
@@ -258,7 +254,6 @@ struct body
     struct body_t
     {
         rgltag body_name;
-
         struct body_type
         {
             rgltag body_type <bgcolor=cSilver>;
@@ -268,11 +263,11 @@ struct body
                 uint composite_cnt; /* swy: recursive thingie; contains a number of other sphere/capsule/manifold items */
                 struct body_type composite[composite_cnt] <optimize=false>;
             }
-            else if (Stricmp(body_type.s, "sphere"   ) == 0)
+            else if (Stricmp(body_type.s, "sphere"   ) == 0) /* swy: a 3D point with a radius, anything (another point) closer to the center point than that is colliding */
             {
                 float radius, x,z,y; uint flag <format=hex>;
             }
-            else if (Stricmp(body_type.s, "capsule"  ) == 0)
+            else if (Stricmp(body_type.s, "capsule"  ) == 0) /* swy: a capsule is a line capped by two spheres at either end, with the line having the same radius as them at any point (it can also be seen as a sphere sliding through a line; so if you find the closest line-point position and then do a sphere check it's the same thing) */
             {
                 float radius, x,z,y, x,z,y; uint flag <format=hex>;
             }
@@ -280,7 +275,7 @@ struct body
             {
                 uint vtx_count; struct { float x, z, y; } vtx[vtx_count]; uint flag <format=hex>;
             }
-            else if (Stricmp(body_type.s, "manifold" ) == 0) /* swy: admits quad and triangle soups (maybe even arbitrary polygons?) */
+            else if (Stricmp(body_type.s, "manifold" ) == 0) /* swy: admits quad and triangle soups (maybe even arbitrary (5-sided+) polygons?) */
             {
                 uint vtx_count;
                 struct { float x, z, y; } vtx[vtx_count];
@@ -338,7 +333,7 @@ string read_mesh(struct mesh_t& _thing)
         SPrintf(s, "%s (%d vertex frames)", s, _thing.extra_frames + 1);
 
     if (_thing.bone_count > 0)
-        SPrintf(s, "%s      (skinned to %u bones)", s, _thing.bone_count); 
+        SPrintf(s, "%s (skinned to %u bones)", s, _thing.bone_count); 
 
     return s;
 }

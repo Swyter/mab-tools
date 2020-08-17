@@ -83,13 +83,19 @@ struct texture /* swy: this is actually more like a texture *reference*, as glue
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;
-                uint size_u : 4 <format=hex>;
-                uint size_v : 4 <format=hex>;
+                enum <uint> tex_size_flags
+                {
+                    AF_default, AF_2, AF_4, AF_8, AF_16, AF_32, AF_64, AF_128, AF_256, AF_512, AF_1024, AF_2048, AF_4092, AF_8K, AF_16K, AF_32K
+                } size_u : 4 <format=hex>;
+                enum tex_size_flags size_v : 4 <format=hex>;
                 uint clamp_u : 1;
                 uint clamp_v : 1;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;
-                uint animation_frames : 4;
+                enum <uint>
+                {
+                    F0, F4, F8, F12, F16, F20, F24, F28, F32, F36, F40, F44, F48, F52, F56, F60
+                } animation_frames : 4;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;

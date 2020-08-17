@@ -129,12 +129,15 @@ struct mesh
         uint bone_count;
         if (bone_count) /* swy: todo; FIXME */
         {
-            uint twelve, b;
-            struct
+            struct bone_influence
             {
-                uint idx;
-                float thing;
-            } bone[804];
+                uint bone_id, count;
+                struct
+                {
+                    uint idx;
+                    float weight; /* swy: amount of normalized influence this bone has over the vertice */
+                } bone[count];
+            } bi[bone_count];
         }
 
         uint extra_frames;
@@ -154,7 +157,7 @@ struct mesh
                 {
                     float x, y, z;
                 } nrm_[nrm_cnt];
-            } v[extra_frames] <optimize=false>;
+            } v[extra_frames];
         }
         uint vtx_cnt;
         struct
@@ -177,7 +180,7 @@ struct mesh
             {
                 byte unk[25]; float f_a, f_b;
             }
-        } vtx[vtx_cnt] <optimize=false>;
+        } vtx[vtx_cnt];
 
         int tri_cnt;
 

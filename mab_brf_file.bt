@@ -85,7 +85,7 @@ struct texture /* swy: this is actually more like a texture *reference*, as glue
                 uint maybe_unused : 1;
                 enum <uint> tex_size_flags
                 {
-                    AF_default, AF_2, AF_4, AF_8, AF_16, AF_32, AF_64, AF_128, AF_256, AF_512, AF_1024, AF_2048, AF_4092, AF_8K, AF_16K, AF_32K
+                    TSF_default, TSF_2, TSF_4, TSF_8, TSF_16, TSF_32, TSF_64, TSF_128, TSF_256, TSF_512, TSF_1024, TSF_2048, TSF_4092, TSF_8K, TSF_16K, TSF_32K
                 } size_u : 4 <format=hex>;
                 enum tex_size_flags size_v : 4 <format=hex>;
                 uint clamp_u : 1;
@@ -150,7 +150,45 @@ struct mesh
     struct mesh_t
     {
         rgltag mesh_name <bgcolor=cRed>;
-        uint32 flag <format=hex>;
+        union
+        {
+            uint32 val <format=hex>;
+            struct
+            {
+                uint unk_props : 1;
+                uint unk_particles : 1;
+                uint unk_plants : 1;
+                uint unk_particles_b : 1;
+                uint maybe_unused : 1;
+                uint unk_hair_and_body_parts : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint unk_particles : 1;
+                uint unk_screen_space : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint reserved_tangent_space : 1;
+                uint reserved_warband_model_format : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint pre_exponentiate_colors : 1;
+                uint maybe_unused : 1;
+                uint unk_particles_c : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+            } flags <open=true>;
+        } flag;
         rgltag mat_name <bgcolor=cSilver>;
 
         /* swy: unique vertex positions for this mesh, deduplicated from the vtx array, we don't want to store three

@@ -174,11 +174,11 @@ struct mesh
 
             if (!is_wb_brf)
             {
-                float  n_a, n_b, n_c, x_a, x_b, u, v;  /* swy: todo; FIXME */
+                float  n_a, n_b, n_c, u, v, u_unused, v_unused;  /* swy: OpenBRF copies the u/v fields into the unused ones, which are blank in original BRF files */
             }
             else
             {
-                float n_a, n_b, n_c, x_a, x_b, z; byte one_or_zero; float u, v;
+                float n_a, n_b, n_c, x_a, x_b, z; byte tangent_flip_or_not_maybe /* handedness?; false => 1 or true => -1 */; float u, v;
             }
         } vtx[vtx_cnt] <optimize=true>;
 

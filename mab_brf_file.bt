@@ -127,7 +127,7 @@ struct mesh
         } pos[pos_cnt];
 
         uint bone_count;
-        if (bone_count) /* swy: todo; FIXME */
+        if (bone_count) /* swy: every vertice can be moved by/get attached to a maximum of four bones, and the sum of all its influences must be 1.0 (e.g. Vertex index 34: (Bone A) 0.25 + (Bone B) 0.75 = 1.0f, this vertex is mostly going to follow bone B while still being nudged a bit by Bone A as each of them move around) */
         {
             struct bone_influence
             {
@@ -141,7 +141,7 @@ struct mesh
         }
 
         uint extra_frames;
-        if (extra_frames) /* swy: todo; FIXME */
+        if (extra_frames) /* swy: every mesh has a base "frame" by default, here any additional snapshots of the same displaced mesh are stored as variations of existing positions (and their corrected normals, to still get correct lighting) this is used for morph targets, from face morphing to moving crowsbows; always limited by the existing number and IDs of the base vertex; we can't add new per-frame UVs or colors */
         {
                 
             struct vertex_frame
@@ -172,13 +172,13 @@ struct mesh
               } components;
             } rgb;
 
-            if (!is_wb_brf)
+            if (!is_wb_brf) /* swy: FIXME: find out and complete what each of the unknown fields really does internally, probably just computed tangent stuff for nifty-looking normal maps */
             {
                 float  n_a, n_b, n_c, u, v, u_unused, v_unused;  /* swy: OpenBRF copies the u/v fields into the unused ones, which are blank in original BRF files */
             }
             else
             {
-                float n_a, n_b, n_c, x_a, x_b, z; byte tangent_flip_or_not_maybe /* handedness?; false => 1 or true => -1 */; float u, v;
+                float n_a, n_b, n_c, unk_a, unk_b, unk_z; byte unk_one_or_zero_tangent_flip_or_not_maybe /* handedness?; false => 1 or true => -1 */; float u, v;
             }
         } vtx[vtx_cnt] <optimize=true>;
 

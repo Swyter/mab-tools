@@ -28,6 +28,7 @@ struct obj
         Prop    = 0, /* Scene Prop */
         Entry   = 1, /* Entry Point */
         Item    = 2, /* Item Kind */
+        Unused  = 3,
         Plant   = 4, /* Flora */
         Passage = 5
     } type <bgcolor=cBlue>;
@@ -61,7 +62,7 @@ struct obj
     uint32 menu_item_no;
 
     float scale[3]; /* scaling multiplier, per axis; x, y, z */
-} objects[head.object_count] <optimize=false, read=sceneprop__Read>;
+} objects[head.object_count] <optimize=false, read=sceneprop_read>;
 
 
 /* -- ai mesh vertices; probably */
@@ -159,7 +160,7 @@ string UIntToStr(unsigned int e)
     string s; SPrintf(s, "%d", e); return s;
 }
 
-string sceneprop__Read(struct obj &m)
+string sceneprop_read(struct obj &m)
 {
          if (m.type == Prop ||
              m.type == Item ||

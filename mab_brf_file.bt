@@ -151,15 +151,15 @@ struct mesh
         uint extra_frames;
         struct vertex_frame
         {
-            uint time;
+            uint time; /* swy: this is what the game actually uses in the frame timeline; sometimes searching for specific/hardcoded numbers */
 
-            uint pos_cnt;
+            uint pos_cnt; /* swy: overriden vertex position (for this frame) */
             struct 
             {
                 float x, y, z;
             } pos[pos_cnt];
 
-            uint nrm_cnt;
+            uint nrm_cnt; /* swy: overriden vertex normal (for this frame) */
             struct 
             {
                 float x, y, z;
@@ -210,11 +210,11 @@ struct skel
         uint32 bone_count; /* swy: humans have 20 bones, while mounts have 28 */
         struct
         {
-            int parent_idx;
+            int parent_idx; /* swy: parent bone, up in the chain we depend on; as transformations are relative to them; -1 for the root bone */
             rgltag bone_name <bgcolor=cSilver>;
             int flag_zero; /* swy: seems unused, I think :) */
-            float local_transform_matrix[9]; /* swy: affine transformation 3x3 matrix */
-            float x, z, y;
+            float local_transform_matrix[9]; /* swy: affine transformation 3x3 matrix (i.e. encodes local rotation) */
+            float x, z, y; /* swy: bone rest position while T-posing */
         } bon[bone_count] <optimize=false>;
     } elem[object_count] <optimize=false, read=read_skl>;
 };
@@ -337,7 +337,7 @@ string read_mesh(struct mesh_t& _thing)
 
     return s;
 }
-wstring read_body(struct body_t& _thing)
+string read_body(struct body_t& _thing)
 {
     return "- " + _thing.body_name.s;
 }

@@ -143,9 +143,25 @@ struct material
                 uint specular_enable : 1;
                 uint uniform_lighting : 1;
                 uint maybe_unused : 1;
-                uint transparency : 3;
+                enum <uint> mat_transp_flags /* swy: more like material blending modes */
+                {
+                    MTF_none,
+                    MTF_alpha_blend,
+                    MTF_additive_alpha_blend,
+                    MTF_multiply_darken_blend,
+                    MTF_additive_no_alpha_blend,
+                    MTF_undefined,
+                    MTF_undefined_b,
+                    MTF_default_blend_when_alpha_less_and_one,
+                } transparency : 3;
                 uint auto_normalize_normals : 1;
-                uint alpha_test : 2;
+                enum <uint> mat_alphatest_flags
+                {
+                    MAF_none,
+                    MAF_large_margin,  /* transparent when alpha <   8/256 */
+                    MAF_normal_margin, /* transparent when alpha < 136/256 */
+                    MAF_tight_margin,  /* transparent when alpha < 251/256 */
+                } alpha_test : 2;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;
                 uint render_first : 1;
@@ -156,7 +172,7 @@ struct material
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;
-                uint render_order : 4;
+                 int render_order : 4;
                 uint invert_bumpmap : 1;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;

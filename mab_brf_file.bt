@@ -120,46 +120,59 @@ struct mesh
         rgltag mesh_name <bgcolor=cRed>;
         uint32 flag <format=hex>;
         rgltag mat_name <bgcolor=cSilver>;
+
+        /* swy: unique vertex positions for this mesh, deduplicated from the vtx array, we don't want to store three
+                floats there each time; instead of that, a single index pointing here will do */
         uint pos_cnt;
+
         struct 
         {
             float x, y, z;
         } pos[pos_cnt];
 
+        /* swy: every vertex can be moved by/get attached to a maximum of four bones, and the sum of all its influences must
+                be 1.0 (e.g. Vertex index 34: (Bone A) 0.25 + (Bone B) 0.75 = 1.0f, this vertex is mostly going to follow
+                bone B while still being nudged a bit by Bone A as each of them move around) */
         uint bone_count;
-        if (bone_count) /* swy: every vertice can be moved by/get attached to a maximum of four bones, and the sum of all its influences must be 1.0 (e.g. Vertex index 34: (Bone A) 0.25 + (Bone B) 0.75 = 1.0f, this vertex is mostly going to follow bone B while still being nudged a bit by Bone A as each of them move around) */
-        {
-            struct bone_influence
-            {
-                uint bone_id, count;
-                struct
-                {
-                    uint idx;
-                    float weight; /* swy: amount of normalized influence this bone has over the vertice */
-                } bone[count];
-            } bi[bone_count] <optimize=false>;
-        }
 
-        uint extra_frames;
-        if (extra_frames) /* swy: every mesh has a base "frame" by default, here any additional snapshots of the same displaced mesh are stored as variations of existing positions (and their corrected normals, to still get correct lighting) this is used for morph targets, from face morphing to moving crowsbows; always limited by the existing number and IDs of the base vertex; we can't add new per-frame UVs or colors */
+        struct bone_influence
         {
-                
-            struct vertex_frame
+            uint bone_id, count;
+            struct
             {
-                uint time;
-                uint pos_cnt;
-                struct 
-                {
-                    float x, y, z;
-                } pos_[pos_cnt];
-                uint nrm_cnt;
-                struct 
-                {
-                    float x, y, z;
-                } nrm_[nrm_cnt];
-            } v[extra_frames] <optimize=true>;
-        }
+                uint idx;
+                float weight; /* swy: amount of normalized influence this bone has over the vertex */
+            } bone[count];
+        } bi[bone_count] <optimize=false>;
+
+        /* swy: every mesh has a base "frame" by default, here any additional snapshots of the same displaced mesh are stored
+                as variations of existing positions (and their corrected normals, to still get correct lighting)
+                this is used for morph targets, from face morphing to moving crowsbows; always limited by the
+                existing number and IDs of the base vertex; we can't add new per-frame UVs or colors */
+        uint extra_frames;
+
+        struct vertex_frame
+        {
+            uint time;
+
+            uint pos_cnt;
+            struct 
+            {
+                float x, y, z;
+            } pos[pos_cnt];
+
+            uint nrm_cnt;
+            struct 
+            {
+                float x, y, z;
+            } nrm[nrm_cnt];
+        } vtxfrm[extra_frames] <optimize=true>;
+
+        /* swy: actual vertex definitions go here; where the actual properties are stored, keep in mind that because various
+                vertices can exist at the same position the {x,y,z} positions are saved separately (in the pos array) and
+                indexed in their own array to avoid duplication/redundancies */
         uint vtx_cnt;
+
         struct
         {
             int pos_idx;
@@ -174,7 +187,7 @@ struct mesh
 
             if (!is_wb_brf) /* swy: FIXME: find out and complete what each of the unknown fields really does internally, probably just computed tangent stuff for nifty-looking normal maps */
             {
-                float  n_a, n_b, n_c, u, v, u_unused, v_unused;  /* swy: OpenBRF copies the u/v fields into the unused ones, which are blank in original BRF files */
+                float n_a, n_b, n_c, u, v, u_unused, v_unused;  /* swy: OpenBRF copies the u/v fields into the unused ones, which are blank in original BRF files */
             }
             else
             {
@@ -182,6 +195,7 @@ struct mesh
             }
         } vtx[vtx_cnt] <optimize=true>;
 
+        /* swy: a list of triangles; each triangle can index three vertices from the (previous) vtx array */
         int tri_cnt;
 
         struct
@@ -296,12 +310,6 @@ while (FTell() < FileSize())
         else if (Stricmp(tag.s, "skeleton_anim") == 0) struct skel_ani ska <open=true, bgcolor=cDkRed>;
         else if (Stricmp(tag.s, "end"          ) == 0);
     } section <optimize=false, open=true, read=read_brf>;
-}
-
-
-string UIntToStr(unsigned int e)
-{
-    string s; SPrintf(s, "%d", e); return s;
 }
 
 string read_ver(struct ver_t& _thing)

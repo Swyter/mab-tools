@@ -111,7 +111,48 @@ struct shader
     struct sha_t
     {
         rgltag tex_name <bgcolor=cSilver>;
-        uint32 flag <format=hex>;
+        union
+        {
+            uint32 val <format=hex>;
+            struct
+            {
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint specular_enable : 1;
+                uint maybe_unused : 1 <hidden=true>;
+                uint static_lighting : 1;
+
+                uint uses_envmap : 1;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint preshaded : 1;
+                uint uses_instancing : 1;
+                uint maybe_unused : 1 <hidden=true>;
+                uint biased : 1;
+
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint maybe_unused : 1 <hidden=true>;
+                uint uses_pixel_shader : 1;
+                uint uses_hlsl : 1;
+                uint uses_normal_map : 1;
+                uint uses_skinning : 1;
+            } flags <open=true>;
+        } flag <open=true>;
         uint unk_zero;
         rgltag technique; /* swy: originally the HLSL technique name in mb.fx, later also mapped to GLShaders/techniques.xml for GLSL program binding on the OpenGL backend used for Linux, macOS and Android */
         uint alt_count;   /* swy: alt shader names; used as fallback and originally shipped as *.pp asm files for low-spec computers, generally zero or one */

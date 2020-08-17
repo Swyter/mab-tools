@@ -63,18 +63,45 @@ struct rfver
 struct texture /* swy: this is actually more like a texture *reference*, as glue between a material and a .DDS file */
 {
     uint object_count;
-
     struct tex_t
     {
-        rgltag tex_name <bgcolor=cSilver>; /* swy: path to the Modules/<mod-name>/Textures/<texture-name>.dds file where the data is actually stored, */
-        uint32 flag <format=hex>;          /*      only a limited subset of DX9 DDS textures are supported: ST3C and a few others, not DirectX 11 ones */
+        rgltag tex_name <bgcolor=cSilver>; /* swy: path to the Modules/<mod-name>/Textures/<texture-name>.dds file where the data is actually stored,  */
+        union                              /*      only a limited subset of DX9 DDS textures are supported: ST3C and a few others, not DirectX 11 ones */
+        {
+            uint32 val <format=hex>;
+            struct
+            {
+                uint unk : 1;
+                uint force_hi_res : 1;
+                uint unk : 1;
+                uint language_dependent : 1;
+                uint hdr_only : 1;
+                uint no_hdr : 1;
+                uint maybe_unused : 1;
+                uint unk : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint size_u : 4 <format=hex>;
+                uint size_v : 4 <format=hex>;
+                uint clamp_u : 1;
+                uint clamp_v : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint animation_frames : 4;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+            } flags <open=true>;
+        } flag <open=true>;
     } elem[object_count] <optimize=false, read=read_tex>; /* swy: when a texture has multiple frames (like waterbump) every frame is stored as its own files, like this: <texture-name>_<frame-number-that-starts-at-zero>.dds */
 };
 
 struct shader
 {
     uint object_count;
-
     struct sha_t
     {
         rgltag tex_name <bgcolor=cSilver>;
@@ -94,7 +121,6 @@ struct shader
 struct material
 {
     uint object_count;
-
     struct mat_t
     {
         rgltag mat_name <bgcolor=cSilver>;

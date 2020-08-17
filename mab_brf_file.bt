@@ -174,22 +174,22 @@ struct material
                 uint maybe_unused : 1;
                 enum <uint> mat_render_order
                 {
-                    /* 0001 -8 */ MRO_minus_8 = 0b0001,
+                    /* 0001 -8 */ MRO_minus_8 = 0b1000,
                     /* 1001 -7 */ MRO_minus_7 = 0b1001,
-                    /* 0101 -6 */ MRO_minus_6 = 0b0101,
-                    /* 1101 -5 */ MRO_minus_5 = 0b1101,
-                    /* 0011 -4 */ MRO_minus_4 = 0b0011,
-                    /* 1011 -3 */ MRO_minus_3 = 0b1011,
-                    /* 0111 -2 */ MRO_minus_2 = 0b0111,
+                    /* 0101 -6 */ MRO_minus_6 = 0b1010,
+                    /* 1101 -5 */ MRO_minus_5 = 0b1011,
+                    /* 0011 -4 */ MRO_minus_4 = 0b1100,
+                    /* 1011 -3 */ MRO_minus_3 = 0b1101,
+                    /* 0111 -2 */ MRO_minus_2 = 0b1110,
                     /* 1111 -1 */ MRO_minus_1 = 0b1111,
                     /* 0000  0 */ MRO_zero    = 0b0000,
-                    /* 1000 +1 */ MRO_plus_1  = 0b1000,
-                    /* 0100 +2 */ MRO_plus_2  = 0b0100,
-                    /* 1100 +3 */ MRO_plus_3  = 0b1100,
-                    /* 0010 +4 */ MRO_plus_4  = 0b0010,
-                    /* 1010 +5 */ MRO_plus_5  = 0b1010,
+                    /* 1000 +1 */ MRO_plus_1  = 0b0001,
+                    /* 0100 +2 */ MRO_plus_2  = 0b0010,
+                    /* 1100 +3 */ MRO_plus_3  = 0b0011,
+                    /* 0010 +4 */ MRO_plus_4  = 0b0100,
+                    /* 1010 +5 */ MRO_plus_5  = 0b0101,
                     /* 0110 +6 */ MRO_plus_6  = 0b0110,
-                    /* 1110 +7 */ MRO_plus_7  = 0b1110,
+                    /* 1110 +7 */ MRO_plus_7  = 0b0111,
                 } render_order : 4 <format=hex>;
                 uint invert_bumpmap : 1;
                 uint maybe_unused : 1;

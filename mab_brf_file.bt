@@ -145,14 +145,14 @@ struct material
                 uint maybe_unused : 1;
                 enum <uint> mat_transp_flags /* swy: more like material blending modes */
                 {
-                    MTF_none,
-                    MTF_alpha_blend,
-                    MTF_additive_alpha_blend,
-                    MTF_multiply_darken_blend,
-                    MTF_additive_no_alpha_blend,
+                    MTF_none,                                   /* swy: always opaque */
+                    MTF_alpha_blend,                            /* Blend              */ /* [ S*a + D*(1-a) ] */
+                    MTF_additive_alpha_blend,                   /* Add (lighten)      */ /* [ S*a + D ]       */
+                    MTF_multiply_darken_blend,                  /* Multiply (darken)  */ /* [ S * D ]         */
+                    MTF_additive_no_alpha_blend,                /* Add, no alpha      */ /* [ S + D ]         */
                     MTF_undefined,
                     MTF_undefined_b,
-                    MTF_default_blend_when_alpha_less_and_one,
+                    MTF_default_blend_when_alpha_less_and_one,  /* Auto  (blend if mat.a<1) */
                 } transparency : 3;
                 uint auto_normalize_normals : 1;
                 enum <uint> mat_alphatest_flags

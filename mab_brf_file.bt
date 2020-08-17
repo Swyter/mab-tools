@@ -92,9 +92,9 @@ struct texture /* swy: this is actually more like a texture *reference*, as glue
                 uint clamp_v : 1;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;
-                enum <uint>
+                enum <uint> tex_anim_flags
                 {
-                    F0, F4, F8, F12, F16, F20, F24, F28, F32, F36, F40, F44, F48, F52, F56, F60
+                    TAF_0, TAF_4, TAF_8, TAF_12, TAF_16, TAF_20, TAF_24, TAF_28, TAF_32, TAF_36, TAF_40, TAF_44, TAF_48, TAF_52, TAF_56, TAF_60
                 } animation_frames : 4;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;
@@ -130,7 +130,39 @@ struct material
     struct mat_t
     {
         rgltag mat_name <bgcolor=cSilver>;
-        uint32 flag <format=hex>;
+        union
+        {
+            uint32 val <format=hex>;
+            struct
+            {
+                uint no_fog : 1;
+                uint no_lighting : 1;
+                uint dont_block_light : 1;
+                uint no_z_write : 1;
+                uint no_depth_test : 1;
+                uint specular_enable : 1;
+                uint uniform_lighting : 1;
+                uint maybe_unused : 1;
+                uint transparency : 3;
+                uint auto_normalize_normals : 1;
+                uint alpha_test : 2;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint render_first : 1;
+                uint origin_at_camera : 1;
+                uint combine_meshes : 1;
+                uint warband_combine_low_poly_meshes : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint render_order : 4;
+                uint invert_bumpmap : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+                uint maybe_unused : 1;
+            } flags <open=true>;
+        } flag;
 
         rgltag shader_name <bgcolor=cSilver>;
 
@@ -171,8 +203,8 @@ struct mesh
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;
-                uint reserved_tangent_space : 1;
-                uint reserved_warband_model_format : 1;
+                uint reserved_warband_tangent_space : 1;
+                uint reserved_warband_model_format  : 1;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;
                 uint maybe_unused : 1;

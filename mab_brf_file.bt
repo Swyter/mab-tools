@@ -85,14 +85,14 @@ struct texture /* swy: this is actually more like a texture *reference*, as glue
                 uint maybe_unused          : 1 <hidden=true>;
                 enum <uint> tex_size_flags
                 {
-                    TSF_default, TSF_2, TSF_4, TSF_8, TSF_16, TSF_32, TSF_64, TSF_128, TSF_256, TSF_512, TSF_1024, TSF_2048, TSF_4092, TSF_8K, TSF_16K, TSF_32K
+                    TSF_default, TSF_2, TSF_4, TSF_8, TSF_16, TSF_32, TSF_64, TSF_128, TSF_256, TSF_512, TSF_1024, TSF_2048, TSF_4096, TSF_8K, TSF_16K, TSF_32K
                 } size_u                   : 4 <format=hex>;
                 enum tex_size_flags size_v : 4 <format=hex>;
                 uint clamp_u               : 1;
                 uint clamp_v               : 1;
                 uint maybe_unused          : 1 <hidden=true>;
                 uint maybe_unused          : 1 <hidden=true>;
-                enum <uint> tex_anim_flags
+                enum <uint> tex_anim_flags /* swy: textures can be animated by adding frames as independent <tex_name>_<frame_number>.dds files starting at 0, see the watermap.dds file on Native */
                 {
                     TAF_0, TAF_4, TAF_8, TAF_12, TAF_16, TAF_20, TAF_24, TAF_28, TAF_32, TAF_36, TAF_40, TAF_44, TAF_48, TAF_52, TAF_56, TAF_60
                 } animation_frames         : 4;
@@ -301,7 +301,6 @@ struct mesh
         /* swy: unique vertex positions for this mesh, deduplicated from the vtx array, we don't want to store three
                 floats there each time; instead of that, a single index pointing here will do */
         uint pos_cnt;
-
         struct 
         {
             float x, y, z;

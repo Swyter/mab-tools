@@ -71,35 +71,38 @@ struct texture /* swy: this is actually more like a texture *reference*, as glue
             uint32 val <format=hex>;
             struct
             {
-                uint unk                   : 1;
-                uint force_hi_res          : 1;
-                uint unk                   : 1;
-                uint language_dependent    : 1;
-                uint hdr_only              : 1;
-                uint no_hdr                : 1;
-                uint maybe_unused          : 1 <hidden=true>;
-                uint unk                   : 1;
-                uint maybe_unused          : 1 <hidden=true>;
-                uint maybe_unused          : 1 <hidden=true>;
-                uint maybe_unused          : 1 <hidden=true>;
-                uint maybe_unused          : 1 <hidden=true>;
+                uint unk                   : 1;                 /*          0x1 */
+                uint force_hi_res          : 1;                 /*          0x2 */
+                uint unk                   : 1;                 /*          0x4 */
+                uint language_dependent    : 1;                 /*          0x8 */
+                uint hdr_only              : 1;                 /*         0x10 */
+                uint no_hdr                : 1;                 /*         0x20 */
+                uint maybe_unused          : 1 <hidden=true>;   /*         0x40 */
+                uint unk                   : 1;                 /*         0x80 */
+
+                uint maybe_unused          : 1 <hidden=true>;   /*        0x100 */
+                uint maybe_unused          : 1 <hidden=true>;   /*        0x200 */
+                uint maybe_unused          : 1 <hidden=true>;   /*        0x400 */
+                uint maybe_unused          : 1 <hidden=true>;   /*        0x800 */
+
                 enum <uint> tex_size_flags
                 {
                     TSF_default, TSF_2, TSF_4, TSF_8, TSF_16, TSF_32, TSF_64, TSF_128, TSF_256, TSF_512, TSF_1024, TSF_2048, TSF_4096, TSF_8K, TSF_16K, TSF_32K
-                } size_u                   : 4 <format=hex>;
-                enum tex_size_flags size_v : 4 <format=hex>;
-                uint clamp_u               : 1;
-                uint clamp_v               : 1;
-                uint maybe_unused          : 1 <hidden=true>;
-                uint maybe_unused          : 1 <hidden=true>;
+                } size_u                   : 4 <format=hex>;    /*      0x0f000 */
+                enum tex_size_flags size_v : 4 <format=hex>;    /*      0xf0000 */
+
+                uint clamp_u               : 1;                 /*     0x100000 */
+                uint clamp_v               : 1;                 /*     0x200000 */
+                uint maybe_unused          : 1 <hidden=true>;   /*     0x400000 */
+                uint maybe_unused          : 1 <hidden=true>;   /*     0x800000 */
                 enum <uint> tex_anim_flags /* swy: textures can be animated by adding frames as independent <tex_name>_<frame_number>.dds files starting at 0, see the watermap.dds file on Native */
                 {
                     TAF_0, TAF_4, TAF_8, TAF_12, TAF_16, TAF_20, TAF_24, TAF_28, TAF_32, TAF_36, TAF_40, TAF_44, TAF_48, TAF_52, TAF_56, TAF_60
-                } animation_frames         : 4;
-                uint maybe_unused          : 1 <hidden=true>;
-                uint maybe_unused          : 1 <hidden=true>;
-                uint maybe_unused          : 1 <hidden=true>;
-                uint maybe_unused          : 1 <hidden=true>;
+                } animation_frames         : 4;                 /*    0xf000000 */
+                uint maybe_unused          : 1 <hidden=true>;   /*   0x10000000 */
+                uint maybe_unused          : 1 <hidden=true>;   /*   0x20000000 */
+                uint maybe_unused          : 1 <hidden=true>;   /*   0x40000000 */
+                uint maybe_unused          : 1 <hidden=true>;   /*   0x80000000 */
             } flags <open=true>;
         } flag <open=true>;
     } elem[object_count] <optimize=false, read=read_tex>; /* swy: when a texture has multiple frames (like waterbump) every frame is stored as its own files, like this: <texture-name>_<frame-number-that-starts-at-zero>.dds */
@@ -116,41 +119,41 @@ struct shader
             uint32 val <format=hex>;
             struct
             {
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint specular_enable   : 1;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint static_lighting   : 1;
+                uint maybe_unused      : 1 <hidden=true>;   /*          0x1 */
+                uint maybe_unused      : 1 <hidden=true>;   /*          0x2 */
+                uint maybe_unused      : 1 <hidden=true>;   /*          0x4 */
+                uint maybe_unused      : 1 <hidden=true>;   /*          0x8 */
+                uint maybe_unused      : 1 <hidden=true>;   /*         0x10 */
+                uint specular_enable   : 1;                 /*         0x20 */
+                uint maybe_unused      : 1 <hidden=true>;   /*         0x40 */
+                uint static_lighting   : 1;                 /*         0x80 */
 
-                uint uses_envmap       : 1;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint preshaded         : 1;
-                uint uses_instancing   : 1;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint biased            : 1;
+                uint uses_envmap       : 1;                 /*        0x100 */
+                uint maybe_unused      : 1 <hidden=true>;   /*        0x200 */
+                uint maybe_unused      : 1 <hidden=true>;   /*        0x400 */
+                uint maybe_unused      : 1 <hidden=true>;   /*        0x800 */
+                uint preshaded         : 1;                 /*       0x1000 */
+                uint uses_instancing   : 1;                 /*       0x2000 */
+                uint maybe_unused      : 1 <hidden=true>;   /*       0x4000 */
+                uint biased            : 1;                 /*       0x8000 */
 
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
+                uint maybe_unused      : 1 <hidden=true>;   /*      0x10000 */
+                uint maybe_unused      : 1 <hidden=true>;   /*      0x20000 */
+                uint maybe_unused      : 1 <hidden=true>;   /*      0x40000 */
+                uint maybe_unused      : 1 <hidden=true>;   /*      0x80000 */
+                uint maybe_unused      : 1 <hidden=true>;   /*     0x100000 */
+                uint maybe_unused      : 1 <hidden=true>;   /*     0x200000 */
+                uint maybe_unused      : 1 <hidden=true>;   /*     0x400000 */
+                uint maybe_unused      : 1 <hidden=true>;   /*     0x800000 */
 
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint maybe_unused      : 1 <hidden=true>;
-                uint uses_pixel_shader : 1;
-                uint uses_hlsl         : 1;
-                uint uses_normal_map   : 1;
-                uint uses_skinning     : 1;
+                uint maybe_unused      : 1 <hidden=true>;   /*    0x1000000 */
+                uint maybe_unused      : 1 <hidden=true>;   /*    0x2000000 */
+                uint maybe_unused      : 1 <hidden=true>;   /*    0x4000000 */
+                uint maybe_unused      : 1 <hidden=true>;   /*    0x8000000 */
+                uint uses_pixel_shader : 1;                 /*   0x10000000 */
+                uint uses_hlsl         : 1;                 /*   0x20000000 */
+                uint uses_normal_map   : 1;                 /*   0x40000000 */
+                uint uses_skinning     : 1;                 /*   0x80000000 */
             } flags <open=true>;
         } flag <open=true>;
         uint unk_zero;
@@ -262,38 +265,45 @@ struct mesh
             uint32 val <format=hex>;
             struct
             {
-                uint unk_props                      : 1;                 /*          0x1 */            
+                uint unk_props                      : 1;                 /*          0x1 */
                 uint unk_particles                  : 1;                 /*          0x2 */
                 uint unk_plants                     : 1;                 /*          0x4 */
                 uint unk_particles_b                : 1;                 /*          0x8 */
-                uint maybe_unused                   : 1 <hidden=true>;   /*         0x10 */           
+
+                uint maybe_unused                   : 1 <hidden=true>;   /*         0x10 */
                 uint unk_hair_and_body_parts        : 1;                 /*         0x20 */
-                uint maybe_unused                   : 1 <hidden=true>;   /*         0x40 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*         0x80 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*         0x40 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*         0x80 */
+
                 uint unk_particles                  : 1;                 /*        0x100 */
                 uint unk_screen_space               : 1;                 /*        0x200 */
-                uint maybe_unused                   : 1 <hidden=true>;   /*        0x400 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*        0x800 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*       0x1000 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*       0x2000 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*       0x4000 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*       0x8000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*        0x400 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*        0x800 */
+
+                uint maybe_unused                   : 1 <hidden=true>;   /*       0x1000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*       0x2000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*       0x4000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*       0x8000 */
+
                 uint reserved_warband_tangent_space : 1;                 /*      0x10000 */
                 uint reserved_warband_model_format  : 1;                 /*      0x20000 */
-                uint maybe_unused                   : 1 <hidden=true>;   /*      0x40000 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*      0x80000 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*     0x100000 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*     0x200000 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*     0x400000 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*     0x800000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*      0x40000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*      0x80000 */
+
+                uint maybe_unused                   : 1 <hidden=true>;   /*     0x100000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*     0x200000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*     0x400000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*     0x800000 */
+
                 uint pre_exponentiate_colors        : 1;                 /*    0x1000000 */
-                uint maybe_unused                   : 1 <hidden=true>;   /*    0x2000000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*    0x2000000 */
                 uint unk_particles_c                : 1;                 /*    0x4000000 */
-                uint maybe_unused                   : 1 <hidden=true>;   /*    0x8000000 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*   0x10000000 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*   0x20000000 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*   0x40000000 */           
-                uint maybe_unused                   : 1 <hidden=true>;   /*   0x80000000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*    0x8000000 */
+
+                uint maybe_unused                   : 1 <hidden=true>;   /*   0x10000000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*   0x20000000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*   0x40000000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*   0x80000000 */
             } flags <open=true>;
         } flag;
         rgltag mat_name <bgcolor=cSilver>;
@@ -433,7 +443,7 @@ struct body
         struct body_type
         {
             rgltag body_type <bgcolor=cSilver>;
-            
+
             /* swy: kindly provided by K700 in the M&B modding Discord: https://discord.com/channels/411286129317249035/411291151979773963 */
             union rgl_body_part_flags
             {
@@ -448,6 +458,7 @@ struct body
                     uint maybe_unused                   : 1 <hidden=true>;   /*         0x20 */
                     uint maybe_unused                   : 1 <hidden=true>;   /*         0x40 */
                     uint maybe_unused                   : 1 <hidden=true>;   /*         0x80 */
+
                     uint bf_barrier_ai                  : 1;                 /*        0x100 */
                     uint bf_tree                        : 1;                 /*        0x200 */
                     uint maybe_unused                   : 1 <hidden=true>;   /*        0x400 */
@@ -456,6 +467,7 @@ struct body
                     uint maybe_unused                   : 1 <hidden=true>;   /*       0x2000 */
                     uint bf_dusty                       : 1;                 /*       0x4000 */
                     uint bf_unknown                     : 1;                 /*       0x8000 - K700: TODO */
+
                     uint bf_barrier_2d                  : 1;                 /*      0x10000 */
                     uint bf_dynamic                     : 1;                 /*      0x20000 */
                     uint bf_moveable                    : 1;                 /*      0x40000 */
@@ -464,6 +476,7 @@ struct body
                     uint bf_barrier_player              : 1;                 /*     0x200000 */
                     uint maybe_unused                   : 1 <hidden=true>;   /*     0x400000 */
                     uint bf_static_movement             : 1;                 /*     0x800000 */
+
                     uint bf_barrier_ai_3d               : 1;                 /*    0x1000000 */
                     uint maybe_unused                   : 1 <hidden=true>;   /*    0x2000000 */
                     uint maybe_unused                   : 1 <hidden=true>;   /*    0x4000000 */
@@ -472,7 +485,7 @@ struct body
                     uint maybe_unused                   : 1 <hidden=true>;   /*   0x20000000 */
                     uint maybe_unused                   : 1 <hidden=true>;   /*   0x40000000 */
                     uint maybe_unused                   : 1 <hidden=true>;   /*   0x80000000 */
-                } flags <open=true>;;
+                } flags <open=true>;
             };
 
                  if (Stricmp(body_type.s, "composite") == 0)

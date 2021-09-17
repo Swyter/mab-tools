@@ -4,7 +4,7 @@
 //      File: Mount&Blade Binary Resource File
 //   Authors: Swyter
 //    E-mail: swyterzone+mab@gmail.com
-//   Version: 2020.07.01
+//   Version: 2021.09.17
 //   Purpose: Opens M&B 1.011 and Warband BRF files (Resource/*.brf)
 //  Category: Game
 // File Mask: *.brf
@@ -262,38 +262,38 @@ struct mesh
             uint32 val <format=hex>;
             struct
             {
-                uint unk_props                      : 1;
-                uint unk_particles                  : 1;
-                uint unk_plants                     : 1;
-                uint unk_particles_b                : 1;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint unk_hair_and_body_parts        : 1;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint unk_particles                  : 1;
-                uint unk_screen_space               : 1;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint reserved_warband_tangent_space : 1;
-                uint reserved_warband_model_format  : 1;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint pre_exponentiate_colors        : 1;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint unk_particles_c                : 1;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
-                uint maybe_unused                   : 1 <hidden=true>;
+                uint unk_props                      : 1;                 /*          0x1 */            
+                uint unk_particles                  : 1;                 /*          0x2 */
+                uint unk_plants                     : 1;                 /*          0x4 */
+                uint unk_particles_b                : 1;                 /*          0x8 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*         0x10 */           
+                uint unk_hair_and_body_parts        : 1;                 /*         0x20 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*         0x40 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*         0x80 */           
+                uint unk_particles                  : 1;                 /*        0x100 */
+                uint unk_screen_space               : 1;                 /*        0x200 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*        0x400 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*        0x800 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*       0x1000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*       0x2000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*       0x4000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*       0x8000 */           
+                uint reserved_warband_tangent_space : 1;                 /*      0x10000 */
+                uint reserved_warband_model_format  : 1;                 /*      0x20000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*      0x40000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*      0x80000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*     0x100000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*     0x200000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*     0x400000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*     0x800000 */           
+                uint pre_exponentiate_colors        : 1;                 /*    0x1000000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*    0x2000000 */           
+                uint unk_particles_c                : 1;                 /*    0x4000000 */
+                uint maybe_unused                   : 1 <hidden=true>;   /*    0x8000000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*   0x10000000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*   0x20000000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*   0x40000000 */           
+                uint maybe_unused                   : 1 <hidden=true>;   /*   0x80000000 */           
             } flags <open=true>;
         } flag;
         rgltag mat_name <bgcolor=cSilver>;
@@ -301,7 +301,7 @@ struct mesh
         /* swy: unique vertex positions for this mesh, deduplicated from the vtx array, we don't want to store three
                 floats there each time; instead of that, a single index pointing here will do */
         uint pos_cnt;
-        struct 
+        struct
         {
             float x, y, z;
         } pos[pos_cnt];
@@ -330,13 +330,13 @@ struct mesh
             uint time; /* swy: this is what the game actually uses in the frame timeline; sometimes searching for specific/hardcoded numbers */
 
             uint pos_cnt; /* swy: overriden vertex position (for this frame) */
-            struct 
+            struct
             {
                 float x, y, z;
             } pos[pos_cnt];
 
             uint nrm_cnt; /* swy: overriden vertex normal (for this frame) */
-            struct 
+            struct
             {
                 float x, y, z;
             } nrm[nrm_cnt];
@@ -433,6 +433,47 @@ struct body
         struct body_type
         {
             rgltag body_type <bgcolor=cSilver>;
+            
+            /* swy: kindly provided by K700 in the M&B modding Discord: https://discord.com/channels/411286129317249035/411291151979773963 */
+            union rgl_body_part_flags
+            {
+                uint32 val <format=hex>;
+                struct
+                {
+                    uint maybe_unused                   : 1 <hidden=true>;   /*          0x1 */
+                    uint bf_no_collision                : 1;                 /*          0x2 */
+                    uint bf_invisible                   : 1;                 /*          0x4 */
+                    uint bf_indestructible              : 1;                 /*          0x8 */
+                    uint bf_terrain_quad                : 1;                 /*         0x10 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*         0x20 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*         0x40 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*         0x80 */
+                    uint bf_barrier_ai                  : 1;                 /*        0x100 */
+                    uint bf_tree                        : 1;                 /*        0x200 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*        0x400 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*        0x800 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*       0x1000 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*       0x2000 */
+                    uint bf_dusty                       : 1;                 /*       0x4000 */
+                    uint bf_unknown                     : 1;                 /*       0x8000 - K700: TODO */
+                    uint bf_barrier_2d                  : 1;                 /*      0x10000 */
+                    uint bf_dynamic                     : 1;                 /*      0x20000 */
+                    uint bf_moveable                    : 1;                 /*      0x40000 */
+                    uint bf_ladder                      : 1;                 /*      0x80000 */
+                    uint bf_barrier_3d                  : 1;                 /*     0x100000 */
+                    uint bf_barrier_player              : 1;                 /*     0x200000 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*     0x400000 */
+                    uint bf_static_movement             : 1;                 /*     0x800000 */
+                    uint bf_barrier_ai_3d               : 1;                 /*    0x1000000 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*    0x2000000 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*    0x4000000 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*    0x8000000 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*   0x10000000 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*   0x20000000 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*   0x40000000 */
+                    uint maybe_unused                   : 1 <hidden=true>;   /*   0x80000000 */
+                } flags <open=true>;;
+            };
 
                  if (Stricmp(body_type.s, "composite") == 0)
             {
@@ -441,15 +482,15 @@ struct body
             }
             else if (Stricmp(body_type.s, "sphere"   ) == 0) /* swy: a 3D point with a radius, anything (another point) closer to the center point than that is colliding */
             {
-                float radius, x,z,y; uint flag <format=hex>;
+                float radius, x,z,y; rgl_body_part_flags flags <format=hex>;
             }
             else if (Stricmp(body_type.s, "capsule"  ) == 0) /* swy: a capsule is a line capped by two spheres at either end, with the line having the same radius as them at any point (it can also be seen as a sphere sliding through a line; so if you find the closest line-point position and then do a sphere check it's the same thing) */
             {
-                float radius, x,z,y, x,z,y; uint flag <format=hex>;
+                float radius, x,z,y, x,z,y; rgl_body_part_flags flags <format=hex>;
             }
             else if (Stricmp(body_type.s, "face"     ) == 0) /* swy: only ever used in bo_mesh_passage, as far as I know */
             {
-                uint vtx_count; struct { float x, z, y; } vtx[vtx_count]; uint flag <format=hex>;
+                uint vtx_count; struct { float x, z, y; } vtx[vtx_count]; uint flags <format=hex>;
             }
             else if (Stricmp(body_type.s, "manifold" ) == 0) /* swy: admits quad and triangle soups (maybe even arbitrary (5-sided+) polygons?) */
             {
@@ -457,7 +498,7 @@ struct body
                 struct { float x, z, y; } vtx[vtx_count];
 
                 uint poly_elem;
-                struct { int minus_one, unk_zero, vtx_count; uint vtx_idx[vtx_count]; } poly[poly_elem] <optimize=false>;
+                struct { int minus_one; rgl_body_part_flags flags <format=hex>; uint vtx_count; uint vtx_idx[vtx_count]; } poly[poly_elem] <optimize=false>;
             }
         } body <optimize=false>;
     } elem[object_count] <optimize=false, read=read_body>;
@@ -502,14 +543,14 @@ string read_mat(struct mat_t& _thing)
 string read_mesh(struct mesh_t& _thing)
 {
     string s =  "";
-    
+
     SPrintf(s, "* %-80s", _thing.mesh_name.s);
 
     if (_thing.extra_frames > 0)
         SPrintf(s, "%s (%d vertex frames)", s, _thing.extra_frames + 1);
 
     if (_thing.bone_count > 0)
-        SPrintf(s, "%s (skinned to %u bones)", s, _thing.bone_count); 
+        SPrintf(s, "%s (skinned to %u bones)", s, _thing.bone_count);
 
     return s;
 }

@@ -105,7 +105,7 @@ struct
     } vertex[vertex_count];
     
     
-    uint32 thing_count;
+    uint32 edge_count;
     struct
     {
         int32 a;
@@ -113,10 +113,10 @@ struct
         int32 vtx_b;
         int32 d;
         int32 e;
-    } tt[thing_count];
+    } edge[edge_count];
     
     
-    uint32 thing_count_b;
+    uint32 face_count;
     struct
     {
         uint32 poly_count <bgcolor=cDkGreen>;
@@ -126,7 +126,7 @@ struct
         } elem[poly_count];
     
          int a;
-    } yy[thing_count_b] <optimize=false>;     
+    } face[face_count] <optimize=false>;     
 } ai_mesh;
 
 rglmarker terrain_marker;

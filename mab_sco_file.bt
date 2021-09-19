@@ -66,8 +66,22 @@ struct
         /* swy: some kind of universal flag that depends on the game version? don't ask me */
         enum <uint32>
         {
-            Const_MB = 0x930F6C4,
-            Const_WB = 0x94AEF80
+            Const_MB_SWC_old  = 0x952EFEC,
+            Const_MB_SWC_c    = 0x99EF47C,
+            Const_MB_SWC_d    = 0x387F7E0,
+            Const_MB_SWC      = 0x9A3F034,
+            Const_MB_a        = 0x930F6C4,
+            Const_MB_TLD      = 0x930F6D4,
+            Const_MB_c        = 0x930F6DC,
+            Const_WB          = 0x94AEF80,
+            Const_MB_Native   = 0x3A4EF9C,
+            Const_WB_Standalo = 0x317F2C0,
+            Const_MB_Native_a = 0x386F7E8,
+            Const_MB_Native_b = 0x397F154,
+            Const_MB_Native_d = 0x940EFD0,
+            Const_MB_Native_e = 0x947EF90,
+            Const_MB_Native_f = 0x94FEF94,
+
         } unk <format=hex>; /* swy: looking at the Site::save_site_objects() -> Mission_object::write(rglIO_Stream&) function decompilation, it seems to write weird uninitialized stack garbage */
     
         float mtx_row_a[3]; /* affine 3x3 row-major matrix; encodes rotation and maybe shearing (rglMat3) */
@@ -120,9 +134,9 @@ struct
     struct
     {
         uint32 poly_count <bgcolor=cDkGreen>;
-        uint a[poly_count];
-        uint b[poly_count];
-        uint c, ai_mesh_id;
+        uint a[poly_count] <bgcolor=cBlue>;
+        uint b[poly_count] <bgcolor=cDkBlue>;
+        uint c <bgcolor=cRed>;//, ai_mesh_id <bgcolor=cWhite>;
     } face[face_count] <optimize=false>;     
 } ai_mesh;
 
@@ -142,7 +156,7 @@ struct
 
     local uint block_count = scene_width * scene_height;
 
-    struct named_block
+    struct ground_block
     {
         uint32 index;
         rgltag str <fgcolor=cWhite, bgcolor=cDkBlue>;
@@ -166,7 +180,7 @@ struct
             }while(remaining_blocks > 0);
 
         }
-    } block[num_layers] <optimize=false, read=block_read>;
+    } named_block[num_layers] <optimize=false, read=block_read>;
 } terrain;
 
 // sum of steppe blocks
@@ -196,8 +210,8 @@ string sceneprop_read(struct obj &m)
     else                        return EnumToString(m.type);
 };
 
-string block_read(struct named_block &m)
+string block_read(struct ground_block &m)
 {
-    return "[/] " + m.str.s;
+    return "[/] " + m.str.s + " (enabled: " + UIntToStr(m.enabled) + ")";
 };
 

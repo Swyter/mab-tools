@@ -13,6 +13,17 @@
 
 LittleEndian();
 
+typedef union
+{
+    char fourcc[4];
+    int32 integer <format=hex>;
+} rglmarker <read=read_rglmarker>;
+
+string read_rglmarker(rglmarker &m)
+{
+    return "[" + m.fourcc + "]";
+};
+
 typedef struct
 {
     uint tag_len;
@@ -26,99 +37,107 @@ string read_rgltag(struct rgltag& _thing)
 
 struct
 {
-    int magic;      /* swy: '3ýÿÿ', or 33 FD FF FF. seemingly stored as `mnv this, #716` (-717) on Android */
+    rglmarker magic;   /* swy: '3ýÿÿ', or 33 FD FF FF. seemingly stored as `mnv this, #716` (-717) on Android */
     int version;       /* swy: always version 4 */
-    int object_count;  /* swy: number of scene/mission objects/props that follow */
 } head <open=true, bgcolor=cDkRed>;
 
-/* -- scene objects */
-struct obj
+
+struct
 {
-    enum <uint32> /* swy: as shown in the edit mode scene editor combobox; same order */
+    int object_count;  /* swy: number of scene/mission objects/props that follow */
+
+    /* -- scene objects */
+    struct obj
     {
-        Prop    = 0, /* Scene Prop */
-        Entry   = 1, /* Entry Point */
-        Item    = 2, /* Item Kind */
-        Unused  = 3,
-        Plant   = 4, /* Flora */
-        Passage = 5
-    } type <bgcolor=cBlue>;
-
-    /* swy: the index from (ID_scene_props.py or ID_items.py) that (hopefully) matches the
-            string constant; depending on the object type */
-    uint32 id;
-
-    /* swy: some kind of universal flag that depends on the game version? don't ask me */
-    enum <uint32>
-    {
-        Const_MB = 0x930F6C4,
-        Const_WB = 0x94AEF80
-    } unk <format=hex>; /* swy: looking at the Site::save_site_objects() -> Mission_object::write(rglIO_Stream&) function decompilation, it seems to write weird uninitialized stack garbage */
-
-    float mtx_row_a[3]; /* affine 3x3 row-major matrix; encodes rotation and maybe shearing (rglMat3) */
-    float mtx_row_b[3];
-    float mtx_row_c[3];
-
-    float pos[3]; /* translation; x, y, z */
-
-    /* swy: it's set to zero for things without constant; like entry points or passages
-            the constant hopefully should match the ID. Keep in mind that the game
-            doesn't seem to use this string field for retrieving anything, only
-            IDs, so they should be remapped manually after re-shuffling. */
-    rgltag str <fgcolor=cWhite, bgcolor=cDkBlue>;
-
-    /* swy: as shown in the edit mode scene editor; entry number is used for entry point indexes,
-            while the menu item is used to map passages to city menus */
-    uint32 entry_no;
-    uint32 menu_item_no;
-
-    float scale[3]; /* scaling multiplier, per axis; x, y, z */
-} objects[head.object_count] <optimize=false, read=sceneprop_read>;
+        enum <uint32> /* swy: as shown in the edit mode scene editor combobox; same order */
+        {
+            Prop    = 0, /* Scene Prop */
+            Entry   = 1, /* Entry Point */
+            Item    = 2, /* Item Kind */
+            Unused  = 3,
+            Plant   = 4, /* Flora */
+            Passage = 5
+        } type <bgcolor=cBlue>;
+    
+        /* swy: the index from (ID_scene_props.py or ID_items.py) that (hopefully) matches the
+                string constant; depending on the object type */
+        uint32 id;
+    
+        /* swy: some kind of universal flag that depends on the game version? don't ask me */
+        enum <uint32>
+        {
+            Const_MB = 0x930F6C4,
+            Const_WB = 0x94AEF80
+        } unk <format=hex>; /* swy: looking at the Site::save_site_objects() -> Mission_object::write(rglIO_Stream&) function decompilation, it seems to write weird uninitialized stack garbage */
+    
+        float mtx_row_a[3]; /* affine 3x3 row-major matrix; encodes rotation and maybe shearing (rglMat3) */
+        float mtx_row_b[3];
+        float mtx_row_c[3];
+    
+        float pos[3]; /* translation; x, y, z */
+    
+        /* swy: it's set to zero for things without constant; like entry points or passages
+                the constant hopefully should match the ID. Keep in mind that the game
+                doesn't seem to use this string field for retrieving anything, only
+                IDs, so they should be remapped manually after re-shuffling. */
+        rgltag str <fgcolor=cWhite, bgcolor=cDkBlue>;
+    
+        /* swy: as shown in the edit mode scene editor; entry number is used for entry point indexes,
+                while the menu item is used to map passages to city menus */
+        uint32 entry_no;
+        uint32 menu_item_no;
+    
+        float scale[3]; /* scaling multiplier, per axis; x, y, z */
+    } objects[object_count] <optimize=false, read=sceneprop_read>;
+} mission_objects;
 
 
 /* -- ai mesh vertices; probably */
-uint32 next_section_rel_offset;
-uint32 id;
 struct
 {
-    float x;
-    float y;
-    float height;
-} vertex[id];
-
-
-uint32 ido;
-struct
-{
-    uint32 a;
-    uint32 b;
-    uint32 c;
-    uint32 d;
-    uint32 e;
-} tt[ido];
-
-
-uint32 ide;
-struct
-{
-    uint32 poly_count <bgcolor=cDkGreen>;
+    uint32 next_section_rel_offset <format=hex>;
+    uint32 vertex_count;
     struct
     {
-        uint a,b;
-    } elem[poly_count];
+        float x;
+        float y;
+        float height;
+    } vertex[vertex_count];
+    
+    
+    uint32 thing_count;
+    struct
+    {
+        uint32 a;
+        uint32 b;
+        uint32 c;
+        uint32 d;
+        uint32 e;
+    } tt[thing_count];
+    
+    
+    uint32 thing_count_b;
+    struct
+    {
+        uint32 poly_count <bgcolor=cDkGreen>;
+        struct
+        {
+            uint a,b;
+        } elem[poly_count];
+    
+         int a;
+    } yy[thing_count_b] <optimize=false>;     
+} ai_mesh;
 
-     int a;
-} yy[ide] <optimize=false>;     
-
-uint32 idu;
+rglmarker terrain_marker;
 
 /* -- ground layers */
-FSeek(startof(next_section_rel_offset) + sizeof(int) + next_section_rel_offset);
+FSeek(startof(ai_mesh.next_section_rel_offset) + sizeof(int) + ai_mesh.next_section_rel_offset);
 //FSeek(0xe8f5); // tldmod\SceneObj\scn_cair_andros_center.sco
 //FSeek(0x83d8); // MountBlade Warband\Modules\Native\SceneObj\scn_town_13_center.sco
 struct
 {
-    int magic <bgcolor=cDkRed>; /* ¦ÑJÿ / 0xff4ad1a6 / ground_paint_saved_magic */
+    rglmarker magic <bgcolor=cDkRed>; /* ¦ÑJÿ / 0xff4ad1a6 / ground_paint_saved_magic */
     uint32 relative_offset_to_end;
     uint32 num_layers;
     uint32 scene_width;

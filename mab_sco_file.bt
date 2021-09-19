@@ -108,7 +108,7 @@ struct
     uint32 edge_count;
     struct
     {
-        int32 a;
+        int32 some_count; /* swy: maybe adjacency count for nearby polys */
         int32 vtx_a;
         int32 vtx_b;
         int32 d;

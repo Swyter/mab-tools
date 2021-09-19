@@ -4,7 +4,7 @@
 //      File: Mount&Blade Scene Object file
 //   Authors: Swyter
 //    E-mail: swyterzone+mab@gmail.com
-//   Version: 2020.06.17
+//   Version: 2021.09.19
 //   Purpose: Opens scene files (SceneObj/scn_*.sco) on M&B 1.011 and Warband
 //  Category: Game
 // File Mask: *.sco
@@ -13,11 +13,22 @@
 
 LittleEndian();
 
+typedef struct
+{
+    uint tag_len;
+    char s[tag_len];
+} rgltag <read=read_rgltag>;
+
+string read_rgltag(struct rgltag& _thing)
+{
+    return _thing.s;
+}
+
 struct
 {
-    char magic[4];      /* swy: '3ýÿÿ', or 33 FD FF FF. seemingly stored as `mnv this, #716` (-717) on Android */
-    int  version;       /* swy: always version 4 */
-    int  object_count;  /* swy: number of scene/mission objects/props that follow */
+    int magic;      /* swy: '3ýÿÿ', or 33 FD FF FF. seemingly stored as `mnv this, #716` (-717) on Android */
+    int version;       /* swy: always version 4 */
+    int object_count;  /* swy: number of scene/mission objects/props that follow */
 } head <open=true, bgcolor=cDkRed>;
 
 /* -- scene objects */
@@ -54,7 +65,7 @@ struct obj
             the constant hopefully should match the ID. Keep in mind that the game
             doesn't seem to use this string field for retrieving anything, only
             IDs, so they should be remapped manually after re-shuffling. */
-    uint32 str_size; char str[str_size] <fgcolor=cWhite, bgcolor=cDkBlue>;
+    rgltag str <fgcolor=cWhite, bgcolor=cDkBlue>;
 
     /* swy: as shown in the edit mode scene editor; entry number is used for entry point indexes,
             while the menu item is used to map passages to city menus */
@@ -70,10 +81,10 @@ uint32 next_section_rel_offset;
 uint32 id;
 struct
 {
-    float a;
-    float b;
+    float x;
+    float y;
     float height;
-} ss[id];
+} vertex[id];
 
 
 uint32 ido;
@@ -107,7 +118,7 @@ FSeek(startof(next_section_rel_offset) + sizeof(int) + next_section_rel_offset);
 //FSeek(0x83d8); // MountBlade Warband\Modules\Native\SceneObj\scn_town_13_center.sco
 struct
 {
-    char magic[4] <bgcolor=cDkRed>; /* ¦ÑJÿ / 0xff4ad1a6 / ground_paint_saved_magic */
+    int magic <bgcolor=cDkRed>; /* ¦ÑJÿ / 0xff4ad1a6 / ground_paint_saved_magic */
     uint32 relative_offset_to_end;
     uint32 num_layers;
     uint32 scene_width;
@@ -118,8 +129,7 @@ struct
     struct named_block
     {
         uint32 index;
-        uint32 str_size;
-        char str[str_size] <fgcolor=cWhite, bgcolor=cDkBlue>;
+        rgltag str <fgcolor=cWhite, bgcolor=cDkBlue>;
         uint32 enabled;
 
         if (enabled)
@@ -140,8 +150,8 @@ struct
             }while(remaining_blocks > 0);
 
         }
-    } block[num_layers] <optimize=false>;
-} thing;
+    } block[num_layers] <optimize=false, read=block_read>;
+} terrain;
 
 // sum of steppe blocks
 // >>> 5041 + 4 + 4
@@ -164,8 +174,14 @@ string sceneprop_read(struct obj &m)
 {
          if (m.type == Prop ||
              m.type == Item ||
-             m.type == Plant)   return EnumToString(m.type) + " -- " + m.str;
+             m.type == Plant)   return EnumToString(m.type) + " -- " + m.str.s;
     else if (m.type == Entry)   return EnumToString(m.type) + " point ["  + UIntToStr(m.entry_no) + "]";
     else if (m.type == Passage) return EnumToString(m.type) + " for menu item " + UIntToStr(m.menu_item_no);
     else                        return EnumToString(m.type);
 };
+
+string block_read(struct named_block &m)
+{
+    return "[/] " + m.str.s;
+};
+

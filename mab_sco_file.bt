@@ -125,8 +125,8 @@ struct
         int32 some_count; /* swy: maybe adjacency count for nearby polys */
         int32 vtx_a;
         int32 vtx_b;
-        int32 d;
-        int32 e;
+        int32 face_idx_maybe_a; /* swy: one of these is set to -10000 when some_count is 1 */
+        int32 face_idx_maybe_b; /*      mainly the bottom one here, I think it's a main face back-reference */
     } edge[edge_count];
     
     
@@ -145,50 +145,60 @@ struct
     } face[face_count] <optimize=false>;     
 } ai_mesh;
 
-rglmarker terrain_marker;
-
-/* -- ground layers */
-FSeek(startof(ai_mesh.section_size) + sizeof(int) + ai_mesh.section_size);
-//FSeek(0xe8f5); // tldmod\SceneObj\scn_cair_andros_center.sco
-//FSeek(0x83d8); // MountBlade Warband\Modules\Native\SceneObj\scn_town_13_center.sco
-struct
+if (!FEof()) /* swy: if the file ends here it means that it's an interior and that we don't have any terrain/paint stuff */
 {
-    rglmarker magic <bgcolor=cDkRed>; /* ¦ÑJÿ / 0xff4ad1a6 / ground_paint_saved_magic */
-    uint32 section_size; /* swy: or a relative offset to the end */
 
-    uint32 num_layers;
+    rglmarker terrain_marker; /* swy: this is just here to ensure that the end of the ai_mesh stuff lines up automatically with the next section without needing fseek(), as a bit of a canary */
 
-    uint32 scene_width;
-    uint32 scene_height;
 
-    local uint block_count = scene_width * scene_height;
-
-    struct ground_block
+    /* -- ground layers */
+    FSeek(startof(ai_mesh.section_size) + sizeof(int) + ai_mesh.section_size);
+    //FSeek(0xe8f5); // tldmod\SceneObj\scn_cair_andros_center.sco
+    //FSeek(0x83d8); // MountBlade Warband\Modules\Native\SceneObj\scn_town_13_center.sco
+    struct
     {
-        uint32 index;
-        rgltag str <fgcolor=cWhite, bgcolor=cDkBlue>;
-        uint32 enabled;
-
-        if (enabled)
-        {
-            local int remaining_blocks = block_count;
-            do {
-            struct
-            {
-                uint32 rle;
-                uint32 elem_count;
-
-                Printf("remaining_blocks = %u -= (%u + %u == %u)\n", remaining_blocks, rle, elem_count, rle + elem_count);
+        rglmarker magic <bgcolor=cDkRed>; /* ¦ÑJÿ / 0xff4ad1a6 / ground_paint_saved_magic */
+        uint32 section_size; /* swy: or a relative offset to the end */
     
-                remaining_blocks -= rle + elem_count;
-
-                char elem[elem_count];
-            } blockb[1] <optimize=false>;
-            }while(remaining_blocks > 0);
-
-        }
-    } named_block[num_layers] <optimize=false, read=block_read>;
-} terrain;
+        uint32 num_layers;
+    
+        uint32 scene_width;
+        uint32 scene_height;
+    
+        local uint block_count = scene_width * scene_height;
+    
+        struct ground_block
+        {
+            uint32 index;
+            rgltag str <fgcolor=cWhite, bgcolor=cDkBlue>;
+            uint32 enabled;
+            uint32 rle;
+    
+            if (enabled)
+            {
+                local int remaining_blocks = block_count;
+                do {
+                struct
+                {
+                    
+                    uint32 elem_count;
+    
+                    Printf("remaining_blocks = %u -= (%u + %u == %u)\n", remaining_blocks, rle, elem_count, rle + elem_count);
+        
+                    remaining_blocks -= rle + elem_count;
+    
+                    //if (elem_count == 1)
+                    //   break;
+    
+                    char elem[elem_count];
+                    uint32 rle;
+                } blockb[1] <optimize=false>;
+                }while(remaining_blocks > 0);
+    
+            }
+        } named_block[num_layers] <optimize=false, read=block_read>;
+    } terrain;
+}
 
 // sum of steppe blocks
 // >>> 5041 + 4 + 4

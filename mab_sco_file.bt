@@ -120,12 +120,9 @@ struct
     struct
     {
         uint32 poly_count <bgcolor=cDkGreen>;
-        struct
-        {
-            uint a,b;
-        } elem[poly_count];
-    
-         int a;
+        uint a[poly_count];
+        uint b[poly_count];
+        uint c, ai_mesh_id;
     } face[face_count] <optimize=false>;     
 } ai_mesh;
 

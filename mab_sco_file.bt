@@ -136,7 +136,10 @@ struct
         uint32 poly_count <bgcolor=cDkGreen>;
         uint a[poly_count] <bgcolor=cBlue>;
         uint b[poly_count] <bgcolor=cDkBlue>;
-        uint c <bgcolor=cRed>;//, ai_mesh_id <bgcolor=cWhite>;
+        uint has_more <bgcolor=cRed>;
+
+        if (has_more)
+            uint ai_mesh_id <bgcolor=cWhite>;
     } face[face_count] <optimize=false>;     
 } ai_mesh;
 

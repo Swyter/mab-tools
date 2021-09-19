@@ -109,7 +109,7 @@ struct
 /* -- ai mesh vertices; probably */
 struct
 {
-    uint32 next_section_rel_offset <format=hex>;
+    uint32 section_size <format=hex>; /* swy: this seems more like a relative offset to skip the block altogether */
     uint32 vertex_count;
     struct
     {
@@ -133,27 +133,31 @@ struct
     uint32 face_count;
     struct
     {
-        uint32 poly_count <bgcolor=cDkGreen>;
-        uint a[poly_count] <bgcolor=cBlue>;
-        uint b[poly_count] <bgcolor=cDkBlue>;
+        uint32 edge_count <bgcolor=cDkGreen>;
+        uint a[edge_count] <bgcolor=cBlue>;
+        uint b[edge_count] <bgcolor=cDkBlue>;
+
         uint has_more <bgcolor=cRed>;
 
         if (has_more)
             uint ai_mesh_id <bgcolor=cWhite>;
+
     } face[face_count] <optimize=false>;     
 } ai_mesh;
 
 rglmarker terrain_marker;
 
 /* -- ground layers */
-FSeek(startof(ai_mesh.next_section_rel_offset) + sizeof(int) + ai_mesh.next_section_rel_offset);
+FSeek(startof(ai_mesh.section_size) + sizeof(int) + ai_mesh.section_size);
 //FSeek(0xe8f5); // tldmod\SceneObj\scn_cair_andros_center.sco
 //FSeek(0x83d8); // MountBlade Warband\Modules\Native\SceneObj\scn_town_13_center.sco
 struct
 {
     rglmarker magic <bgcolor=cDkRed>; /* ¦ÑJÿ / 0xff4ad1a6 / ground_paint_saved_magic */
-    uint32 relative_offset_to_end;
+    uint32 section_size; /* swy: or a relative offset to the end */
+
     uint32 num_layers;
+
     uint32 scene_width;
     uint32 scene_height;
 

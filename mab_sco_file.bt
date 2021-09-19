@@ -108,11 +108,11 @@ struct
     uint32 thing_count;
     struct
     {
-        uint32 a;
-        uint32 b;
-        uint32 c;
-        uint32 d;
-        uint32 e;
+        int32 a;
+        int32 vtx_a;
+        int32 vtx_b;
+        int32 d;
+        int32 e;
     } tt[thing_count];
     
     

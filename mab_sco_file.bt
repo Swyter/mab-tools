@@ -167,7 +167,24 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
     
         struct ground_block
         {
-            int32 index;
+            enum <int32>
+            {
+                gray_stone    = 0,
+                brown_stone   = 1,
+                turf    = 2,
+                steppe  = 3,
+                snow   = 4,
+                earth = 5,
+                desert = 6,
+                forest = 7,
+                pebbles = 8,
+                village = 9,
+                path = 10,
+                ground_elevation = -7793, /* swy: wtfbbq?! */
+                ground_leveling = -12565,
+            } index <bgcolor=cBlue>;
+
+
             rgltag str <fgcolor=cWhite, bgcolor=cDkBlue>;
             uint32 enabled;
             //uint32 rle;

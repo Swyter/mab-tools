@@ -209,14 +209,10 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
             
                         remaining_blocks -= elem_count;
         
-                        if (index == 4294959503)
-                            float elem[elem_count];
-                        else if (index == -12565) /* swy: thanks, scn_village_81.sco, you are a great and terse example of ground_leveling :-) */
-                            float elem[elem_count];
-                        else
-                            char elem[elem_count];
-
-
+                             if (index == ground_elevation) float                                                           elem[elem_count];
+                        /* swy: thanks, scn_village_81.sco, you are a great and terse example of ground_leveling :-) */
+                        else if (index == ground_leveling)  union { uint val <format=hex>; struct { byte r,g,b,a; } chan; } elem[elem_count];
+                        else                                char                                                            elem[elem_count];
 
                         /* swconquest-git\SceneObj\scn_mainplanet_sarapin_land_battle.sco */
                         /* ground_elevation_floats -> 6347 floats / 25388 bytes */

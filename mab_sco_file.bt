@@ -167,7 +167,7 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
     
         struct ground_block
         {
-            uint32 index;
+            int32 index;
             rgltag str <fgcolor=cWhite, bgcolor=cDkBlue>;
             uint32 enabled;
             //uint32 rle;
@@ -212,35 +212,6 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
                         /* swconquest-git\SceneObj\scn_mainplanet_sarapin_land_battle.sco */
                         /* ground_elevation_floats -> 6347 floats / 25388 bytes */
 
->>> 0x28/4/4
-2.5
->>> 0x24/4/4
-2.25
->>> 0x20/4/4
-2.0
->>> (0x20/4)/4
-2.0
->>> 86*84
-7224
->>> 86*84
-7224
->>> 0x79064
-495716
->>> 0x79064 - 0x53680
-154084
->>> 0x134dc - 0x53680
--262564
->>> 0x134dc - 0xd1b0
-25388
->>> 25388 / 7224
-3.514396456256921
->>> 25388 / 4
-6347.0
->>> 80*4
-320
->>>
-*/
-
                         //uint32 rle;
                     } blockb[1] <optimize=false>;
                 }
@@ -278,6 +249,6 @@ string sceneprop_read(struct obj &m)
 
 string block_read(struct ground_block &m)
 {
-    return "[/] " + m.str.s + " (enabled: " + UIntToStr(m.enabled) + ")";
+    return "[/] " + m.str.s + " (enabled: " + UIntToStr(m.enabled) + ", id: " + UIntToStr(m.index) + ")";
 };
 

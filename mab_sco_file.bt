@@ -181,7 +181,7 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
                 village          =      9,
                 path             =     10,
                 ground_elevation =  -7793, /* swy: wtfbbq?! */
-                ground_leveling  = -12565,
+                ground_leveling  = -12565, /* swy: more like vertex_coloring */
             } index <bgcolor=cBlue>;
 
             rgltag str <fgcolor=cWhite, bgcolor=cDkBlue>;
@@ -209,10 +209,14 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
             
                         remaining_blocks -= elem_count;
         
-                        if (index != 4294959503)
-                            char elem[elem_count];
-                        else
+                        if (index == 4294959503)
                             float elem[elem_count];
+                        else if (index == -12565) /* swy: thanks, scn_village_81.sco, you are a great and terse example of ground_leveling :-) */
+                            float elem[elem_count];
+                        else
+                            char elem[elem_count];
+
+
 
                         /* swconquest-git\SceneObj\scn_mainplanet_sarapin_land_battle.sco */
                         /* ground_elevation_floats -> 6347 floats / 25388 bytes */

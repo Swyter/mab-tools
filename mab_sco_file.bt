@@ -169,25 +169,24 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
         {
             enum <int32>
             {
-                gray_stone    = 0,
-                brown_stone   = 1,
-                turf    = 2,
-                steppe  = 3,
-                snow   = 4,
-                earth = 5,
-                desert = 6,
-                forest = 7,
-                pebbles = 8,
-                village = 9,
-                path = 10,
-                ground_elevation = -7793, /* swy: wtfbbq?! */
-                ground_leveling = -12565,
+                gray_stone       =      0,
+                brown_stone      =      1,
+                turf             =      2,
+                steppe           =      3,
+                snow             =      4,
+                earth            =      5,
+                desert           =      6, /* swy: sometimes missing, depending on the map; why not just disable it/make it empty */
+                forest           =      7,
+                pebbles          =      8,
+                village          =      9,
+                path             =     10,
+                ground_elevation =  -7793, /* swy: wtfbbq?! */
+                ground_leveling  = -12565,
             } index <bgcolor=cBlue>;
 
-
             rgltag str <fgcolor=cWhite, bgcolor=cDkBlue>;
+
             uint32 enabled;
-            //uint32 rle;
     
             if (enabled)
             {
@@ -197,12 +196,9 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
                 {
                     struct
                     {
-                        int rle;
+                        int rle; /* swy: empty blocks to skip; substract from the total and exit early if no blocks left */
     
                         remaining_blocks -= rle;
-    
-                        //if (remaining_blocks - rle <= 0)
-                        //    break;
     
                         if (remaining_blocks <= 0)
                             break;
@@ -211,15 +207,7 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
         
                         //Printf("remaining_blocks = %u -= (%u + %u == %u)\n", remaining_blocks, rle, elem_count, rle + elem_count);
             
-                        //remaining_blocks -= rle + elem_count;
-    
                         remaining_blocks -= elem_count;
-    
-                       // if (remaining_blocks <= 0)
-                       //     break;
-        
-                        //if (elem_count == 1)
-                        //   break;
         
                         if (index != 4294959503)
                             char elem[elem_count];
@@ -229,7 +217,6 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
                         /* swconquest-git\SceneObj\scn_mainplanet_sarapin_land_battle.sco */
                         /* ground_elevation_floats -> 6347 floats / 25388 bytes */
 
-                        //uint32 rle;
                     } blockb[1] <optimize=false>;
                 }
             }

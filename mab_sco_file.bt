@@ -174,6 +174,15 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
     
             if (enabled)
             {
+               if (index == 4294959503)
+               {
+
+                float a[block_count];
+
+               }
+               else
+               {
+
                 local int remaining_blocks = block_count;
                 while(remaining_blocks > 0)
                 {
@@ -206,7 +215,10 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
                     char elem[elem_count];
                     //uint32 rle;
                 } blockb[1] <optimize=false>;
-                }
+               }
+
+
+}
     
             }
         } named_block[num_layers] <optimize=false, read=block_read>;

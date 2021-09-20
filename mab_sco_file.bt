@@ -147,9 +147,7 @@ struct
 
 if (!FEof()) /* swy: if the file ends here it means that it's an interior and that we don't have any terrain/paint stuff */
 {
-
     rglmarker terrain_marker; /* swy: this is just here to ensure that the end of the ai_mesh stuff lines up automatically with the next section without needing fseek(), as a bit of a canary */
-
 
     /* -- ground layers */
     FSeek(startof(ai_mesh.section_size) + sizeof(int) + ai_mesh.section_size);
@@ -172,28 +170,43 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
             uint32 index;
             rgltag str <fgcolor=cWhite, bgcolor=cDkBlue>;
             uint32 enabled;
-            uint32 rle;
+            //uint32 rle;
     
             if (enabled)
             {
                 local int remaining_blocks = block_count;
-                do {
+                while(remaining_blocks > 0)
+                {
                 struct
                 {
-                    
+                    int rle;
+
+                    remaining_blocks -= rle;
+
+                    //if (remaining_blocks - rle <= 0)
+                    //    break;
+
+                    if (remaining_blocks <= 0)
+                        break;
+
                     uint32 elem_count;
     
-                    Printf("remaining_blocks = %u -= (%u + %u == %u)\n", remaining_blocks, rle, elem_count, rle + elem_count);
+                    //Printf("remaining_blocks = %u -= (%u + %u == %u)\n", remaining_blocks, rle, elem_count, rle + elem_count);
         
-                    remaining_blocks -= rle + elem_count;
+                    //remaining_blocks -= rle + elem_count;
+
+                    remaining_blocks -= elem_count;
+
+                   // if (remaining_blocks <= 0)
+                   //     break;
     
                     //if (elem_count == 1)
                     //   break;
     
                     char elem[elem_count];
-                    uint32 rle;
+                    //uint32 rle;
                 } blockb[1] <optimize=false>;
-                }while(remaining_blocks > 0);
+                }
     
             }
         } named_block[num_layers] <optimize=false, read=block_read>;

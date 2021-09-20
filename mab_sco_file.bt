@@ -35,6 +35,9 @@ string read_rgltag(struct rgltag& _thing)
     return _thing.s;
 }
 
+typedef union { uint val <format=hex>; struct { byte r,g,b,a; } chan; } rglcolor;
+
+
 struct
 {
     rglmarker magic;   /* swy: '3ýÿÿ', or 33 FD FF FF. seemingly stored as `mnv this, #716` (-717) on Android */
@@ -163,6 +166,8 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
         uint32 scene_width;
         uint32 scene_height;
     
+        /* swy: if every terrain layer has something in common is that there is
+                a static number of width * height cells for every type */
         local uint block_count = scene_width * scene_height;
     
         struct ground_block
@@ -190,9 +195,9 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
     
             if (enabled)
             {
-
                 local int remaining_blocks = block_count;
-                while(remaining_blocks > 0)
+
+                while (remaining_blocks > 0)
                 {
                     struct
                     {
@@ -209,10 +214,9 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
             
                         remaining_blocks -= elem_count;
         
-                             if (index == ground_elevation) float                                                           elem[elem_count];
-                        /* swy: thanks, scn_village_81.sco, you are a great and terse example of ground_leveling :-) */
-                        else if (index == ground_leveling)  union { uint val <format=hex>; struct { byte r,g,b,a; } chan; } elem[elem_count];
-                        else                                char                                                            elem[elem_count];
+                             if (index == ground_elevation) float    elem[elem_count];
+                        else if (index == ground_leveling)  rglcolor elem[elem_count]; /* swy: thanks, scn_village_81.sco, you are a great and terse example of ground_leveling :-) */
+                        else                                ubyte    elem[elem_count] <format=hex>;
 
                         /* swconquest-git\SceneObj\scn_mainplanet_sarapin_land_battle.sco */
                         /* ground_elevation_floats -> 6347 floats / 25388 bytes */

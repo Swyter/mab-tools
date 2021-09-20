@@ -174,52 +174,76 @@ if (!FEof()) /* swy: if the file ends here it means that it's an interior and th
     
             if (enabled)
             {
-               if (index == 4294959503)
-               {
-
-                float a[block_count];
-
-               }
-               else
-               {
 
                 local int remaining_blocks = block_count;
                 while(remaining_blocks > 0)
                 {
-                struct
-                {
-                    int rle;
-
-                    remaining_blocks -= rle;
-
-                    //if (remaining_blocks - rle <= 0)
-                    //    break;
-
-                    if (remaining_blocks <= 0)
-                        break;
-
-                    uint32 elem_count;
+                    struct
+                    {
+                        int rle;
     
-                    //Printf("remaining_blocks = %u -= (%u + %u == %u)\n", remaining_blocks, rle, elem_count, rle + elem_count);
+                        remaining_blocks -= rle;
+    
+                        //if (remaining_blocks - rle <= 0)
+                        //    break;
+    
+                        if (remaining_blocks <= 0)
+                            break;
+    
+                        uint32 elem_count;
         
-                    //remaining_blocks -= rle + elem_count;
-
-                    remaining_blocks -= elem_count;
-
-                   // if (remaining_blocks <= 0)
-                   //     break;
+                        //Printf("remaining_blocks = %u -= (%u + %u == %u)\n", remaining_blocks, rle, elem_count, rle + elem_count);
+            
+                        //remaining_blocks -= rle + elem_count;
     
-                    //if (elem_count == 1)
-                    //   break;
+                        remaining_blocks -= elem_count;
     
-                    char elem[elem_count];
-                    //uint32 rle;
-                } blockb[1] <optimize=false>;
-               }
+                       // if (remaining_blocks <= 0)
+                       //     break;
+        
+                        //if (elem_count == 1)
+                        //   break;
+        
+                        if (index != 4294959503)
+                            char elem[elem_count];
+                        else
+                            float elem[elem_count];
 
+                        /* swconquest-git\SceneObj\scn_mainplanet_sarapin_land_battle.sco */
+                        /* ground_elevation_floats -> 6347 floats / 25388 bytes */
 
-}
-    
+>>> 0x28/4/4
+2.5
+>>> 0x24/4/4
+2.25
+>>> 0x20/4/4
+2.0
+>>> (0x20/4)/4
+2.0
+>>> 86*84
+7224
+>>> 86*84
+7224
+>>> 0x79064
+495716
+>>> 0x79064 - 0x53680
+154084
+>>> 0x134dc - 0x53680
+-262564
+>>> 0x134dc - 0xd1b0
+25388
+>>> 25388 / 7224
+3.514396456256921
+>>> 25388 / 4
+6347.0
+>>> 80*4
+320
+>>>
+*/
+
+                        //uint32 rle;
+                    } blockb[1] <optimize=false>;
+                }
             }
         } named_block[num_layers] <optimize=false, read=block_read>;
     } terrain;

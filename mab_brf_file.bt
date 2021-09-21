@@ -35,14 +35,17 @@ LittleEndian();
 typedef struct
 {
     uint tag_len;
-    char s[tag_len];
+    if (tag_len)
+        char s[tag_len];
 } rgltag <read=read_rgltag>;
 
 string read_rgltag(struct rgltag& _thing)
 {
-    return _thing.s;
+    if (_thing.tag_len <= 0)
+        return "";
+    else
+        return _thing.s;
 }
-
 /* -- */
 
 local uint is_wb_brf = false;

@@ -27,10 +27,8 @@ string read_rglmarker(rglmarker &m)
 typedef struct
 {
     uint tag_len;
-
     if (tag_len)
         char s[tag_len];
-
 } rgltag <read=read_rgltag>;
 
 string read_rgltag(struct rgltag& _thing)

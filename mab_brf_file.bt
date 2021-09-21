@@ -437,15 +437,15 @@ struct skel_ani
     } elem[object_count] <optimize=false, read=read_ska>;
 };
 
-struct body
+struct body /* swy: this is an invisible 3D collision surface; manifolds are collision mesh parts supporting triangles or quads, but you can also use simpler (and way-more-performant) shapes, like spheres or capsules. all of them approximate a visible mesh surface, but often tweaked a bit and by removing holes (and with less complex shapes) */
 {
-    uint object_count;
+    uint object_count; /* swy: how many? */
     struct body_t
     {
-        rgltag body_name;
+        rgltag body_name; /* swy: usually starting by `bo_`, by convention */
         struct body_type
         {
-            rgltag body_type <bgcolor=cSilver>;
+            rgltag body_type <bgcolor=cSilver>; /* swy: see below for the conditional fields depending on the body type */
 
             /* swy: kindly provided by K700 in the M&B modding Discord: https://discord.com/channels/411286129317249035/411291151979773963 */
             union rgl_body_part_flags
@@ -504,14 +504,14 @@ struct body
             {
                 float radius, x,z,y, x,z,y; rgl_body_part_flags flags <format=hex>;
             }
-            else if (Stricmp(body_type.s, "face"     ) == 0) /* swy: only ever used in bo_mesh_passage, as far as I know */
+            else if (Stricmp(body_type.s, "face"     ) == 0) /* swy: only ever used in bo_mesh_passage, as far as I know; a single, flat plane */
             {
                 uint vtx_count; struct { float x, z, y; } vtx[vtx_count]; uint flags <format=hex>;
             }
-            else if (Stricmp(body_type.s, "manifold" ) == 0) /* swy: admits quad and triangle soups (maybe even arbitrary (5-sided+) polygons?) */
+            else if (Stricmp(body_type.s, "manifold" ) == 0) /* swy: admits (indexed) quad and triangle soups (maybe even arbitrary (5-sided+) polygons?) */
             {
                 uint vtx_count;
-                struct { float x, z, y; } vtx[vtx_count];
+                struct { float x, z, y; } vtx[vtx_count]; /* swy: by separating the individual/unique positions from the vertices we can deduplicate things and store them more efficiently; they don't repeat as much, which with kind of data it's often an issue */
 
                 uint poly_elem;
                 struct { int minus_one; rgl_body_part_flags flags <format=hex>; uint vtx_count; uint vtx_idx[vtx_count]; } poly[poly_elem] <optimize=false>;

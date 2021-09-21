@@ -48,12 +48,10 @@ struct
     int version;       /* swy: always version 4 */
 } head <open=true, bgcolor=cDkRed>;
 
-
+/* -- scene objects */
 struct
 {
     int object_count;  /* swy: number of scene/mission objects/props that follow */
-
-    /* -- scene objects */
     struct obj
     {
         enum <uint32> /* swy: as shown in the edit mode scene editor combobox; same order */

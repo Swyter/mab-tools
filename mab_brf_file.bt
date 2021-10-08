@@ -371,13 +371,21 @@ struct mesh
               } components;
             } rgb;
 
-            if (!is_wb_brf) /* swy: FIXME: find out and complete what each of the unknown fields really does internally, probably just computed tangent stuff for nifty-looking normal maps */
+            float n_a, n_b, n_c;
+
+            if (!flag.flags.reserved_warband_model_format) /* swy: FIXME: find out and complete what each of the unknown fields really does internally, probably just computed tangent stuff for nifty-looking normal maps */
             {
-                float n_a, n_b, n_c, u, v, u_unused, v_unused;  /* swy: OpenBRF copies the u/v fields into the unused ones, which are blank in original BRF files */
+                float u, v, u_unused, v_unused;  /* swy: OpenBRF copies the u/v fields into the unused ones, which are blank in original BRF files */
             }
             else
             {
-                float n_a, n_b, n_c, unk_a, unk_b, unk_z; byte unk_one_or_zero_tangent_flip_or_not_maybe /* handedness?; false => 1 or true => -1 */; float u, v;
+                if (flag.flags.reserved_warband_tangent_space)
+                {
+                    float tan_a, tan_b, tan_z;
+                    byte unk_one_or_zero_tangent_flip_or_not_maybe /* handedness?; false => 1 or true => -1 */;
+                }
+
+                float u, v;
             }
         } vtx[vtx_cnt] <optimize=true>;
 

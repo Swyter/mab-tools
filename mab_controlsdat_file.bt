@@ -57,9 +57,10 @@ string get_key(uint index)
             toggle_first_person_view,
             character_window,
             inventory_window,
-            party_window_quests_window,
+            party_window,
+            quests_window,
             game_log_window,
-            view_orsers,
+            view_orders,
             order_hold,
             order_follow,
             order_charge,
@@ -75,10 +76,11 @@ string get_key(uint index)
             archers_control,
             cavalry_control,
             others_control,
-            quick_save
+            quick_save,
+            _MAX
         } lookup = index;
 
-        if (index < 5)
+        if (index < _MAX)
             return EnumToString(lookup);
     }
     else if (options.count == 52) /* Warband */

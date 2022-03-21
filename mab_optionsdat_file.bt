@@ -22,9 +22,9 @@ struct options_t
     float vol_sfx;
     float mouse_sensitivity;
     bool reverse_y; /* swy: 01 00 00 00 */
-    float zero[2];
+    bool dynamic_light, particle_systems;
     uint one;
-    float zero_b;
+    bool char_shadows;
     uint one, five, sixtyfour;
     enum {cs_slow, cs_normal, cs_fast} combat_speed;
     enum {ff_halved_very_easy, ff_three_fours_easy, ff_normal } friendly_fire;
@@ -46,11 +46,13 @@ struct options_t
 
     enum { ad_relative_to_enemy, ad_mouse_movement, ad_reversed_mouse_movement } attack_dir;
     enum { bd_auto_recommended, bd_mouse_movement } block_dir;
-    uint zero, zero;
-    bool bajas;
-    uint one, zero, five;
+    bool anisotropy, ambient_shadows;
+    bool ver_bajas;
+    bool one;
+    enum { ps_none, ps_fast, ps_complete } plant_shadows;
+    uint five;
 
     float gamma;
     float mor, mo;
-    uint two;
+    enum { blood_no, blood_near_player, blood_yes } blood;
 } options;

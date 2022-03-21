@@ -1,0 +1,22 @@
+//------------------------------------------------
+//--- 010 Editor v12.0.1 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+
+struct options_t
+{
+
+    uint32 music_vol; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
+    uint32 sfx_vol;
+    uint32 mouse_sensitivity;
+
+} options;

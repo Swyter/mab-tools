@@ -25,7 +25,9 @@ struct options_t
     bool dynamic_light, particle_systems;
     uint one;
     bool char_shadows;
-    uint one, five, sixtyfour;
+    uint one;
+    enum {corps_none, corpse_5, corpse_10, corpse_20, corpse_40, corpse_unlimited} corpse;
+    uint sixtyfour;
     enum {cs_slow, cs_normal, cs_fast} combat_speed;
     enum {ff_halved_very_easy, ff_three_fours_easy, ff_normal } friendly_fire;
     uint zero;

@@ -19,7 +19,7 @@ struct options_t
     float vol_music; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
     float vol_sfx;
     float mouse_sensitivity;
-    bool reverse_y; /* swy: 01 00 00 00 */
+    bool mouse_reverse_y; /* swy: 01 00 00 00 */
     bool dynamic_light, particle_systems;
     uint one;
     bool char_shadows;

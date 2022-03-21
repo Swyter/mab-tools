@@ -38,14 +38,48 @@ string get_key(uint index)
 {
     if (options.count == 37) /* M&B 1.011 */
     {
-        switch (index)
+        enum ui
         {
-        case   0: return "move_forward";
-        case   1: return "move_backward";
-        case   2: return "move_left";
-        case   3: return "move_right";
-        case   4: return "action";
-        }
+            move_forward,
+            move_backward,
+            move_left,
+            move_right,
+            action,
+            jump,
+            attack,
+            defend,
+            equip_next_weapon,
+            equip_next_shield,
+            sheath_weapon,
+            leave_location_retreat,
+            zoom,
+            view_outfit,
+            toggle_first_person_view,
+            character_window,
+            inventory_window,
+            party_window_quests_window,
+            game_log_window,
+            view_orsers,
+            order_hold,
+            order_follow,
+            order_charge,
+            order_dismount_toggle,
+            order_hold_fire_toggle,
+            order_advance,
+            order_fall_back,
+            order_stand_closer,
+            order_spread_out,
+            order_blunt_weapons_toggle,
+            everyone_control,
+            infantry_control,
+            archers_control,
+            cavalry_control,
+            others_control,
+            quick_save
+        } lookup = index;
+
+        if (index < 5)
+            return EnumToString(lookup);
     }
     else if (options.count == 52) /* Warband */
     {

@@ -33,7 +33,17 @@ struct options_t
 
     enum {pd_one_fourth, pd_one_half, pd_normal} player_damage;
     bool show_friendly_troop_names, show_bullseye, show_attack_dir, show_damage, shoot_difficulty;
-    float battlesize; /* swy: slider goes from 0.0f (= 25) to 1.0f (= 100) e.g. 2000 (=150025), -0.5f (= -13), -1.f (= -50), -2.f (= -125), 2.f (= 175), 0.5f (= 62) */ /* swy: the remapping function seems to be floor(25 + (float_val * (100 - 25))) */ /* swy: to go from in-game value to float do this: (floor(final_val) - 25) * (1 / (100 - 25)) */
+
+    /* swy: slider goes from 0.0f (= 25) to 1.0f (= 100) e.g. 2000.0f (=  150025),
+                                                                -0.5f (= -    13),
+                                                                -1.0f (= -    50),
+                                                                -2.0f (= -   125),
+                                                                 2.0f (=     175),
+                                                                 0.5f (=      62)
+            so yeah, the remapping function seems to be:  floor(      25 + (float_val * (100 - 25)))
+              to go from in-game value to float do this: (floor(final_val) - 25) * (1 / (100 - 25))  */
+    float battlesize;
+
     enum { ad_relative_to_enemy, ad_mouse_movement, ad_reversed_mouse_movement } attack_dir, block_dir;
     uint zero, zero;
     bool bajas;

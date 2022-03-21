@@ -1,0 +1,21 @@
+//------------------------------------------------
+//--- 010 Editor v12.0.1 Binary Template
+//
+//      File: Mount&Blade 1.011 - controls.dat
+//   Authors: Swyter
+//    E-mail: swyterzone+mab@gmail.com
+//   Version: 2022.03.21
+//   Purpose: Opens the M&B 1.011 binary keymapping file (%appdata%/Mount&Blade/controls.dat)
+//  Category: Game
+// File Mask: controls.dat
+//------------------------------------------------
+
+LittleEndian();
+
+enum bool { no, yes };
+
+struct options_t
+{
+    uint count;
+    struct { uint thing, thong;} stuff[count];
+} options;

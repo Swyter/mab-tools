@@ -27,7 +27,7 @@ struct options_t
     float zero_b;
     uint one, five, sixtyfour;
     enum {cs_slow, cs_normal, cs_fast} combat_speed;
-    enum {a} friendly_fire;
+    enum {ff_halved_very_easy, ff_three_fours_easy, ff_normal } friendly_fire;
     uint zero;
     enum {ia_good, ia_normal, ia_bad} ia;
 
@@ -44,12 +44,13 @@ struct options_t
               to go from in-game value to float do this: (floor(final_val) - 25) * (1 / (100 - 25))  */
     float battlesize;
 
-    enum { ad_relative_to_enemy, ad_mouse_movement, ad_reversed_mouse_movement } attack_dir, block_dir;
+    enum { ad_relative_to_enemy, ad_mouse_movement, ad_reversed_mouse_movement } attack_dir;
+    enum { bd_auto_recommended, bd_mouse_movement } block_dir;
     uint zero, zero;
     bool bajas;
     uint one, zero, five;
 
-    float unk;
+    float gamma;
     float mor, mo;
     uint two;
 } options;

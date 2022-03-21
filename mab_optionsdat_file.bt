@@ -13,17 +13,24 @@
 
 LittleEndian();
 
+enum bool { no, yes };
+
 struct options_t
 {
 
     float vol_music; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
     float vol_sfx;
     float mouse_sensitivity;
-    uint reverse_y; /* swy: 01 00 00 00 */
+    bool reverse_y; /* swy: 01 00 00 00 */
     float zero[2];
     uint one;
     float zero_b;
-    uint one, five, sixtyfour, zero, zero, zero, two, zero, show_friendly_troop_names, show_bullseye, show_attack_dir, show_damage, one;
+    uint one, five, sixtyfour;
+    enum {slow, normal, fast} combat_speed;
+    bool zero, zero;
+    enum {ass,sdfs,sss} ia;
+
+    bool zero, show_friendly_troop_names, show_bullseye, show_attack_dir, show_damage, one;
     float battlesize;
     uint attack_dir, block_dir;
     uint zero, zero, one, one, zero, five;

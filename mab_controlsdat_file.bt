@@ -22,29 +22,42 @@ enum scancode
     MAB_LEFT_MOUSE_BTN = 0xE0, MAB_RIGHT_MOUSE_BTN = 0xE1, MAB_MIDDLE_MOUSE_BTN = 0xE2, MAB_MOUSE_BTN_4 = 0xE3, MAB_MOUSE_BTN_5 = 0xE4, MAB_MOUSE_BTN_6 = 0xE5, MAB_MOUSE_BTN_7 = 0xE6, MAB_MOUSE_BTN_8 = 0xE7, MAB_SCROLL_UP = 0xEE, MAB_SCROLL_DOWN = 0xEF, 
 };
 
-local uint i;
-
 struct options_t
 {
     uint count; /* swy: 37 on M&B 1.011, 52 on WB */
 
-    for (i=0; i<count; i++)
-        struct { scancode key <format=hex>; int effs; /* swy: the heck? only some keys in the WB version aren't all FFs */ } stuff <open=true, read=Str("LOL %s", get_key(startof(this) / sizeof(this)))>;
+    struct
+    {
+        scancode key <format=hex>;
+        int effs; /* swy: the heck? only some keys in the WB version aren't all FFs */
+    } stuff[count] <open=true, read=Str("[%s]", get_key(startof(this) / sizeof(this)))>;
 } options;
 
 
 string get_key(uint index)
 {
-    if (options.count == 37)
+    if (options.count == 37) /* M&B 1.011 */
     {
-        return "move_forward";
-        return "move_backward";
-        return "move_left";
-        return "move_right";
-        return "action";
+        switch (index)
+        {
+        case   0: return "move_forward";
+        case   1: return "move_backward";
+        case   2: return "move_left";
+        case   3: return "move_right";
+        case   4: return "action";
+        }
     }
-    else if (options.count == 52)
+    else if (options.count == 52) /* Warband */
     {
-        return Str("%i", index);
+        switch (index)
+        {
+        case   0: return "move_forward";
+        case   1: return "move_backward";
+        case   2: return "move_left";
+        case   3: return "move_right";
+        case   4: return "action";
+        }
     }
+
+    return Str("FIXME: unk %i", index);
 }

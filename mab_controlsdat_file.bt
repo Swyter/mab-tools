@@ -12,10 +12,10 @@
 
 LittleEndian();
 
-enum bool { no, yes };
+enum scancode { F1 = 59, F2, F3, F4 };
 
 struct options_t
 {
     uint count;
-    struct { uint thing, thong;} stuff[count];
+    struct { scancode key; int effs; } stuff[count] <open=true>;
 } options;

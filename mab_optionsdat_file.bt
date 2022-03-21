@@ -16,9 +16,13 @@ LittleEndian();
 struct options_t
 {
 
-    float music_vol; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
-    float sfx_vol;
+    float vol_music; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
+    float vol_sfx;
     float mouse_sensitivity;
-    float more[20];
-
+    float zero;
+    float more[25];
+    uint five;
+    float battlesize;
+    float mor, mo;
+    uint two;
 } options;

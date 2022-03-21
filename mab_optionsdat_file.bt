@@ -11,12 +11,14 @@
 //   History: 
 //------------------------------------------------
 
+LittleEndian();
 
 struct options_t
 {
 
-    uint32 music_vol; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
-    uint32 sfx_vol;
-    uint32 mouse_sensitivity;
+    float music_vol; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
+    float sfx_vol;
+    float mouse_sensitivity;
+    float more[20];
 
 } options;

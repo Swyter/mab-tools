@@ -26,14 +26,18 @@ struct options_t
     uint one;
     float zero_b;
     uint one, five, sixtyfour;
-    enum {slow, normal, fast} combat_speed;
-    bool zero, zero;
-    enum {ass,sdfs,sss} ia;
+    enum {cs_slow, cs_normal, cs_fast} combat_speed;
+    enum {a} friendly_fire;
+    uint zero;
+    enum {ia_good, ia_normal, ia_bad} ia;
 
-    bool zero, show_friendly_troop_names, show_bullseye, show_attack_dir, show_damage, one;
-    float battlesize;
+    enum {pd_one_fourth, pd_one_half, pd_normal} player_damage;
+    bool show_friendly_troop_names, show_bullseye, show_attack_dir, show_damage, shoot_difficulty;
+    float battlesize; /* swy: slider goes from 0.0f (= 25) to 1.0f (= 100) */
     uint attack_dir, block_dir;
-    uint zero, zero, one, one, zero, five;
+    uint zero, zero;
+    bool bajas;
+    uint one, zero, five;
 
     float unk;
     float mor, mo;

@@ -19,9 +19,11 @@ struct options_t
     float vol_music; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
     float vol_sfx;
     float mouse_sensitivity;
-    float zero;
-    float more[25];
-    uint five;
+    float zero[3];
+    uint one;
+    float zero_b;
+    uint one, five, sixtyfour, zero, zero, zero, two, zero, one, one, zero, one, one, effs, two, zero, zero, zero, one, one, zero, five;
+
     float battlesize;
     float mor, mo;
     uint two;

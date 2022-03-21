@@ -23,9 +23,10 @@ struct options_t
     float zero[2];
     uint one;
     float zero_b;
-    uint one, five, sixtyfour, zero, zero, zero, two, zero, one, one, zero, one, one;
+    uint one, five, sixtyfour, zero, zero, zero, two, zero, show_friendly_troop_names, show_bullseye, show_attack_dir, show_damage, one;
     float battlesize;
-    uint attack_dir, block_dir, zero, zero, one, one, zero, five;
+    uint attack_dir, block_dir;
+    uint zero, zero, one, one, zero, five;
 
     float unk;
     float mor, mo;

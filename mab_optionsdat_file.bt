@@ -27,7 +27,7 @@ struct options_t
     bool char_shadows;
     uint one;
     enum {corps_none, corpse_5, corpse_10, corpse_20, corpse_40, corpse_unlimited} corpse;
-    uint sixtyfour;
+    uint flora_amount; /* 0-100 */
     enum {cs_slow, cs_normal, cs_fast} combat_speed;
     enum {ff_halved_very_easy, ff_three_fours_easy, ff_normal } friendly_fire;
     uint zero;
@@ -55,6 +55,6 @@ struct options_t
     uint five;
 
     float gamma;
-    float mor, mo;
+    float character_lod_range, char_shadow_lod; /* 0.0 to 1.0 = 0% to 100% */
     enum { blood_no, blood_near_player, blood_yes } blood;
 } options;

@@ -1,14 +1,13 @@
 //------------------------------------------------
 //--- 010 Editor v12.0.1 Binary Template
 //
-//      File: 
-//   Authors: 
-//   Version: 
-//   Purpose: 
-//  Category: 
-// File Mask: 
-//  ID Bytes: 
-//   History: 
+//      File: Mount&Blade 1.011 - options.dat
+//   Authors: Swyter
+//    E-mail: swyterzone+mab@gmail.com
+//   Version: 2022.03.21
+//   Purpose: Opens the M&B 1.011 binary settings file (%appdata%/Mount&Blade/options.dat)
+//  Category: Game
+// File Mask: options.dat
 //------------------------------------------------
 
 LittleEndian();
@@ -17,7 +16,6 @@ enum bool { no, yes };
 
 struct options_t
 {
-
     float vol_music; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
     float vol_sfx;
     float mouse_sensitivity;

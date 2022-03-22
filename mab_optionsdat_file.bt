@@ -16,10 +16,10 @@ enum bool { no, yes };
 
 struct options_t
 {
-    float music_volume; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
-    float sound_volume;
+    float music_volume; /* swy: from 0.f to 1.f */
+    float sound_volume; /* swy: from 0.f to 1.f */
 
-    float mouse_sensitivity;
+    float mouse_sensitivity; /* swy: from 0.f to 1.f */
     bool invert_mouse_y_axis; /* swy: 01 00 00 00 */
 
     bool dynamic_lighting,
@@ -32,7 +32,7 @@ struct options_t
     uint __unk__one;
 
     enum { corpses_none, corpses_5, corpses_10, corpses_20, corpses_40, corpses_unlimited } number_of_corpses;
-    uint grass_density; /* 0-100 */
+    uint grass_density; /* swy: 0-100 */
     enum { cs_slower, cs_normal, cs_fast } combat_speed;
     enum { ff_reduced_to_1_over_2_easiest, ff_reduced_to__3_over_4_easy, ff_normal } damage_to_friends;
 
@@ -73,7 +73,7 @@ struct options_t
     enum { ps_none, ps_quick, ps_full                  } realistic_shadows_on_plants;
     enum { rg_0, rg_1, rg_3, rg_5, rg_10, rg_unlimited } number_of_ragdolls;
 
-    float gamma;
+    float gamma; /* swy: from 1.50 to 2.50; this field is probably the only one actually clamped/limited in range */
     float character_detail, character_shadow_detail; /* 0.0 to 1.0 = 0% to 100% */
     enum { blood_no, blood_near_player, blood_yes } blood;
 } options;

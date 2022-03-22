@@ -16,10 +16,10 @@ enum bool { no, yes };
 
 struct options_t
 {
-    float vol_music; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
-    float vol_sfx;
+    float music_volume; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
+    float sound_volume;
     float mouse_sensitivity;
-    bool mouse_reverse_y; /* swy: 01 00 00 00 */
+    bool invert_mouse_y_axis; /* swy: 01 00 00 00 */
     bool dynamic_lighting, particle_systems;
     uint __one;
     bool character_shadows;
@@ -44,8 +44,8 @@ struct options_t
               to go from in-game value to float do this:  (floor(final_val) - 25) / (100 - 25)    */
     float battle_size;
 
-    enum { ad_relative_enemy_position, ad_by_mouse_movement, ad_by_inverse_mouse_movement } control_attack_dir;
-    enum { bd_automatic_recommended,   bd_by_mouse_movement                               } control_block_dir;
+    enum { ad_relative_enemy_position, ad_by_mouse_movement, ad_by_inverse_mouse_movement } control_attack_direction;
+    enum { bd_automatic_recommended,   bd_by_mouse_movement                               } control_block_direction;
     bool anisotropic_filtering, environment_shadows;
     bool report_casualties;
     bool __one;

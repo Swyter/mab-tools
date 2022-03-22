@@ -23,7 +23,11 @@ enum scancode
     /* swy: custom entries that TaleWorlds seems to have added */
     MAB_LEFT_MOUSE_BTN = 0xE0, MAB_RIGHT_MOUSE_BTN = 0xE1, MAB_MIDDLE_MOUSE_BTN = 0xE2, MAB_MOUSE_BTN_4 = 0xE3, MAB_MOUSE_BTN_5 = 0xE4, MAB_MOUSE_BTN_6 = 0xE5, MAB_MOUSE_BTN_7 = 0xE6, MAB_MOUSE_BTN_8 = 0xE7, MAB_SCROLL_UP = 0xEE, MAB_SCROLL_DOWN = 0xEF,
 
-    MAB_A = 0xF0, MAB_DROP_WEAPON = 0xF1, MAB_KICK = 0xF2, MAB_Y = 0xF3, MAB_UP = 0xF4, MAB_RANGED_WEAP = 0xF5, MAB_LEAVE_LOC = 0xF9, MAB_NXT_WEAP = 0xFA, MAB_NXT_SHIELD = 0xFB, MAB_DEFEND = 0xFC, MAB_RB = 0xFD, MAB_ZOOM = 0xFE, MAB_ORDERS = 0xFF
+    /* swy: the alt field seems to be dedicated to Xbox-style gamepad mappings */
+    MAB_PAD_A = 0xF0, MAB_PAD_B = 0xF1, MAB_PAD_X /* KICK */ = 0xF2, MAB_PAD_Y = 0xF3,
+    MAB_PAD_UP = 0xF4, MAB_PAD_RANGED_WEAP = 0xF5, MAB_PAD_BACK /* LEAVE_LOC */ = 0xF9,
+    MAB_PAD_RB /* NXT_WEAP */ = 0xFA, MAB_PAD_LB /* NXT_SHIELD */ = 0xFB, MAB_PAD_LT /* DEFEND */ = 0xFC,
+    MAB_PAD_RT /* ATTACK */ = 0xFD, MAB_R3 /* ZOOM */ = 0xFE, MAB_L3 /* FIRST_PERSON */ = 0xFF
 };
 
 struct options_t

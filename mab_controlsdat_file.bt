@@ -136,6 +136,11 @@ string get_key(uint index)
             w_quests_window,
             w_game_log_window,
             w_quick_save,
+
+            /* swy: what the heck is this? ¯\_(ツ)_/¯ */
+            w_secret_hidden_z_action,
+            w_secret_hidden_f7_action,
+            w_secret_hidden_f8_action,
             w__MAX
         } lookup = index;
 

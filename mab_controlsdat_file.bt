@@ -33,31 +33,31 @@ enum scancode
     MAB_PAD_A /* JUMP */ = 0xF0, MAB_PAD_B /* DROP_WEAP */ = 0xF1,
     MAB_PAD_X /* KICK */ = 0xF2, MAB_PAD_Y /* ACTION    */ = 0xF3,
 
-    MAB_PAD_UP    /*  QUESTS_WND */ = 0xF4 , MAB_PAD_DOWN /* RANGED_WEAP */ = 0xF5,
-    MAB_PAD_RIGHT /* ! hardcoded */ = 0xF6,  MAB_PAD_LEFT /* ! hardcoded */ = 0xF7, /* swy: these two are hardcoded to a special orders panel but can be doubly-assigned */
+    MAB_PAD_UP    /*  QUESTS_WND  */ = 0xF4, MAB_PAD_DOWN  /* RANGED_WEAP */ = 0xF5,
+    MAB_PAD_RIGHT /* ! hardcoded  */ = 0xF6, MAB_PAD_LEFT  /* ! hardcoded */ = 0xF7, /* swy: these two are hardcoded to a special orders panel but can be doubly-assigned */
 
-    MAB_PAD_BACK /* LEAVE_LOC  */ = 0xF9, MAB_PAD_START /* ! hardcoded */ = 0xF8, /* swy: «Start» is hardcoded to open the pause menu, but it can be doubly assigned */ 
+    MAB_PAD_BACK  /* LEAVE_LOC    */ = 0xF9, MAB_PAD_START /* ! hardcoded */ = 0xF8, /* swy: «Start» is hardcoded to open the pause menu, but it can be doubly assigned */ 
 
-    MAB_PAD_LB /* NXT_SHIELD   */ = 0xFB, MAB_PAD_RB /* NXT_WEAP */ = 0xFA, /* swy: these two values are reversed; good job, TaleWorlds */
-    MAB_PAD_LT /* DEFEND       */ = 0xFC, MAB_PAD_RT /* ATTACK   */ = 0xFD,
-    MAB_PAD_L3 /* FIRST_PERSON */ = 0xFF, MAB_PAD_R3 /* ZOOM     */ = 0xFE  /* swy: also reversed :) */
+    MAB_PAD_LB    /* NXT_SHIELD   */ = 0xFB, MAB_PAD_RB    /* NXT_WEAP    */ = 0xFA, /* swy: these two values are reversed; good job, TaleWorlds */
+    MAB_PAD_LT    /* DEFEND       */ = 0xFC, MAB_PAD_RT    /* ATTACK      */ = 0xFD,
+    MAB_PAD_L3    /* FIRST_PERSON */ = 0xFF, MAB_PAD_R3    /* ZOOM        */ = 0xFE  /* swy: also reversed :) */
 };
 
 struct controls_t
 {
-    uint count; /* swy: 37 on M&B 1.011, 52 on WB */
+    uint count; /* swy: 37 elements on M&B 1.011, 52 on WB */
 
     struct
     {
         scancode key <format=hex>;
         scancode alt <format=hex>; /* swy: the heck? only some keys in the WB version aren't all FFs */
-    } action[count] <open=true, comment=Str("[/] %s", get_key(startof(this) / sizeof(this)))>;
-} controls;
+    } action[count] <open=true, comment=Str("[/] %s", get_action_name(startof(this) / sizeof(this)))>;
+} controls <open=true>;
 
 
-string get_key(uint index)
+string get_action_name(uint index)
 {
-    if (options.count == 37) /* M&B 1.011 */
+    if (controls.count == 37) /* M&B 1.011 */
     {
         local enum ui
         {
@@ -104,7 +104,7 @@ string get_key(uint index)
         if (index < _MAX)
             return EnumToString(lookup);
     }
-    else if (options.count == 52) /* Warband */
+    else if (controls.count == 52) /* Warband */
     {
         local enum wb_ui
         {

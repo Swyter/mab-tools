@@ -38,7 +38,7 @@ string get_key(uint index)
 {
     if (options.count == 37) /* M&B 1.011 */
     {
-        enum ui
+        local enum ui
         {
             move_forward,
             move_backward,
@@ -85,14 +85,62 @@ string get_key(uint index)
     }
     else if (options.count == 52) /* Warband */
     {
-        switch (index)
+        local enum ui_wb
         {
-        case   0: return "move_forward";
-        case   1: return "move_backward";
-        case   2: return "move_left";
-        case   3: return "move_right";
-        case   4: return "action";
-        }
+            w_move_forward,
+            w_move_backward,
+            w_move_left,
+            w_move_right,
+            w_action,
+            w_jump,
+            w_attack,
+            w_defend,
+            w_kick,
+            w_use_ranged_weapon_as_melee,
+            w_equip_weapon_1,
+            w_equip_weapon_2,
+            w_equip_weapon_3,
+            w_equip_weapon_4,
+            w_equip_next_weapon,
+            w_equip_next_shield,
+            w_drop_weapon,
+            w_sheath_weapon,
+            w_leave_location_retreat,
+            w_zoom,
+            w_view_outfit,
+            w_toggle_first_person_view,
+            w_view_orders,
+            w_order_1,
+            w_order_2,
+            w_order_3,
+            w_order_4,
+            w_order_5,
+            w_order_6,
+            w_everyone_control,
+            w_group_value_control1,
+            w_group_value_control2,
+            w_group_value_control3,
+            w_group_value_control4,
+            w_group_value_control5,
+            w_group_value_control6,
+            w_group_value_control7,
+            w_group_value_control8,
+            w_group_value_control9,
+            w_others_control,
+            w_everyone_around_control,
+            w_multiplayer_message_all,
+            w_multiplayer_message_tcam,
+            w_character_window,
+            w_inventory_window,
+            w_party_window,
+            w_quests_window,
+            w_game_log_window,
+            w_quick_save,
+            w__MAX
+        } lookup = index;
+
+        if (index < w__MAX)
+            return EnumToString(lookup);
     }
 
     return Str("FIXME: unk %i", index);

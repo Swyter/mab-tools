@@ -6,6 +6,12 @@
 //    E-mail: swyterzone+mab@gmail.com
 //   Version: 2022.03.21
 //   Purpose: Opens the M&B 1.011 and Warband binary keymapping file (%appdata%/Mount&Blade/controls.dat, %appdata%/Mount&Blade Warband/controls.dat)
+//
+//            Each action has both a main and a secondary binding slot. So even if it is not exposed
+//            in the GUI you can assign up to two scancodes to the same control. Pretty nifty.
+//
+//            The normal key-binding process does not seem to affect/clear any alt slot thing. Unless clicking on reset button.
+//
 //  Category: Game
 // File Mask: controls.dat
 //------------------------------------------------
@@ -23,21 +29,21 @@ enum scancode
     /* swy: custom entries that TaleWorlds seems to have added */
     MAB_LEFT_MOUSE_BTN = 0xE0, MAB_RIGHT_MOUSE_BTN = 0xE1, MAB_MIDDLE_MOUSE_BTN = 0xE2, MAB_MOUSE_BTN_4 = 0xE3, MAB_MOUSE_BTN_5 = 0xE4, MAB_MOUSE_BTN_6 = 0xE5, MAB_MOUSE_BTN_7 = 0xE6, MAB_MOUSE_BTN_8 = 0xE7, MAB_SCROLL_UP = 0xEE, MAB_SCROLL_DOWN = 0xEF,
 
-    /* swy: the alt field seems to be dedicated to Xbox-style gamepad mappings */
+    /* swy: the alt field seems to be dedicated to Xbox-style gamepad mappings in the default layout; pads are Warband-only */
     MAB_PAD_A /* JUMP */ = 0xF0, MAB_PAD_B /* DROP_WEAP */ = 0xF1,
     MAB_PAD_X /* KICK */ = 0xF2, MAB_PAD_Y /* ACTION    */ = 0xF3,
 
-    MAB_PAD_UP    = 0xF4, MAB_PAD_DOWN /* RANGED_WEAP */ = 0xF5,
-    MAB_PAD_RIGHT = 0xF6, MAB_PAD_LEFT                   = 0xF7,
+    MAB_PAD_UP    /*  QUESTS_WND */ = 0xF4 , MAB_PAD_DOWN /* RANGED_WEAP */ = 0xF5,
+    MAB_PAD_RIGHT /* ! hardcoded */ = 0xF6,  MAB_PAD_LEFT /* ! hardcoded */ = 0xF7, /* swy: these two are hardcoded to a special orders panel but can be doubly-assigned */
 
-    MAB_PAD_BACK /* LEAVE_LOC  */ = 0xF9, MAB_PAD_START = 0xF8, /* swy: «Start» is hardcoded to open the pause menu, but it can be doubly assigned */ 
+    MAB_PAD_BACK /* LEAVE_LOC  */ = 0xF9, MAB_PAD_START /* ! hardcoded */ = 0xF8, /* swy: «Start» is hardcoded to open the pause menu, but it can be doubly assigned */ 
 
     MAB_PAD_LB /* NXT_SHIELD   */ = 0xFB, MAB_PAD_RB /* NXT_WEAP */ = 0xFA, /* swy: these two values are reversed; good job, TaleWorlds */
     MAB_PAD_LT /* DEFEND       */ = 0xFC, MAB_PAD_RT /* ATTACK   */ = 0xFD,
     MAB_PAD_L3 /* FIRST_PERSON */ = 0xFF, MAB_PAD_R3 /* ZOOM     */ = 0xFE  /* swy: also reversed :) */
 };
 
-struct options_t
+struct controls_t
 {
     uint count; /* swy: 37 on M&B 1.011, 52 on WB */
 
@@ -45,8 +51,8 @@ struct options_t
     {
         scancode key <format=hex>;
         scancode alt <format=hex>; /* swy: the heck? only some keys in the WB version aren't all FFs */
-    } stuff[count] <open=true, comment=Str("[/] %s", get_key(startof(this) / sizeof(this)))>;
-} options;
+    } action[count] <open=true, comment=Str("[/] %s", get_key(startof(this) / sizeof(this)))>;
+} controls;
 
 
 string get_key(uint index)

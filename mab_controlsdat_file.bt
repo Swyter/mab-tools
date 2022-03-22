@@ -33,7 +33,7 @@ enum scancode
     MAB_PAD_A /* JUMP */ = 0xF0, MAB_PAD_B /* DROP_WEAP */ = 0xF1,
     MAB_PAD_X /* KICK */ = 0xF2, MAB_PAD_Y /* ACTION    */ = 0xF3,
 
-    MAB_PAD_UP    /*  QUESTS_WND  */ = 0xF4, MAB_PAD_DOWN  /* RANGED_WEAP */ = 0xF5,
+    MAB_PAD_UP    /* QUESTS_WND   */ = 0xF4, MAB_PAD_DOWN  /* RANGED_WEAP */ = 0xF5,
     MAB_PAD_RIGHT /* ! hardcoded  */ = 0xF6, MAB_PAD_LEFT  /* ! hardcoded */ = 0xF7, /* swy: these two are hardcoded to a special orders panel but can be doubly-assigned */
 
     MAB_PAD_BACK  /* LEAVE_LOC    */ = 0xF9, MAB_PAD_START /* ! hardcoded */ = 0xF8, /* swy: «Start» is hardcoded to open the pause menu, but it can be doubly assigned */ 

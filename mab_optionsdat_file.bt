@@ -19,8 +19,8 @@ struct options_t
     float music_volume; /* swy: from 0.f to 1.f */
     float sound_volume; /* swy: from 0.f to 1.f */
 
-    float mouse_sensitivity; /* swy: from 0.f to 1.f */
-    bool invert_mouse_y_axis; /* swy: 01 00 00 00 */
+    float mouse_sensitivity;  /* swy: from 0.f to 1.f */
+    bool invert_mouse_y_axis; /* swy: 01 00 00 00     */
 
     bool dynamic_lighting,
          particle_systems;
@@ -34,7 +34,7 @@ struct options_t
     enum { corpses_none, corpses_5, corpses_10, corpses_20, corpses_40, corpses_unlimited } number_of_corpses;
     uint grass_density; /* swy: 0-100 */
     enum { cs_slower, cs_normal, cs_fast } combat_speed;
-    enum { ff_reduced_to_1_over_2_easiest, ff_reduced_to__3_over_4_easy, ff_normal } damage_to_friends;
+    enum { ff_reduced_to_1_over_2_easiest, ff_reduced_to_3_over_4_easy, ff_normal } damage_to_friends;
 
     uint __unk__zero;
 
@@ -65,10 +65,11 @@ struct options_t
     enum { ad_by_relative_enemy_position, ad_by_mouse_movement, ad_by_inverse_mouse_movement } control_attack_direction;
     enum { bd_automatic_recommended,      bd_by_mouse_movement                               } control_block_direction;
 
-    bool anisotropic_filtering, environment_shadows;
+    bool anisotropic_filtering,
+         environment_shadows;
 
-    bool report_casualties;
-    bool report_experience;
+    bool report_casualties,
+         report_experience;
 
     enum { ps_none, ps_quick, ps_full                  } realistic_shadows_on_plants;
     enum { rg_0, rg_1, rg_3, rg_5, rg_10, rg_unlimited } number_of_ragdolls;

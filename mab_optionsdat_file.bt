@@ -18,21 +18,30 @@ struct options_t
 {
     float music_volume; /* min 0 < DE CF 5D 3F < 68 6D 76 3F <  00 00 80 3F */
     float sound_volume;
+
     float mouse_sensitivity;
     bool invert_mouse_y_axis; /* swy: 01 00 00 00 */
-    bool dynamic_lighting, particle_systems;
+
+    bool dynamic_lighting,
+         particle_systems;
     uint __one;
     bool character_shadows;
     uint __one;
-    enum {corps_none, corpse_5, corpse_10, corpse_20, corpse_40, corpse_unlimited} number_of_corpses;
+    enum {corpses_none, corpses_5, corpses_10, corpses_20, corpses_40, corpses_unlimited} number_of_corpses;
     uint grass_density; /* 0-100 */
-    enum {cs_slow, cs_normal, cs_fast} combat_speed;
-    enum {ff_halved_very_easy, ff_three_fours_easy, ff_normal } friendly_damage;
+    enum {cs_slower, cs_normal, cs_fast} combat_speed;
+    enum {ff_reduced_to_1_over_2_easiest, ff_reduced_to__3_over_4_easy, ff_normal } damage_to_friends;
     uint __zero;
     enum {ia_good, ia_average_caps, ia_poor} combat_ai;
 
-    enum {pd_reduced_to_1_over_4_easiest, pd_reduced_to_1_over_2_easy, pd_normal} player_damage;
-    bool show_names_of_friend_troops, show_targeting_reticule, show_attack_direction, report_damage, report_shot_difficulty;
+    enum {pd_reduced_to_1_over_4_easiest, pd_reduced_to_1_over_2_easy, pd_normal} damage_to_player;
+
+    bool show_names_of_friend_troops,
+         show_targeting_reticule,
+         show_attack_direction,
+
+         report_damage,
+         report_shot_difficulty;
 
     /* swy: slider goes from 0.0f (= 25) to 1.0f (= 100) e.g. 2000.0f (=  150025),
                                                                 -0.5f (= -    13),
@@ -47,13 +56,14 @@ struct options_t
 
     battle_size_t battle_size;
 
-    enum { ad_relative_enemy_position, ad_by_mouse_movement, ad_by_inverse_mouse_movement } control_attack_direction;
+    enum { ad_by_relative_enemy_position, ad_by_mouse_movement, ad_by_inverse_mouse_movement } control_attack_direction;
     enum { bd_automatic_recommended,   bd_by_mouse_movement                               } control_block_direction;
+
     bool anisotropic_filtering, environment_shadows;
     bool report_casualties;
     bool __one;
     enum { ps_none, ps_quick, ps_full } realistic_shadows_on_plants;
-    uint __five;
+    enum { rg_0, rg_1, rg_3, rg_5, rg_10, rg_unlimited} number_of_ragdolls;
 
     float gamma;
     float character_detail, character_shadow_detail; /* 0.0 to 1.0 = 0% to 100% */

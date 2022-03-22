@@ -42,7 +42,9 @@ struct options_t
                                                                  0.5f (=      62)
             so yeah, the remapping function seems to be:   floor(25 + (float_val  * (100 - 25)))
               to go from in-game value to float do this:  (floor(final_val) - 25) / (100 - 25)    */
-    float battle_size;
+    typedef float battle_size_t <read=battle_size_read, write=battle_size_write>;
+
+    battle_size_t battle_size;
 
     enum { ad_relative_enemy_position, ad_by_mouse_movement, ad_by_inverse_mouse_movement } control_attack_direction;
     enum { bd_automatic_recommended,   bd_by_mouse_movement                               } control_block_direction;
@@ -56,3 +58,15 @@ struct options_t
     float character_detail, character_shadow_detail; /* 0.0 to 1.0 = 0% to 100% */
     enum { blood_no, blood_near_player, blood_yes } blood;
 } options;
+
+    string battle_size_read(battle_size_t float_val)
+    {
+        string s; SPrintf(s, "%lg", Floor(25 + (float_val  * (100 - 25))));
+        return s;
+    }
+
+    void battle_size_write(battle_size_t &f, string s)
+    {
+        int final_val = Floor(Atof(s));
+        f = (final_val - 25) / (100.0f - 25.0f);
+    }

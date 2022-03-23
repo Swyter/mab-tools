@@ -59,7 +59,7 @@ string get_action_name(uint index)
 {
     if (controls.count == 37) /* M&B 1.011 */
     {
-        local enum ui
+        local enum gamekeys /* swy: see header_triggers.py, found too late */
         {
             move_forward,
             move_backward,
@@ -106,7 +106,7 @@ string get_action_name(uint index)
     }
     else if (controls.count == 52) /* Warband */
     {
-        local enum wb_ui
+        local enum wb_gamekeys
         {
             wb_move_forward,
             wb_move_backward,
@@ -159,9 +159,9 @@ string get_action_name(uint index)
             wb_quick_save,
 
             /* swy: what the heck is this? ¯\_(ツ)_/¯ */
-            wb_secret_hidden_z_action,
-            wb_secret_hidden_f7_action,
-            wb_secret_hidden_f8_action,
+            wb_crouch,  /* wb_secret_hidden_z_action */
+            wb_order_7, /* wb_secret_hidden_f7_action */
+            wb_order_8, /* wb_secret_hidden_f8_action */
             wb__MAX
         } lookup = index;
 

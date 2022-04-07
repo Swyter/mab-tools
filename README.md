@@ -17,7 +17,7 @@ Personally, I think it is a great way of seeing how the sausage is made, aiding 
 
 Interoperability is important.
 
-# Future improvements
+## Future improvements
 
 * Add a small tool to generate and reimport 16-bit linear PGM (grayscale) heightmap images from SCOs.
 * Maybe export the props in a scene as a Wavefront OBJ, by parsing the mods' `.brf` and `.txt` files.

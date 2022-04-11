@@ -1,7 +1,8 @@
 # mab-tools
-[*010 Editor*](https://www.sweetscape.com/010editor/) binary templates for the *Mount&amp;Blade 1.011* and *Warband* game file formats.
+[*010 Editor*](https://www.sweetscape.com/010editor/) binary templates for the *Mount&amp;Blade 1.011* and *Warband* game file formats; they are useful to inspect, understand and manually edit or alter structured data fields from binary files, visually.
 
-Useful to inspect and manually edit or alter structured data fields from binary files visually. The currently available `.bt` files are:
+## What works
+The currently available `.bt` files are:
 * `*.brf`: BRF stands for *Binary Resource File*.
 * `*.sco`: SCO stands for *Scene Object*.
 * `options.dat`: Only used in the original game.
@@ -13,9 +14,17 @@ Useful to inspect and manually edit or alter structured data fields from binary 
    * By editing through the template you can assign two different keys to the same action. You can also bind multiple actions to the same key, as well as remap most of the gamepad keys (unfortunately some of them are hardcoded).
 
 
-Personally, I think it is a great way of seeing how the sausage is made, aiding in making other programs that read or write them. As well as a nifty way of making small, quick changes.
+Personally, I think it is a great way of seeing how the sausage is made, aiding in making other programs that read or write them. As well as a nifty way of making small, quick changes. ¯\\\_(ツ)_/¯
 
 Interoperability is important.
+
+<table><tr>
+  <td><img src='https://cdn.discordapp.com/attachments/411286129317249038/745348802780856450/unknown.png' /> </td>
+  <td><img src='https://cdn.discordapp.com/attachments/411286129317249038/745349467154415737/unknown.png' /> </td>
+  <td><img src='https://cdn.discordapp.com/attachments/411286129317249038/745349843735674924/unknown.png' /> </td>
+  <td><img src='https://cdn.discordapp.com/attachments/411291053702774784/955618600771813446/unknown.png' /> </td>
+</tr>
+</table>
 
 ## Future improvements
 

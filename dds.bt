@@ -709,18 +709,24 @@ struct bc1_block
     ulong endpoint_idx : 2;
 };
 
+struct bc4_block
+{
+    ushort a: 8;
+    ushort b: 8;
+};
+
 local int i = 0; local int width = dds_header.width, height = dds_header.height;
 
-    for (i = 0; i <= dds_header.mipMapCount; i++)
+for (i = 0; i <= dds_header.mipMapCount; i++)
+{
+    struct
     {
-        struct
-        {
-            struct bc1_block data
-            [
-                ( ( width + 3) / 4) *
-                ( (height + 3) / 4)
-            ];
-        } mip;
+        struct bc4_block data
+        [
+            ( ( width + 3) / 4) *
+            ( (height + 3) / 4)
+        ];
+    } mip;
 
-        width /= 2, height /= 2;
-    }
+    width /= 2, height /= 2;
+}

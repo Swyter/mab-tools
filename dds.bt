@@ -709,10 +709,37 @@ struct bc1_block
     ulong endpoint_idx : 2;
 };
 
+enum bc4_endpoint_idx
+{
+    black = 6,
+    white = 7
+};
+
 struct bc4_block
 {
     ushort a: 8;
     ushort b: 8;
+
+    bc4_endpoint_idx endpoint_idx : 3;
+    bc4_endpoint_idx endpoint_idx : 3;
+    bc4_endpoint_idx endpoint_idx : 3;
+    bc4_endpoint_idx endpoint_idx : 3;
+
+    bc4_endpoint_idx endpoint_idx : 3;
+    bc4_endpoint_idx endpoint_idx : 3;
+    bc4_endpoint_idx endpoint_idx : 3;
+    bc4_endpoint_idx endpoint_idx : 3;
+
+    bc4_endpoint_idx endpoint_idx : 3;
+    bc4_endpoint_idx endpoint_idx : 3;
+    bc4_endpoint_idx endpoint_idx : 3;
+    bc4_endpoint_idx endpoint_idx : 3;
+
+    bc4_endpoint_idx endpoint_idx : 3;
+    bc4_endpoint_idx endpoint_idx : 3;
+    bc4_endpoint_idx endpoint_idx : 3;
+    bc4_endpoint_idx endpoint_idx : 3;
+
 };
 
 local int i = 0; local int width = dds_header.width, height = dds_header.height;

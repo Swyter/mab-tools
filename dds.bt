@@ -671,12 +671,15 @@ struct bc1_block
     _____GGG GGG_____
     ________ ___BBBBB
 */
-    struct col
-    {
-        ushort b : 5; /* 0-31 */
-        ushort g : 6; /* 0-63 */
-        ushort r : 5; /* 0-31 */
-    } c[2];
+
+    uint64 b : 5; /* 0-31 */
+    uint64 g : 6; /* 0-63 */
+    uint64 r : 5; /* 0-31 */
+
+    uint64 b : 5; /* 0-31 */
+    uint64 g : 6; /* 0-63 */
+    uint64 r : 5; /* 0-31 */
+
 
     /* swy: four indexes, two colors above, two interpolated ones from those */
     /* 0: C0,
@@ -688,37 +691,38 @@ struct bc1_block
     /* swy: works as a single endian-aware u64 element; less significant two bits (end of first byte in little-endian) are top-left texel,
             most significant two bits (first of last byte in little-endian) are bottom-right texel */
 
-    ulong endpoint_idx : 2;
-    ulong endpoint_idx : 2;
-    ulong endpoint_idx : 2;
-    ulong endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
 
-    ulong endpoint_idx : 2;
-    ulong endpoint_idx : 2;
-    ulong endpoint_idx : 2;
-    ulong endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
 
-    ulong endpoint_idx : 2;
-    ulong endpoint_idx : 2;
-    ulong endpoint_idx : 2;
-    ulong endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
 
-    ulong endpoint_idx : 2;
-    ulong endpoint_idx : 2;
-    ulong endpoint_idx : 2;
-    ulong endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
+    uint64 endpoint_idx : 2;
 };
 
-enum bc4_endpoint_idx
+enum<uint64> bc4_endpoint_idx
 {
+    _a, _b, _c, _d, _e, _f,
     black = 6,
     white = 7
 };
 
 struct bc4_block
 {
-    ushort a: 8;
-    ushort b: 8;
+    uint64 a: 8;
+    uint64 b: 8;
 
     bc4_endpoint_idx endpoint_idx : 3;
     bc4_endpoint_idx endpoint_idx : 3;
@@ -748,7 +752,7 @@ for (i = 0; i <= dds_header.mipMapCount; i++)
 {
     struct
     {
-        struct bc4_block data
+        struct bc1_block data
         [
             ( ( width + 3) / 4) *
             ( (height + 3) / 4)

@@ -658,7 +658,7 @@ string ReadHeader10MiscFlags2(uint flags)
 }
 
 
-struct surf
+struct bc1_block
 {
 /* little-endian (normal):
     ________ RRRRR___
@@ -713,13 +713,14 @@ local int i = 0; local int width = dds_header.width, height = dds_header.height;
 
     for (i = 0; i <= dds_header.mipMapCount; i++)
     {
-        struct { struct surf a[
-        (
-            (  (width + 3) / 4)
-        ) *
-        (
-            ( (height + 3) / 4)
-        )]; } data;
+        struct
+        {
+            struct bc1_block data
+            [
+                ( ( width + 3) / 4) *
+                ( (height + 3) / 4)
+            ];
+        } mip;
 
         width /= 2, height /= 2;
     }

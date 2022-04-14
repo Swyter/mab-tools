@@ -716,6 +716,20 @@ struct bc1_block
     bc1_endpoint_idx endpoint_idx : 2;
 };
 
+
+struct bc1_block_as_components
+{
+    ushort color_a, color_b; /* swy: when color_b <= color_a the last endpoint index value (I2) remaps as fully-transparent, and I1 is the average between the two C0 and C1 colors; so we lose one shade but gain punchout alpha */
+    ubyte a, b, c, d;
+};
+
+union bc1_block_combined
+{
+    bc1_block               block;
+    bc1_block_as_components as_components;
+};
+
+
 enum<uint64> bc4_endpoint_idx
 {
     _a, _b, _c, _d, _e, _f,
@@ -756,7 +770,7 @@ for (i = 0; i <= dds_header.mipMapCount; i++)
 {
     struct
     {
-        struct bc1_block data
+        bc1_block_combined data
         [
             ( ( width + 3) / 4) *
             ( (height + 3) / 4)

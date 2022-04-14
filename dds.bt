@@ -657,26 +657,30 @@ string ReadHeader10MiscFlags2(uint flags)
     return "";
 }
 
+enum<uint64> bc1_endpoint_idx
+{
+    C0, C1, I0, I1
+};
 
 struct bc1_block
 {
-/* little-endian (normal):
+/* little-endian bit layout for each RGB565 color (normal):
     ________ RRRRR___
     GGG_____ _____GGG
     ___BBBBB ________
 */
 
-/* big-endian:
+/* big-endian bit layout:
     RRRRR___ ________
     _____GGG GGG_____
     ________ ___BBBBB
 */
 
-    uint64 b : 5; /* 0-31 */
+    uint64 b : 5; /* 0-31 */ /* COLOR 0 */
     uint64 g : 6; /* 0-63 */
     uint64 r : 5; /* 0-31 */
 
-    uint64 b : 5; /* 0-31 */
+    uint64 b : 5; /* 0-31 */ /* COLOR 1 */
     uint64 g : 6; /* 0-63 */
     uint64 r : 5; /* 0-31 */
 
@@ -691,25 +695,25 @@ struct bc1_block
     /* swy: works as a single endian-aware u64 element; less significant two bits (end of first byte in little-endian) are top-left texel,
             most significant two bits (first of last byte in little-endian) are bottom-right texel */
 
-    uint64 endpoint_idx : 2;
-    uint64 endpoint_idx : 2;
-    uint64 endpoint_idx : 2;
-    uint64 endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
 
-    uint64 endpoint_idx : 2;
-    uint64 endpoint_idx : 2;
-    uint64 endpoint_idx : 2;
-    uint64 endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
 
-    uint64 endpoint_idx : 2;
-    uint64 endpoint_idx : 2;
-    uint64 endpoint_idx : 2;
-    uint64 endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
 
-    uint64 endpoint_idx : 2;
-    uint64 endpoint_idx : 2;
-    uint64 endpoint_idx : 2;
-    uint64 endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
+    bc1_endpoint_idx endpoint_idx : 2;
 };
 
 enum<uint64> bc4_endpoint_idx

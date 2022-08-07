@@ -7,7 +7,7 @@
 <html lang="en-EN"><head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<meta charset="UTF-8">
-	<title>Swyter's Mount&amp;Blade Terrain Hash Generator | Just great.</title>
+	<title>Swyter's Mount&amp;Blade Face code Generator | Just great.</title>
 	<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAG1BMVEUAAAAmJiZNTVRhXV9rZFt4ZmZ2dG2NcXqIioGHzHJjAAAAAXRSTlMAQObYZgAAAG5JREFUeNo1jdEJgDAMRNMNeqULeN1AEb8jRdzABUT8LriBg5so5ifHPV4iggBkRPF1AxBoXRSEhHxWZYPkfGpib6geyjJZs+4zizVhqYmlRYERDpuhO5GjW+aU7Q1Oml/mMF2dWSaR/uub+Ad5AL4eE+r2NulVAAAAAElFTkSuQmCC">
 	<style type="text/css">
 	html{
@@ -397,8 +397,8 @@
 
 			/* --- */
 
-			if (e.target.type=="checkbox")
-				_out= (e.target.checked) ? 1 : 0;
+			if (e.target.type == "checkbox")
+				_out = e.target.checked ? 1 : 0;
 			else
 				_out = e.target.value;
 
@@ -448,8 +448,6 @@
 			//There's a limitation in bitwise operations in js: 32 bit signed integers, so if we set the last bit it turns out negative :/
 			//_outhack = (_out << shift).tobin().substr( -(shift+num_bits), num_bits );
 			
-			
-			
 			_("----------");
 			_("    out:"+_out);
 			_outhack = Number(_out).tobin().substr( -(num_bits), num_bits );
@@ -485,88 +483,90 @@
 	app.onkeydown=function(e)
 	{
 		/* swy: only react to the Enter key */
-		if (!(e.keyIdentifier == 'Enter' || e.keyCode == 13)) //firefux doesn't supprts keyIdentifier, of course :(
-			return;
-
-		//if (e.target!=flseed && e.target!=riseed && e.target!=teseed){return 0;}
-		_("boom");
-		//! http://stackoverflow.com/a/6005163
-		e.target.value = Math.floor(Math.random() * ( 65535 /* even better, 4 ones, as the game does 1048575/* use half of the bitmask instead 2147483647*/ + 1));
-		app.onchange(e); // we've to force a new state so the app knows that the randomization has been launched by the user :)
+		if (e.keyIdentifier == 'Enter' || e.keyCode == 13) //firefux doesn't supprts keyIdentifier, of course :(
+		{
+			//if (e.target!=flseed && e.target!=riseed && e.target!=teseed){return 0;}
+			_("boom");
+			//! http://stackoverflow.com/a/6005163
+			e.target.value = Math.floor(Math.random() * ( 65535 /* even better, 4 ones, as the game does 1048575/* use half of the bitmask instead 2147483647*/ + 1));
+			app.onchange(e); // we've to force a new state so the app knows that the randomization has been launched by the user :)
+		}
 	}
 	
 	function _parse(e)
 	{
 		e=e.replace('0x','');
-		if (e.length!=64)
+		if (e.length != 64)
 		{
 			_("badly formatted hash :(");
 			return false; //doesn't validate
 		}
 		
-		for (var i=1; i<=4; i++){ // 4 64-bit chunks == 8 32-bit chunks
+		for (var i=1; i<=4; i++) // 4 64-bit chunks == 8 32-bit chunks
 			hash[i-1] = /*parseInt(*/e.substr(-16*i,16)/*, 16).toString(2)*/;
-		}
+
 		//https://ricochen.wordpress.com/2010/04/24/javascript-zero-padding-numbers/
 		//String('00000'+n).slice(-5);
 		_(e);
-		_(hash[0]+hash[1]+hash[2]+hash[3]+hash[4]);
+		_(hash[0] + hash[1] + hash[2] + hash[3]);
 		
 		
-		for (var key in struct) {
-		 _("---");
-		 _("||    Key: "+key);
+		for (var key in struct)
+		{
+			_("---");
+			_("||    Key: " + key);
 			_("//key no. //shift //num bits");
- 		_("|| Struct: "+struct[key]);
+			_("|| Struct: " + struct[key]);
  		 
- 		 key_no   = struct[key][0];
- 		 shift    = struct[key][1];
- 		 num_bits = struct[key][2];
- 		 
-		_bin = hash[ key_no ].fromhex().tobin()
-		_bin = _bin.pad(_bin.length);
-		
-		_cut = _bin.substr( -(shift+num_bits), num_bits );
-		
-		base= _bin.length;
-		basb= _cut.length;
-		_("     base: "+base);
-		_("    shift: "+shift);
-		
-		
-		_('||    Do:  '  + ('-').repeat( (32-base) ) + _bin );
-		
-		
-		_(' |  Mask:  '  + ('-').repeat( 32-(num_bits)-(shift) ) + ('X').repeat( (num_bits) ) );
-		//_('||       '  + ('-').repeat( (32-base) ) + ('.').repeat( (32-base)+(32-basb)-2 ) + _cut );
-		_(' | Final:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _cut );
-	
-		_dec = _cut.frombin();
-		_('');
-		_('|| Decim: '+_dec);
-		_bool= ((_dec==0) ? false : true );
-		_('||  Bool: '+_bool);
-		
-		_( struct[key][1]*struct[key][0]+" / size: " + struct[key][2]);
-		
-		//update our controls
-		struct[key][3].value=_dec;
-		if (struct[key][3].attributes[4]){
-			struct[key][3].attributes[4].value=_dec; //manages the display of the values in sliders
-		}
-		//if (_bool){
+			key_no   = struct[key][0];
+			shift    = struct[key][1];
+			num_bits = struct[key][2];
+
+			_bin = hash[ key_no ].fromhex().tobin()
+			_bin = _bin.pad(_bin.length);
+
+			_cut = _bin.substr( -(shift+num_bits), num_bits );
+
+			base= _bin.length;
+			basb= _cut.length;
+			_("     base: " + base);
+			_("    shift: " + shift);
+
+
+			_('||    Do:  '  + ('-').repeat( (32-base) ) + _bin );
+
+
+			_(' |  Mask:  '  + ('-').repeat( 32-(num_bits)-(shift) ) + ('X').repeat( (num_bits) ) );
+			//_('||       '  + ('-').repeat( (32-base) ) + ('.').repeat( (32-base)+(32-basb)-2 ) + _cut );
+			_(' | Final:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _cut );
+
+			_dec = _cut.frombin();
+			_('');
+			_('|| Decim: ' + _dec);
+			_bool= ((_dec==0) ? false : true );
+			_('||  Bool: ' + _bool);
+
+			_( struct[key][1]*struct[key][0]+" / size: " + struct[key][2]);
+
+			//update our controls
+			struct[key][3].value=_dec;
+
+			if (struct[key][3].attributes[4])
+				struct[key][3].attributes[4].value=_dec; //manages the display of the values in sliders
+
+			//if (_bool){
 			struct[key][3].checked=_bool;
-		//}
+			//}
 		}
 	}
 
 	//! dbg----
-	window.onload=function()
+	window.onload = function()
 	{
-		if (window.location.hash=='')
+		if (window.location.hash == '')
 		{
-			def='0x000000000000000036db6db6db6db6dbb6db6db6db6db6db0000000000000000';
-			thash.value=def;
+			def = '0x000000000000000036db6db6db6db6dbb6db6db6db6db6db0000000000000000';
+			thash.value = def;
 			_parse(def);
 		}
 		else
@@ -574,10 +574,10 @@
 	}
 	
 	//! permalink
-	window.onhashchange=function()
+	window.onhashchange = function()
 	{
-		def=window.location.hash.replace('#','');
-		thash.value=def;
+		def=window.location.hash.replace('#', '');
+		thash.value = def;
 		_parse(def);
 	}
 	</script>

@@ -18,7 +18,7 @@
 		-o-user-select:none;
 	}
 	body{
-		width: 600px;
+		width: 777px;
 		white-space: pre-line;
 		margin: 0 auto;
 		padding:45px;
@@ -71,15 +71,13 @@
 	}
 	
 	input#thash{
-		width:119%;
+		width:100%;
 		text-align:center;
 		font-size:140%;
 		font-family:times,serif;
 		font-style: oblique;
 		text-transform: lowercase;
 		box-shadow: 0 0 114px #89A;
-		left: -64px;
-		position: relative;
 	}
 	
 	input[type=checkbox]{
@@ -195,6 +193,12 @@
 		position: relative;
     	left: 30px;
 	}
+
+    div#droparea {
+
+        width: 400px; height: 500px; display: inline-block; position: absolute; bottom: 0, left: 0; background: red; border: 1px solid black;
+    }
+
 	</style>
 </head>
 <body>
@@ -256,6 +260,7 @@
 	<label for="fk02">face key 02 </label>  <input id="fk02" type="range" min="0" max="7" value="0">
 	<label for="fk01">face key 01 </label>  <input id="fk01" type="range" min="0" max="7" value="0">
 	<label for="fk00">face key 00 </label>  <input id="fk00" type="range" min="0" max="7" value="0"> <!-- count: 1 - skin2 begins -->
+	<div id=droparea>Drag drop</div>
 	<script type="text/javascript">
 	/* basic helpers */
 	app = document;
@@ -311,10 +316,10 @@
 	var hash   = {}
 	var struct = {
     //value       //key no. //shift //num bits     //input        //WORKING FINE?
-	hair          : [0,      0,      6,            hai        ], // max bits known, touching next left field (beard)
-	beard         : [0,      6,      6,            bea        ], // max bits known, touching next left field (skin)
+	hair          : [0,      0,      6,            hai        ], // max bits known, adjacent to next left field (beard)
+	beard         : [0,      6,      6,            bea        ], // max bits known, adjacent to next left field (skin)
 	skin          : [0,     12,      6,            ski        ], // ¡! check max bits for correctness
-	hair_color    : [0,     24,      6,            col        ], // max bits known, touching next left field (age)
+	hair_color    : [0,     24,      6,            col        ], // max bits known, adjacent to next left field (age)
 	age           : [0,     30,      6,            age        ], // ¡! check max bits for correctness
 
 	facekey00     : [1,   3* 0,      3,           fk00        ], //yay -
@@ -635,16 +640,26 @@
 		_parse(def);
 	}
 
-	document.body.ondrop = function(e)
+    droparea = document.querySelector("div#droparea")
+
+	droparea.ondrop = function(e)
 	{
 		console.log(e);
 		console.log(e.dataTransfer.files[0])
 		e.preventDefault();
 	}
 
-	document.body.ondragover = function(e)
+	//droparea.ondropend = function(e)
+	//{
+	//	console.log(e);
+	//	e.preventDefault();
+	//}
+
+
+	droparea.ondragover = function(e)
 	{
 		console.log(e);
+        e.preventDefault();
 	}
 	</script>
 </body></html>

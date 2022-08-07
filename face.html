@@ -661,5 +661,22 @@
 		console.log(e);
         e.preventDefault();
 	}
+
+
+	xhr = new XMLHttpRequest;
+	xhr.responseType = 'text/plain';
+	xhr.open('GET', 'https://gist.githubusercontent.com/Swyter/0b03cdae54886afc5ff2e51f3d8f1223/raw/383bc333829c2867132a9737d2079798c38cd73c/skins.txt');
+	xhr.onloadend = function(e)
+	{
+		if (e.target.readyState != e.target.DONE)
+			return;
+
+		if (e.target.status != 200)
+			return;
+
+		console.log(e, e.target.response);
+	}
+	xhr.send();
+
 	</script>
 </body></html>

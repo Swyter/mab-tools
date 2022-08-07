@@ -376,7 +376,7 @@
 */
 	/* handlers */
 	
-	app.onchange=function(e)
+	app.onchange = function(e)
 	{
 		switch (e.target)
 		{
@@ -423,15 +423,15 @@
 			basb= _cut.length;
 			
 			_("//key no. //shift //num bits");
-			_("|| Struct: "+struct[key]);
-			_("     base: "+base);
-			_("    shift: "+shift);
-			_('||    Do:  '  + ('-').repeat( (32-base) ) + _bin );
+			_("|| Struct: " + struct[key]);
+			_("     base: " + base);
+			_("    shift: " + shift);
+			_('||    Do:  ' + ('-').repeat( (32-base) ) + _bin );
 
 
-			_(' |  Mask:  '  + ('-').repeat( 32-(num_bits)-(shift) ) + ('X').repeat( (num_bits) ) );
-			_(' | Final:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _outbin.substr(-num_bits) );
-			_(' |  Prev:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _cut );
+			_(' |  Mask:  ' + ('-').repeat( 32-(num_bits)-(shift) ) + ('X').repeat( (num_bits) ) );
+			_(' | Final:  ' + (' ').repeat( 32-(num_bits)-(shift) ) + _outbin.substr(-num_bits) );
+			_(' |  Prev:  ' + (' ').repeat( 32-(num_bits)-(shift) ) + _cut );
 			
 			//Reset the enabled bitmask values by XOR'ing them with themselves...
 			/*-->
@@ -449,14 +449,14 @@
 			//_outhack = (_out << shift).tobin().substr( -(shift+num_bits), num_bits );
 			
 			_("----------");
-			_("    out:"+_out);
+			_("    out:" + _out);
 			_outhack = Number(_out).tobin().substr( -(num_bits), num_bits );
-			_("outhack:"+_outhack);
+			_("outhack:" + _outhack);
 			//_reshack = _reset.tobin().substr( -(shift+num_bits), num_bits );
 			//_("reshack:"+_reshack);
 			//_("out|res:"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits) )
 			//_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits)+"|"+_bin.substr(-shift,shift))
-			_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+_outhack.substr(-num_bits)+"|"+_bin.substr(-shift,shift))
+			_("togther:" + _bin.substr(0, 32-(num_bits+shift) )+"|"+_outhack.substr(-num_bits)+"|"+_bin.substr(-shift,shift))
 			_("----------");
 			
 			//hash[key_no]= String('00000000000000000000000000000000'+_added.tohex()
@@ -473,11 +473,10 @@
 				e.target.attributes[4].value=_out; //manages the display of the values in sliders
 			}
 			
-			thash.value='0x'+(hash[7]+hash[6]+hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
+			thash.value='0x'+(hash[0] + hash[1] + hash[2] + hash[3]);
 			//_parse(thash.value);
 			break;
 		}
-	
 	}
 	
 	app.onkeydown=function(e)

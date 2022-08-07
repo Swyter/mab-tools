@@ -649,13 +649,6 @@
 		e.preventDefault();
 	}
 
-	//droparea.ondropend = function(e)
-	//{
-	//	console.log(e);
-	//	e.preventDefault();
-	//}
-
-
 	droparea.ondragover = function(e)
 	{
 		console.log(e);
@@ -664,6 +657,9 @@
 
 	state = 'MAGIC';
 	race_count = 0;
+	cur_race_idx = 0;
+	cur_hair_count = 0;
+	race = [];
 
 	xhr = new XMLHttpRequest;
 	xhr.responseType = 'text/plain';
@@ -685,8 +681,6 @@
 			line = linetxt.split(' ');
 			console.log(line);
 
-
-
 			switch (state)
 			{
 				case 'MAGIC':
@@ -697,12 +691,61 @@
 						console.warn(`swy: bad file magic value: ${linetxt}`);
 				}
 				break;
-				
+
 				case 'READ_RACE_COUNT':
 				{
 					race_count = line[0];
+					state = 'READ_RACE_NAME';
 				}
+				break;
 
+				case 'READ_RACE_NAME':
+				{
+					race_count = line[0];
+					state = 'READ_RACE';
+				}
+				break;
+
+				case 'READ_RACE':
+				{
+					race[cur_race_idx]={};
+					race[cur_race_idx]["name"] = line[1];
+					state = 'READ_RACE_MESHES';
+				}
+				break;
+
+				case 'READ_RACE_MESHES':
+				{
+					race[cur_race_idx]["mesh_body"] = line[0];
+					race[cur_race_idx]["mesh_calf"] = line[1];
+					race[cur_race_idx]["mesh_hand"] = line[2];
+					state = 'READ_RACE_HEAD';
+				}
+				break;
+
+				case 'READ_RACE_HEAD':
+				{
+					race[cur_race_idx]["mesh_head"] = line[0];
+					state = 'READ_RACE_HAIR_COUNT';
+				}
+				break;
+
+				case 'READ_RACE_HAIR_COUNT':
+				{
+					cur_hair_count = line[0];
+					state = 'READ_RACE_HAIR';
+				}
+				break;
+
+				case 'READ_RACE_HAIR':
+				{
+					race[cur_race_idx]["mesh_hair"] = [];
+
+					for (i = 0; i < cur_hair_count; i++)
+						race[cur_race_idx]["mesh_hair"].push(line[i]);
+
+					//state = 'READ_RACE_HEAD';
+				}
 			}
 			
 		}

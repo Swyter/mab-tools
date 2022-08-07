@@ -330,11 +330,11 @@
 	var hash   = {}
 	var struct = {
     //value       //key no. //shift //num bits     //input        //WORKING FINE?
-	skin          : [0,     12,      6,            ski        ], // check max bits for correctness
+	age           : [0,     30,      6,            age        ], // ¡! check max bits for correctness
+	hair_color    : [0,     24,      6,            col        ], // max bits known, touching next left field (age)
+	skin          : [0,     12,      6,            ski        ], // ¡! check max bits for correctness
 	beard         : [0,      6,      6,            bea        ], // max bits known, touching next left field (skin)
 	hair          : [0,      0,      6,            hai        ], // max bits known, touching next left field (beard)
-	age           : [0,     30,      6,            age        ], // check max bits for correctness
-	hair_color    : [0,     24,      6,            col        ], // max bits known, touching next left field (age)
 
 	fk42          : [2,   3*21,      1, /*<- ! */ fk42        ], /* swy: only one bit left, wonky slider in-game; why not exploit the remaining range better? Don't ask me */
 	fk41          : [2,   3*20,      3,           fk41        ], //yay -

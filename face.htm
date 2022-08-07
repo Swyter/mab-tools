@@ -281,49 +281,27 @@
 	col=$('col');
 	
 	fk42=$('fk42');
-	fk41=$('fk41');
-	fk40=$('fk40');
-	fk39=$('fk39');
-	fk38=$('fk38');
-	fk37=$('fk37');
-	fk36=$('fk36');
-	fk35=$('fk35');
-	fk34=$('fk34');
-	fk33=$('fk33');
-	fk32=$('fk32');
-	fk31=$('fk31');
-	fk30=$('fk30');
-	fk29=$('fk29');
-	fk28=$('fk28');
-	fk27=$('fk27');
-	fk26=$('fk26');
-	fk25=$('fk25');
-	fk24=$('fk24');
-	fk23=$('fk23');
-	fk22=$('fk22');
-	fk21=$('fk21');
-
-	fk20=$('fk20');
-	fk19=$('fk19');
-	fk18=$('fk18');
-	fk17=$('fk17');
-	fk16=$('fk16');
-	fk15=$('fk15');
-	fk14=$('fk14');
-	fk13=$('fk13');
-	fk12=$('fk12');
-	fk11=$('fk11');
-	fk10=$('fk10');
-	fk09=$('fk09');
-	fk08=$('fk08');
-	fk07=$('fk07');
-	fk06=$('fk06');
-	fk05=$('fk05');
-	fk04=$('fk04');
-	fk03=$('fk03');
-	fk02=$('fk02');
-	fk01=$('fk01');
-	fk00=$('fk00');
+	fk41=$('fk41');	fk20=$('fk20');
+	fk40=$('fk40');	fk19=$('fk19');
+	fk39=$('fk39');	fk18=$('fk18');
+	fk38=$('fk38');	fk17=$('fk17');
+	fk37=$('fk37');	fk16=$('fk16');
+	fk36=$('fk36');	fk15=$('fk15');
+	fk35=$('fk35');	fk14=$('fk14');
+	fk34=$('fk34');	fk13=$('fk13');
+	fk33=$('fk33');	fk12=$('fk12');
+	fk32=$('fk32');	fk11=$('fk11');
+	fk31=$('fk31');	fk10=$('fk10');
+	fk30=$('fk30');	fk09=$('fk09');
+	fk29=$('fk29');	fk08=$('fk08');
+	fk28=$('fk28');	fk07=$('fk07');
+	fk27=$('fk27');	fk06=$('fk06');
+	fk26=$('fk26');	fk05=$('fk05');
+	fk25=$('fk25');	fk04=$('fk04');
+	fk24=$('fk24');	fk03=$('fk03');
+	fk23=$('fk23');	fk02=$('fk02');
+	fk22=$('fk22');	fk01=$('fk01');
+	fk21=$('fk21');	fk00=$('fk00');
 	
 	/* basic functions */
 	
@@ -413,112 +391,110 @@
 
 		for (var key in struct)
 		{
-			if (e.target == struct[key][3])
-			{
-				if (e.target.type=="checkbox")
-				{
-						if(e.target.checked){
-								_out=1;
-						}else{
-								_out=0;
-						}
-				}else
-				{
-						_out=e.target.value;
-				}
-				_("I've found a new value to change: "+_out);
-				
-				key_no   = struct[key][0];
-				shift    = struct[key][1];
-				num_bits = struct[key][2];
-				
-				
-				_outbin = String(_out).fromhex().tobin();
-				//_outbin = String('00000000000000000000000000000000'+_outbin
-				//	).slice(-num_bits);
+			/* swy: not this element? skip it */
+			if (e.target != struct[key][3])
+				continue;
 
-				_bin = String(hash[ key_no ]).fromhex().tobin();
-				//_bin = String('00000000000000000000000000000000'+_bin
-				//	).slice(_bin.length);
-				
-				_cut = _bin.substr( -(shift+num_bits), num_bits );
-				
-				base= _bin.length;
-				basb= _cut.length;
-				
-				_("//key no. //shift //num bits");
-				_("|| Struct: "+struct[key]);
-				_("     base: "+base);
-				_("    shift: "+shift);
-				_('||    Do:  '  + ('-').repeat( (32-base) ) + _bin );
+			/* --- */
+
+			if (e.target.type=="checkbox")
+				_out= (e.target.checked) ? 1 : 0;
+			else
+				_out = e.target.value;
+
+			_("I've found a new value to change: "+_out);
+			
+			key_no   = struct[key][0];
+			shift    = struct[key][1];
+			num_bits = struct[key][2];
+			
+			
+			_outbin = String(_out).fromhex().tobin();
+			//_outbin = String('00000000000000000000000000000000'+_outbin
+			//	).slice(-num_bits);
+
+			_bin = String(hash[ key_no ]).fromhex().tobin();
+			//_bin = String('00000000000000000000000000000000'+_bin
+			//	).slice(_bin.length);
+			
+			_cut = _bin.substr( -(shift+num_bits), num_bits );
+			
+			base= _bin.length;
+			basb= _cut.length;
+			
+			_("//key no. //shift //num bits");
+			_("|| Struct: "+struct[key]);
+			_("     base: "+base);
+			_("    shift: "+shift);
+			_('||    Do:  '  + ('-').repeat( (32-base) ) + _bin );
 
 
-				_(' |  Mask:  '  + ('-').repeat( 32-(num_bits)-(shift) ) + ('X').repeat( (num_bits) ) );
-				_(' | Final:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _outbin.substr(-num_bits) );
-				_(' |  Prev:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _cut );
-				
-				//Reset the enabled bitmask values by XOR'ing them with themselves...
-				/*-->
-				
-				_reset= ( _bin.frombin() ) ^ ( _cut.frombin() << shift );
-				_(' | Reset:  '  + _reset.tobin() );
+			_(' |  Mask:  '  + ('-').repeat( 32-(num_bits)-(shift) ) + ('X').repeat( (num_bits) ) );
+			_(' | Final:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _outbin.substr(-num_bits) );
+			_(' |  Prev:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _cut );
+			
+			//Reset the enabled bitmask values by XOR'ing them with themselves...
+			/*-->
+			
+			_reset= ( _bin.frombin() ) ^ ( _cut.frombin() << shift );
+			_(' | Reset:  '  + _reset.tobin() );
 
-				//Add the new values by OR'ing them with the noew blank shift range/scope...
-				_added= ( _reset | _out << shift);
-				_(' | Added:  '  + _added.tobin() );
-				
-				<--*/
-				
-				//There's a limitation in bitwise operations in js: 32 bit signed integers, so if we set the last bit it turns out negative :/
-				//_outhack = (_out << shift).tobin().substr( -(shift+num_bits), num_bits );
-				
-				
-				
-				_("----------");
-				_("    out:"+_out);
-				_outhack = Number(_out).tobin().substr( -(num_bits), num_bits );
-				_("outhack:"+_outhack);
-				//_reshack = _reset.tobin().substr( -(shift+num_bits), num_bits );
-				//_("reshack:"+_reshack);
-				//_("out|res:"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits) )
-				//_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits)+"|"+_bin.substr(-shift,shift))
-				_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+_outhack.substr(-num_bits)+"|"+_bin.substr(-shift,shift))
-				_("----------");
-				
-				//hash[key_no]= String('00000000000000000000000000000000'+_added.tohex()
-				//	).slice(-8);
-				//hash[key_no]= _added.tohex().pad(8);
-				hash[key_no]=(
-						/* 1st orig. chunk */		_bin.substr(0, 32-(num_bits+shift) ) +
-						/* our modif. part */	_outhack.substr(-num_bits) +
-						/* 2nd orig. chunk */	    _bin.substr(-shift,shift)
-								
-								).frombin().tohex().pad(8);
-								
-				if (e.target.attributes[4]) {
-					e.target.attributes[4].value=_out; //manages the display of the values in sliders
-				}
-				
-				thash.value='0x'+(hash[7]+hash[6]+hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
-				//_parse(thash.value);
-				break;
+			//Add the new values by OR'ing them with the noew blank shift range/scope...
+			_added= ( _reset | _out << shift);
+			_(' | Added:  '  + _added.tobin() );
+			
+			<--*/
+			
+			//There's a limitation in bitwise operations in js: 32 bit signed integers, so if we set the last bit it turns out negative :/
+			//_outhack = (_out << shift).tobin().substr( -(shift+num_bits), num_bits );
+			
+			
+			
+			_("----------");
+			_("    out:"+_out);
+			_outhack = Number(_out).tobin().substr( -(num_bits), num_bits );
+			_("outhack:"+_outhack);
+			//_reshack = _reset.tobin().substr( -(shift+num_bits), num_bits );
+			//_("reshack:"+_reshack);
+			//_("out|res:"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits) )
+			//_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits)+"|"+_bin.substr(-shift,shift))
+			_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+_outhack.substr(-num_bits)+"|"+_bin.substr(-shift,shift))
+			_("----------");
+			
+			//hash[key_no]= String('00000000000000000000000000000000'+_added.tohex()
+			//	).slice(-8);
+			//hash[key_no]= _added.tohex().pad(8);
+			hash[key_no]=(
+					/* 1st orig. chunk */		_bin.substr(0, 32-(num_bits+shift) ) +
+					/* our modif. part */	_outhack.substr(-num_bits) +
+					/* 2nd orig. chunk */	    _bin.substr(-shift,shift)
+							
+							).frombin().tohex().pad(8);
+							
+			if (e.target.attributes[4]) {
+				e.target.attributes[4].value=_out; //manages the display of the values in sliders
 			}
+			
+			thash.value='0x'+(hash[7]+hash[6]+hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
+			//_parse(thash.value);
+			break;
 		}
 	
 	}
 	
 	app.onkeydown=function(e)
 	{
-		if (e.keyIdentifier == 'Enter' || e.keyCode == 13){ //firefux doesn't supprts keyIdentifier, of course :(
+		/* swy: only react to the Enter key */
+		if (!(e.keyIdentifier == 'Enter' || e.keyCode == 13)) //firefux doesn't supprts keyIdentifier, of course :(
+			return;
+
 		//if (e.target!=flseed && e.target!=riseed && e.target!=teseed){return 0;}
 		_("boom");
 		//! http://stackoverflow.com/a/6005163
 		e.target.value = Math.floor(Math.random() * ( 65535 /* even better, 4 ones, as the game does 1048575/* use half of the bitmask instead 2147483647*/ + 1));
 		app.onchange(e); // we've to force a new state so the app knows that the randomization has been launched by the user :)
-		}
 	}
 	
-	//00000001324a9cba0005194a000041ef00005ae800003c55
 	function _parse(e)
 	{
 		e=e.replace('0x','');
@@ -581,7 +557,6 @@
 		//if (_bool){
 			struct[key][3].checked=_bool;
 		//}
-		
 		}
 	}
 
@@ -593,9 +568,9 @@
 			def='0x000000000000000036db6db6db6db6dbb6db6db6db6db6db0000000000000000';
 			thash.value=def;
 			_parse(def);
-		} else {
-			window.onhashchange();
 		}
+		else
+			window.onhashchange();
 	}
 	
 	//! permalink

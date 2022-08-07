@@ -264,7 +264,8 @@
 	String.prototype.repeat=function( num ){ return new Array( num + 1 ).join( this );}
 	
 	//! http://www.2ality.com/2012/02/js-integers.html
-	String.prototype.frombin = function ( ) { return parseInt(this, 2);};
+	String.prototype.frombin = function ( ) { return parseInt(this,  2);};
+	String.prototype.fromdec = function ( ) { return parseInt(this, 10);};
 	String.prototype.fromhex = function ( ) { return parseInt(this, 16);};
     Number.prototype.tobin   = function ( ) { var sign = (this < 0 ? "-" : "");var result = Math.abs(this).toString(2);while(result.length < 32) {result = "0" + result;}return sign + result;}
     Number.prototype.tohex   = function ( ) { return this.toString(16);};
@@ -409,11 +410,14 @@
 			num_bits = struct[key][2];
 			
 			
-			_outbin = String(_out).fromhex().tobin();
+			_outbin = String(_out).fromdec().tobin();
 			//_outbin = String('00000000000000000000000000000000'+_outbin
 			//	).slice(-num_bits);
 
-			_bin = String(hash[ key_no ]).fromhex().tobin();
+			_bin  = hash[ key_no ].substr(0, 8).fromhex().tobin() /* swy: "0000000fc0001000".substr(0, 8):          c0001000 */
+			_bin += hash[ key_no ].substr(8, 8).fromhex().tobin() /*      "0000000fc0001000".substr(8, 8):  0000000f         */
+
+
 			//_bin = String('00000000000000000000000000000000'+_bin
 			//	).slice(_bin.length);
 			
@@ -455,12 +459,14 @@
 			_("togther:" + _bin.substr(0, 64-(num_bits+shift))+"|"+_outhack.substr(-num_bits)+"|"+_bin.substr(-shift,shift))
 			_("----------");
 			
-			hash[key_no]=(
+			hash_bin = (
 					/* 1st orig. chunk */		_bin.substr(0, 64-(num_bits+shift) ) +
 					/* our modif. part */	_outhack.substr(-num_bits) +
 					/* 2nd orig. chunk */	    _bin.substr(-shift,shift)
 							
-							).frombin().tohex().pad(8);
+							);
+			hash[key_no]  = hash_bin.substr( 0, 32).frombin().tohex().pad(8);
+			hash[key_no] += hash_bin.substr(32, 32).frombin().tohex().pad(8);
 							
 			if (e.target.attributes[4]) {
 				e.target.attributes[4].value=_out; //manages the display of the values in sliders

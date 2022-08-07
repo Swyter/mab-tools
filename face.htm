@@ -302,6 +302,7 @@
 	fk23=$('fk23');
 	fk22=$('fk22');
 	fk21=$('fk21');
+
 	fk20=$('fk20');
 	fk19=$('fk19');
 	fk18=$('fk18');
@@ -330,9 +331,9 @@
 	var struct = {
     //value       //key no. //shift //num bits     //input        //WORKING FINE?
 	skin          : [0,      0,     31,           ski         ], //yay -
-	beard         : [1,      0,     31,           bea      ], //yay -
+	beard         : [1,      0,     31,           bea         ], //yay -
 	hair          : [1,     31,      1,           hai         ], //bugged !! -later test: now okay! hackfix works... yay!
-	age           : [2,      0,     31,           age      ], //yay -
+	age           : [2,      0,     31,           age         ], //yay -
 	hair_color    : [3,      0,     10,           col         ], //yay - 
 
 	fk42          : [5,      0,      2,           fk42        ], //yay -
@@ -357,6 +358,7 @@
 	fk23          : [5,      0,      2,           fk23        ], //yay -
 	fk22          : [5,      0,      2,           fk22        ], //yay -
 	fk21          : [5,      0,      2,           fk21        ], //yay -
+	
 	fk20          : [5,      0,      2,           fk20        ], //yay -
 	fk19          : [5,      0,      2,           fk19        ], //yay -
 	fk18          : [5,      0,      2,           fk18        ], //yay -
@@ -483,7 +485,7 @@
 									e.target.attributes[4].value=_out; //manages the display of the values in sliders
 								}
 								
-								thash.value='0x'+(hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
+								thash.value='0x'+(hash[7]+hash[6]+hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
 								//_parse(thash.value);
 								break;
 					}

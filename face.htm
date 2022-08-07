@@ -514,7 +514,10 @@
 			shift    = struct[key][1];
 			num_bits = struct[key][2];
 
-			_bin = hash[ key_no ].fromhex().tobin()
+			/* swy: split them in two because the fromhex() and tobin() functions can't
+			        really handle more than 32 bits at a time */
+			_bin  = hash[ key_no ].substr(0, 8).fromhex().tobin() /* swy: "0000000fc0001000".substr(0, 8):          c0001000 */
+			_bin += hash[ key_no ].substr(8, 8).fromhex().tobin() /*      "0000000fc0001000".substr(8, 8):  0000000f         */
 			_bin = _bin.pad(_bin.length);
 
 			_cut = _bin.substr( -(shift+num_bits), num_bits );

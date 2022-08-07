@@ -330,56 +330,56 @@
 	var hash   = {}
 	var struct = {
     //value       //key no. //shift //num bits     //input        //WORKING FINE?
-	age           : [0,     30,      6,            age        ], // ¡! check max bits for correctness
-	hair_color    : [0,     24,      6,            col        ], // max bits known, touching next left field (age)
-	skin          : [0,     12,      6,            ski        ], // ¡! check max bits for correctness
-	beard         : [0,      6,      6,            bea        ], // max bits known, touching next left field (skin)
 	hair          : [0,      0,      6,            hai        ], // max bits known, touching next left field (beard)
+	beard         : [0,      6,      6,            bea        ], // max bits known, touching next left field (skin)
+	skin          : [0,     12,      6,            ski        ], // ¡! check max bits for correctness
+	hair_color    : [0,     24,      6,            col        ], // max bits known, touching next left field (age)
+	age           : [0,     30,      6,            age        ], // ¡! check max bits for correctness
 
-	fk42          : [2,   3*21,      1, /*<- ! */ fk42        ], /* swy: only one bit left, wonky slider in-game; why not exploit the remaining range better? Don't ask me */
-	fk41          : [2,   3*20,      3,           fk41        ], //yay -
-	fk40          : [2,   3*19,      3,           fk40        ], //yay -
-	fk39          : [2,   3*18,      3,           fk39        ], //yay -
-	fk38          : [2,   3*17,      3,           fk38        ], //yay -
-	fk37          : [2,   3*16,      3,           fk37        ], //yay -
-	fk36          : [2,   3*15,      3,           fk36        ], //yay -
-	fk35          : [2,   3*14,      3,           fk35        ], //yay -
-	fk34          : [2,   3*13,      3,           fk34        ], //yay -
-	fk33          : [2,   3*12,      3,           fk33        ], //yay -
-	fk32          : [2,   3*11,      3,           fk32        ], //yay -
-	fk31          : [2,   3*10,      3,           fk31        ], //yay -
-	fk30          : [2,   3* 9,      3,           fk30        ], //yay -
-	fk29          : [2,   3* 8,      3,           fk29        ], //yay -
-	fk28          : [2,   3* 7,      3,           fk28        ], //yay -
-	fk27          : [2,   3* 6,      3,           fk27        ], //yay -
-	fk26          : [2,   3* 5,      3,           fk26        ], //yay -
-	fk25          : [2,   3* 4,      3,           fk25        ], //yay -
-	fk24          : [2,   3* 3,      3,           fk24        ], //yay -
-	fk23          : [2,   3* 2,      3,           fk23        ], //yay -
-	fk22          : [2,   3* 1,      3,           fk22        ], //yay -
-	fk21          : [2,   3* 0,      3,           fk21        ], //yay -
+	facekey00     : [1,   3* 0,      3,           fk00        ], //yay -
+	facekey01     : [1,   3* 1,      3,           fk01        ], //yay -
+	facekey02     : [1,   3* 2,      3,           fk02        ], //yay -
+	facekey03     : [1,   3* 3,      3,           fk03        ], //yay -
+	facekey04     : [1,   3* 4,      3,           fk04        ], //yay -
+	facekey05     : [1,   3* 5,      3,           fk05        ], //yay -
+	facekey06     : [1,   3* 6,      3,           fk06        ], //yay -
+	facekey07     : [1,   3* 7,      3,           fk07        ], //yay -
+	facekey08     : [1,   3* 8,      3,           fk08        ], //yay -
+	facekey09     : [1,   3* 9,      3,           fk09        ], //yay -
+	facekey10     : [1,   3*10,      3,           fk10        ], //yay -
+	facekey11     : [1,   3*11,      3,           fk11        ], //yay -
+	facekey12     : [1,   3*12,      3,           fk12        ], //yay -
+	facekey13     : [1,   3*13,      3,           fk13        ], //yay -
+	facekey14     : [1,   3*14,      3,           fk14        ], //yay -
+	facekey15     : [1,   3*15,      3,           fk15        ], //yay -
+	facekey16     : [1,   3*16,      3,           fk16        ], //yay -
+	facekey17     : [1,   3*17,      3,           fk17        ], //yay -
+	facekey18     : [1,   3*18,      3,           fk18        ], //yay -
+	facekey19     : [1,   3*19,      3,           fk19        ], //yay -
+	facekey20     : [1,   3*20,      3,           fk20        ], //yay -
 
-	fk20          : [1,   3*20,      3,           fk20        ], //yay -
-	fk19          : [1,   3*19,      3,           fk19        ], //yay -
-	fk18          : [1,   3*18,      3,           fk18        ], //yay -
-	fk17          : [1,   3*17,      3,           fk17        ], //yay -
-	fk16          : [1,   3*16,      3,           fk16        ], //yay -
-	fk15          : [1,   3*15,      3,           fk15        ], //yay -
-	fk14          : [1,   3*14,      3,           fk14        ], //yay -
-	fk13          : [1,   3*13,      3,           fk13        ], //yay -
-	fk12          : [1,   3*12,      3,           fk12        ], //yay -
-	fk11          : [1,   3*11,      3,           fk11        ], //yay -
-	fk10          : [1,   3*10,      3,           fk10        ], //yay -
-	fk09          : [1,   3* 9,      3,           fk09        ], //yay -
-	fk08          : [1,   3* 8,      3,           fk08        ], //yay -
-	fk07          : [1,   3* 7,      3,           fk07        ], //yay -
-	fk06          : [1,   3* 6,      3,           fk06        ], //yay -
-	fk05          : [1,   3* 5,      3,           fk05        ], //yay -
-	fk04          : [1,   3* 4,      3,           fk04        ], //yay -
-	fk03          : [1,   3* 3,      3,           fk03        ], //yay -
-	fk02          : [1,   3* 2,      3,           fk02        ], //yay -
-	fk01          : [1,   3* 1,      3,           fk01        ], //yay -
-	fk00          : [1,   3* 0,      3,           fk00        ], //yay -
+	facekey21     : [2,   3* 0,      3,           fk21        ], //yay -
+	facekey22     : [2,   3* 1,      3,           fk22        ], //yay -
+	facekey23     : [2,   3* 2,      3,           fk23        ], //yay -
+	facekey24     : [2,   3* 3,      3,           fk24        ], //yay -
+	facekey25     : [2,   3* 4,      3,           fk25        ], //yay -
+	facekey26     : [2,   3* 5,      3,           fk26        ], //yay -
+	facekey27     : [2,   3* 6,      3,           fk27        ], //yay -
+	facekey28     : [2,   3* 7,      3,           fk28        ], //yay -
+	facekey29     : [2,   3* 8,      3,           fk29        ], //yay -
+	facekey30     : [2,   3* 9,      3,           fk30        ], //yay -
+	facekey31     : [2,   3*10,      3,           fk31        ], //yay -
+	facekey32     : [2,   3*11,      3,           fk32        ], //yay -
+	facekey33     : [2,   3*12,      3,           fk33        ], //yay -
+	facekey34     : [2,   3*13,      3,           fk34        ], //yay -
+	facekey35     : [2,   3*14,      3,           fk35        ], //yay -
+	facekey36     : [2,   3*15,      3,           fk36        ], //yay -
+	facekey37     : [2,   3*16,      3,           fk37        ], //yay -
+	facekey38     : [2,   3*17,      3,           fk38        ], //yay -
+	facekey39     : [2,   3*18,      3,           fk39        ], //yay -
+	facekey40     : [2,   3*19,      3,           fk40        ], //yay -
+	facekey41     : [2,   3*20,      3,           fk41        ], //yay -
+	facekey42     : [2,   3*21,      1, /*<- ! */ fk42        ], /* swy: only one bit left, wonky slider in-game; why not exploit the remaining range better? Don't ask me */
 }
 /*
 

@@ -368,6 +368,7 @@
  face_key_1 = 180000041
  face_key_2 = 36db79b6db6db6fb
                                                  
+
                                   <------- start-|
                   <------- start-|               |
   <------- start-|               |               |
@@ -383,35 +384,42 @@
   from the table below to build bitmasks and retrieve each field:
 
   For example, age is in block (0), has 6 bits and a shift of 30 bits,
-  using hex((pow(2, num_bits) - 1) << bit_shift) we get 
+  using hex((pow(2, num_bits) - 1) << bit_shift) we get:
 
-	>>> hex((pow(2,6)-1) << 30)
-	'0xfc0000000'
-	>>> hex((pow(2,6)-1))
-	'0x3f'
+    >>> hex((pow(2,6)-1) << 30)
+    '0xfc0000000'
+    >>> hex((pow(2,6)-1))
+    '0x3f'
 
-	>>> bin((pow(2,6)-1) << 30) # swy: same thing, but in binary
-	'0b111111000000000000000000000000000000'
-	>>> bin((pow(2,6)-1))
-	'0b111111'
+    >>> bin((pow(2,6)-1) << 30) # swy: same thing, but in binary
+    '0b111111000000000000000000000000000000'
+    >>> bin((pow(2,6)-1)) # swy: what this does is just to generate six ones, six bits
+    '0b111111'
 
-  Now that we have the right bitmask we can use the AND operation to isolate only the bits
-  we are interested in and shift them back to the right to get the number:
+  Now that we have the right bitmask we can use the logical AND operation to isolate only the bits
+  we are interested in and shift them back to the right (we can also see it as removing the padding)
+  to get the actual number with just a simple ((block & bitmask) >> bit_shift):
 
-	>>> hex(0x180000041 & 0xfc0000000) # swy: only leave our six potential bits toggled
-	'0x180000000'
-	>>> bin(0x180000041 & 0xfc0000000) # swy: same thing, but in binary
-	'0b110000000000000000000000000000000'
+    >>> hex(0x180000041 & 0xfc0000000) # swy: only leave our six potential bits toggled
+    '0x180000000'
+    >>> bin(0x180000041 & 0xfc0000000) # swy: same thing, but in binary
+    '0b110000000000000000000000000000000'
+    >>> bin(0x180000041)               # swy: here's the original, compare against the one above
+    '0b110000000000000000000000001000001'
 
-	>>> hex((0x180000041 & 0xfc0000000) >> 30) # swy: we are interested in the left-most «110» bit part
-	'0x6'
-	>>> bin((0x180000041 & 0xfc0000000) >> 30) # swy: move the bits 30 positions to the right
-	'0b110'
+    >>> hex((0x180000041 & 0xfc0000000) >> 30) # swy: we are interested in the left-most «110» bit part you see above
+    '0x6'
+    >>> bin((0x180000041 & 0xfc0000000) >> 30) # swy: so move the bits 30 positions to the right, same but shown in binary
+    '0b110'
 
-	>>> ((0x180000041 & 0xfc0000000) >> 30)
-	6
+    >>> ((0x180000041 & 0xfc0000000) >> 30)
+    6
 
-	In our case the age field contains the number six. See more examples below.
+||    Do:  0000000000000000000000000000000110000000000000000000000001000001
+ |  Mask:  ----------------------------XXXXXX
+ | Final:                              000110
+
+  In our case the age field contains the number six. See more examples below.
 
   _______180000041
                 3f # hair: to get the field ((0x180000041 & 0x3f) >> 0), which results in 1
@@ -420,6 +428,7 @@
           3f000000 # hair_color: to get the field ((0x180000041 & 0x3f000000) >> 24), which results in 0
          fc0000000 # age: python code to generate a bitmask: hex((pow(2,6)-1) << 30)
 */
+
 	/* handlers */
 	app.onchange = function(e)
 	{

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- MADE BY SWYTER ON THE FIRST QUARTER OF 2012
+<!-- MADE BY SWYTER ON THE THIRD QUARTER OF 2022
   -- MAKES USE OF A HTML5 COMPLIANT BROWSER, NO EXTERNALS -- HAVE FUN
   -- References: <http://mbmodwiki.ollclan.eu/SceneObj>
   -- Programs used: Notepad++ 5.9.8 with NppFTP, Chromium Dev Tools.
@@ -201,12 +201,12 @@
 	<h2>who needs the game, anyway?<span>Ten year anniversary!</span></h2>
 	<input id="thash" type="text" placeholder="~Paste your hash here~" data-kpxc-id="thash" value="0x00000001324a9cba0005194a000041ef00005ae800003c55">
 	
-	<label for="ski">skin         </label>  <input type="number" id="ski" min="0" max="7" value="0">
-	<label for="bea">beard        </label>  <input type="number" id="bea" min="0" max="7" value="0">
-	<label for="hai">hair         </label>  <input type="number" id="hai" min="0" max="7" value="0"> 
+	<label for="ski">skin         </label>  <input type="number" id="ski" min="0" max="63" value="0">
+	<label for="bea">beard        </label>  <input type="number" id="bea" min="0" max="63" value="0">
+	<label for="hai">hair         </label>  <input type="number" id="hai" min="0" max="63" value="0"> 
 	
-	<label for="age">age          </label>  <input id="age" type="range" min="0" max="252" value="18">
-	<label for="col">hair color   </label>  <input id="col" type="range" min="0" max="7" value="42">
+	<label for="age">age          </label>  <input id="age" type="range" min="0" max="63" value="18">
+	<label for="col">hair color   </label>  <input id="col" type="range" min="0" max="63" value="42">
 
 	<!--input type="range" min="0" max="50" value="25" step="5" /-->
 	<label for="fk42">face key 42 </label>  <input id="fk42" type="range" min="0" max="1" value="0"> <!-- count: 21 - cleared skin3 leftmost, only has one bit, i think -->
@@ -398,112 +398,117 @@
 */
 	/* handlers */
 	
-	app.onchange=function(e){
-	
-	switch (e.target){
-		case thash: 
-			_('a new hash has arrived!');
-			_parse(thash.value);
-			break;
-			
-		default:
-			_(e.target.id+" has changed");
-	}
-	
-			for (var key in struct) {
-					if (e.target == struct[key][3]){
-								if(e.target.type=="checkbox"){
-										if(e.target.checked){
-												_out=1;
-										}else{
-												_out=0;
-										}
-								}else{
-										_out=e.target.value;
-								}
-								_("I've found a new value to change: "+_out);
-								
-								key_no   = struct[key][0];
-								shift    = struct[key][1];
-								num_bits = struct[key][2];
-								
-								
-								_outbin = String(_out).fromhex().tobin();
-								//_outbin = String('00000000000000000000000000000000'+_outbin
-								//	).slice(-num_bits);
+	app.onchange=function(e)
+	{
+		switch (e.target)
+		{
+			case thash: 
+				_('a new hash has arrived!');
+				_parse(thash.value);
+				break;
+				
+			default:
+				_(e.target.id+" has changed");
+		}
 
-								_bin = String(hash[ key_no ]).fromhex().tobin();
-								//_bin = String('00000000000000000000000000000000'+_bin
-								//	).slice(_bin.length);
-								
-								_cut = _bin.substr( -(shift+num_bits), num_bits );
-								
-								base= _bin.length;
-								basb= _cut.length;
-								
-								_("//key no. //shift //num bits");
-								_("|| Struct: "+struct[key]);
-								_("     base: "+base);
-								_("    shift: "+shift);
-								_('||    Do:  '  + ('-').repeat( (32-base) ) + _bin );
-		
-		
-								_(' |  Mask:  '  + ('-').repeat( 32-(num_bits)-(shift) ) + ('X').repeat( (num_bits) ) );
-								_(' | Final:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _outbin.substr(-num_bits) );
-								_(' |  Prev:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _cut );
-								
-								//Reset the enabled bitmask values by XOR'ing them with themselves...
-								/*-->
-								
-								_reset= ( _bin.frombin() ) ^ ( _cut.frombin() << shift );
-								_(' | Reset:  '  + _reset.tobin() );
+		for (var key in struct)
+		{
+			if (e.target == struct[key][3])
+			{
+				if (e.target.type=="checkbox")
+				{
+						if(e.target.checked){
+								_out=1;
+						}else{
+								_out=0;
+						}
+				}else
+				{
+						_out=e.target.value;
+				}
+				_("I've found a new value to change: "+_out);
+				
+				key_no   = struct[key][0];
+				shift    = struct[key][1];
+				num_bits = struct[key][2];
+				
+				
+				_outbin = String(_out).fromhex().tobin();
+				//_outbin = String('00000000000000000000000000000000'+_outbin
+				//	).slice(-num_bits);
 
-								//Add the new values by OR'ing them with the noew blank shift range/scope...
-								_added= ( _reset | _out << shift);
-								_(' | Added:  '  + _added.tobin() );
+				_bin = String(hash[ key_no ]).fromhex().tobin();
+				//_bin = String('00000000000000000000000000000000'+_bin
+				//	).slice(_bin.length);
+				
+				_cut = _bin.substr( -(shift+num_bits), num_bits );
+				
+				base= _bin.length;
+				basb= _cut.length;
+				
+				_("//key no. //shift //num bits");
+				_("|| Struct: "+struct[key]);
+				_("     base: "+base);
+				_("    shift: "+shift);
+				_('||    Do:  '  + ('-').repeat( (32-base) ) + _bin );
+
+
+				_(' |  Mask:  '  + ('-').repeat( 32-(num_bits)-(shift) ) + ('X').repeat( (num_bits) ) );
+				_(' | Final:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _outbin.substr(-num_bits) );
+				_(' |  Prev:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _cut );
+				
+				//Reset the enabled bitmask values by XOR'ing them with themselves...
+				/*-->
+				
+				_reset= ( _bin.frombin() ) ^ ( _cut.frombin() << shift );
+				_(' | Reset:  '  + _reset.tobin() );
+
+				//Add the new values by OR'ing them with the noew blank shift range/scope...
+				_added= ( _reset | _out << shift);
+				_(' | Added:  '  + _added.tobin() );
+				
+				<--*/
+				
+				//There's a limitation in bitwise operations in js: 32 bit signed integers, so if we set the last bit it turns out negative :/
+				//_outhack = (_out << shift).tobin().substr( -(shift+num_bits), num_bits );
+				
+				
+				
+				_("----------");
+				_("    out:"+_out);
+				_outhack = Number(_out).tobin().substr( -(num_bits), num_bits );
+				_("outhack:"+_outhack);
+				//_reshack = _reset.tobin().substr( -(shift+num_bits), num_bits );
+				//_("reshack:"+_reshack);
+				//_("out|res:"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits) )
+				//_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits)+"|"+_bin.substr(-shift,shift))
+				_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+_outhack.substr(-num_bits)+"|"+_bin.substr(-shift,shift))
+				_("----------");
+				
+				//hash[key_no]= String('00000000000000000000000000000000'+_added.tohex()
+				//	).slice(-8);
+				//hash[key_no]= _added.tohex().pad(8);
+				hash[key_no]=(
+						/* 1st orig. chunk */		_bin.substr(0, 32-(num_bits+shift) ) +
+						/* our modif. part */	_outhack.substr(-num_bits) +
+						/* 2nd orig. chunk */	    _bin.substr(-shift,shift)
 								
-								<--*/
+								).frombin().tohex().pad(8);
 								
-								//There's a limitation in bitwise operations in js: 32 bit signed integers, so if we set the last bit it turns out negative :/
-								//_outhack = (_out << shift).tobin().substr( -(shift+num_bits), num_bits );
-								
-								
-								
-								_("----------");
-								_("    out:"+_out);
-								_outhack = Number(_out).tobin().substr( -(num_bits), num_bits );
-								_("outhack:"+_outhack);
-								//_reshack = _reset.tobin().substr( -(shift+num_bits), num_bits );
-								//_("reshack:"+_reshack);
-								//_("out|res:"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits) )
-								//_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits)+"|"+_bin.substr(-shift,shift))
-								_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+_outhack.substr(-num_bits)+"|"+_bin.substr(-shift,shift))
-								_("----------");
-								
-								//hash[key_no]= String('00000000000000000000000000000000'+_added.tohex()
-								//	).slice(-8);
-								//hash[key_no]= _added.tohex().pad(8);
-								hash[key_no]=(
-										/* 1st orig. chunk */		_bin.substr(0, 32-(num_bits+shift) ) +
-										/* our modif. part */	_outhack.substr(-num_bits) +
-										/* 2nd orig. chunk */	    _bin.substr(-shift,shift)
-												
-											 ).frombin().tohex().pad(8);
-											 
-								if (e.target.attributes[4]){
-									e.target.attributes[4].value=_out; //manages the display of the values in sliders
-								}
-								
-								thash.value='0x'+(hash[7]+hash[6]+hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
-								//_parse(thash.value);
-								break;
-					}
+				if (e.target.attributes[4]) {
+					e.target.attributes[4].value=_out; //manages the display of the values in sliders
+				}
+				
+				thash.value='0x'+(hash[7]+hash[6]+hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
+				//_parse(thash.value);
+				break;
 			}
+		}
 	
 	}
 	
-	app.onkeydown=function(e){
-	
+	app.onkeydown=function(e)
+	{
 		if (e.keyIdentifier == 'Enter' || e.keyCode == 13){ //firefux doesn't supprts keyIdentifier, of course :(
 		//if (e.target!=flseed && e.target!=riseed && e.target!=teseed){return 0;}
 		_("boom");
@@ -514,11 +519,13 @@
 	}
 	
 	//00000001324a9cba0005194a000041ef00005ae800003c55
-	function _parse(e){
+	function _parse(e)
+	{
 		e=e.replace('0x','');
-		if (e.length!=64){
+		if (e.length!=64)
+		{
 			_("badly formatted hash :(");
-			return false; //doesn't validates
+			return false; //doesn't validate
 		}
 		
 		for (var i=1; i<=4; i++){ // 4 64-bit chunks == 8 32-bit chunks
@@ -576,32 +583,27 @@
 		//}
 		
 		}
-		
-		
 	}
 
 	//! dbg----
-	window.onload=function(){
-		if(window.location.hash==''){
+	window.onload=function()
+	{
+		if (window.location.hash=='')
+		{
 			def='0x000000000000000036db6db6db6db6dbb6db6db6db6db6db0000000000000000';
 			thash.value=def;
 			_parse(def);
-		}else{
+		} else {
 			window.onhashchange();
 		}
 	}
 	
 	//! permalink
-	window.onhashchange=function(){
+	window.onhashchange=function()
+	{
 		def=window.location.hash.replace('#','');
 		thash.value=def;
 		_parse(def);
 	}
 	</script>
-	
-	
-	<a hr="" ef="http://www.w3.org/html/logo/" style="position:fixed;bottom:0;right:0;">
-		<!--/img sr//c="http://www.w3.org/html/logo/badge/html5-badge-h-css3-semantics-storage.png" alt="HTML5 Powered with CSS3 / Styling, Semantics, and Offline &amp; Storage" title="HTML5 Powered with CSS3 / Styling, Semantics, and Offline &amp; Storage"-->
-	</a>
-
 </body></html>

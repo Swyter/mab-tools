@@ -455,7 +455,7 @@
 			//_reshack = _reset.tobin().substr( -(shift+num_bits), num_bits );
 			//_("reshack:"+_reshack);
 			//_("out|res:"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits) )
-			//_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits)+"|"+_bin.substr(-shift,shift))
+			//_("togther:"+_bin.substr(0, 64-(num_bits+shift) )+"|"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits)+"|"+_bin.substr(-shift,shift))
 			_("togther:" + _bin.substr(0, 64-(num_bits+shift) )+"|"+_outhack.substr(-num_bits)+"|"+_bin.substr(-shift,shift))
 			_("----------");
 			
@@ -532,12 +532,12 @@
 			_("    shift: " + shift);
 
 
-			_('||    Do:  '  + ('-').repeat( (32-base) ) + _bin );
+			_('||    Do:  '  + ('-').repeat( (64-base) ) + _bin );
 
 
-			_(' |  Mask:  '  + ('-').repeat( 32-(num_bits)-(shift) ) + ('X').repeat( (num_bits) ) );
-			//_('||       '  + ('-').repeat( (32-base) ) + ('.').repeat( (32-base)+(32-basb)-2 ) + _cut );
-			_(' | Final:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _cut );
+			_(' |  Mask:  '  + ('-').repeat( 64-(num_bits)-(shift) ) + ('X').repeat( (num_bits) ) );
+			//_('||       '  + ('-').repeat( (64-base) ) + ('.').repeat( (64-base)+(64-basb)-2 ) + _cut );
+			_(' | Final:  '  + (' ').repeat( 64-(num_bits)-(shift) ) + _cut );
 
 			_dec = _cut.frombin();
 			_('');

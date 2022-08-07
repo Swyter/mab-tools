@@ -676,9 +676,9 @@ struct bc1_block
     ________ ___BBBBB
 */
 
-    uint64 b : 5 <read=Str("%lg", Floor(this * (254.f / 31.f))), write=(this = Floor(Atof(value)) / (254.f / 31.f)), comment=Str("[%lg]",this)>; /* 0-31 */ /* COLOR 0 */
-    uint64 g : 6 <read=Str("%lg", Floor(this * (254.f / 63.f))), write=(this = Floor(Atof(value)) / (254.f / 63.f)), comment=Str("[%lg]",this)>; /* 0-63 */
-    uint64 r : 5 <read=Str("%lg", Floor(this * (254.f / 31.f))), write=(this = Floor(Atof(value)) / (254.f / 31.f)), comment=Str("[%lg]",this)>; /* 0-31 */
+    uint64 b : 5; /* 0-31 */ /* COLOR 0 */
+    uint64 g : 6; /* 0-63 */
+    uint64 r : 5; /* 0-31 */
 
     uint64 b : 5; /* 0-31 */ /* COLOR 1 */
     uint64 g : 6; /* 0-63 */

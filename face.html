@@ -662,6 +662,8 @@
         e.preventDefault();
 	}
 
+	state = 'MAGIC';
+	race_count = 0;
 
 	xhr = new XMLHttpRequest;
 	xhr.responseType = 'text/plain';
@@ -674,7 +676,36 @@
 		if (e.target.status != 200)
 			return;
 
-		console.log(e, e.target.response);
+		console.log(e);
+
+		txt = e.target.response.split('\n');
+
+		for (var linetxt of txt)
+		{
+			line = linetxt.split(' ');
+			console.log(line);
+
+
+
+			switch (state)
+			{
+				case 'MAGIC':
+				{
+					if (state == 'MAGIC' && linetxt == 'skins_file version 1')
+						state = 'READ_RACE_COUNT';
+					else
+						console.warn(`swy: bad file magic value: ${linetxt}`);
+				}
+				break;
+				
+				case 'READ_RACE_COUNT':
+				{
+					race_count = line[0];
+				}
+
+			}
+			
+		}
 	}
 	xhr.send();
 

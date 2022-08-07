@@ -192,6 +192,8 @@
 		font-style: oblique;
 		text-transform: lowercase;
 		text-shadow: 1px 1px black;
+		position: relative;
+    	left: 30px;
 	}
 	</style>
 </head>
@@ -360,23 +362,65 @@
 	facekey41     : [2,   3*20,      3,           fk41        ], //yay -
 	facekey42     : [2,   3*21,      1, /*<- ! */ fk42        ], /* swy: only one bit left, wonky slider in-game; why not exploit the remaining range better? Don't ask me */
 }
+
 /*
 
  face_key_1 = 180000041
  face_key_2 = 36db79b6db6db6fb
-                                                 2
-                                 1<---------------
-                  <---------------
+                                                 
+                                  <------- start-|
+                  <------- start-|               |
+  <------- start-|               |               |
 0x000000018000004136db79b6db6db6fb7fffff6d77bf36db0000000000000000
   _______180000041
        (0)        36db79b6db6db6fb
-                        (1)       ffffffffffffffff
+                        (1)       7fffff6d77bf36db
                                         (2)       ----------------
                                                          (3)
                                                        (unused)
+
+  Here is block (0) from the example above, we will use the bit shift and number of bits columns
+  from the table below to build bitmasks and retrieve each field:
+
+  For example, age is in block (0), has 6 bits and a shift of 30 bits,
+  using hex((pow(2, num_bits) - 1) << bit_shift) we get 
+
+	>>> hex((pow(2,6)-1) << 30)
+	'0xfc0000000'
+	>>> hex((pow(2,6)-1))
+	'0x3f'
+
+	>>> bin((pow(2,6)-1) << 30) # swy: same thing, but in binary
+	'0b111111000000000000000000000000000000'
+	>>> bin((pow(2,6)-1))
+	'0b111111'
+
+  Now that we have the right bitmask we can use the AND operation to isolate only the bits
+  we are interested in and shift them back to the right to get the number:
+
+	>>> hex(0x180000041 & 0xfc0000000) # swy: only leave our six potential bits toggled
+	'0x180000000'
+	>>> bin(0x180000041 & 0xfc0000000) # swy: same thing, but in binary
+	'0b110000000000000000000000000000000'
+
+	>>> hex((0x180000041 & 0xfc0000000) >> 30) # swy: we are interested in the left-most «110» bit part
+	'0x6'
+	>>> bin((0x180000041 & 0xfc0000000) >> 30) # swy: move the bits 30 positions to the right
+	'0b110'
+
+	>>> ((0x180000041 & 0xfc0000000) >> 30)
+	6
+
+	In our case the age field contains the number six. See more examples below.
+
+  _______180000041
+                3f # hair: to get the field ((0x180000041 & 0x3f) >> 0), which results in 1
+               fc0 # beard
+             3f000 # skin
+          3f000000 # hair_color: to get the field ((0x180000041 & 0x3f000000) >> 24), which results in 0
+         fc0000000 # age: python code to generate a bitmask: hex((pow(2,6)-1) << 30)
 */
 	/* handlers */
-	
 	app.onchange = function(e)
 	{
 		switch (e.target)

@@ -198,12 +198,12 @@
 <body>
 	<h3>— the one and only —</h3>
 	<h1>face code generator</h1>
-	<h2>who needs the game, anyway?<span>Now with 21.78% more size!</span></h2>
+	<h2>who needs the game, anyway?<span>Ten year anniversary!</span></h2>
 	<input id="thash" type="text" placeholder="~Paste your hash here~" data-kpxc-id="thash" value="0x00000001324a9cba0005194a000041ef00005ae800003c55">
 	
-	<label for="ski">skin         </label>  <input type="number" id="ski" value="0">
-	<label for="bea">beard        </label>  <input type="number" id="bea" value="0">
-	<label for="hai">hair         </label>  <input type="number" id="hai" value="0"> 
+	<label for="ski">skin         </label>  <input type="number" id="ski" min="0" max="7" value="0">
+	<label for="bea">beard        </label>  <input type="number" id="bea" min="0" max="7" value="0">
+	<label for="hai">hair         </label>  <input type="number" id="hai" min="0" max="7" value="0"> 
 	
 	<label for="age">age          </label>  <input id="age" type="range" min="0" max="7" value="18">
 	<label for="col">hair color   </label>  <input id="col" type="range" min="0" max="7" value="42">
@@ -439,12 +439,12 @@
 	//00000001324a9cba0005194a000041ef00005ae800003c55
 	function _parse(e){
 		e=e.replace('0x','');
-		if (e.length!=48){
+		if (e.length!=64){
 			_("badly formatted hash :(");
 			return false; //doesn't validates
 		}
 		
-		for (var i=1; i<=6; i++){
+		for (var i=1; i<=8; i++){ // 4 64-bit chunks == 8 32-bit chunks
 			hash[i-1] = /*parseInt(*/e.substr(-8*i,8)/*, 16).toString(2)*/;
 			
 			//hash[i] = String('00000000000000000000000000000000'+
@@ -467,7 +467,7 @@
 		//https://ricochen.wordpress.com/2010/04/24/javascript-zero-padding-numbers/
 		//String('00000'+n).slice(-5);
 		_(e);
-		_(hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
+		_(hash[7]+hash[6]+hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
 		
 		
 		for (var key in struct) {
@@ -570,7 +570,7 @@
 	//! dbg----
 	window.onload=function(){
 		if(window.location.hash==''){
-			def='0x00000001324a9cba0005194a000041ef00005ae800003c55';
+			def='0x000000000000000036db6db6db6db6dbb6db6db6db6db6db0000000000000000';
 			thash.value=def;
 			_parse(def);
 		}else{

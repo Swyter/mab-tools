@@ -333,7 +333,7 @@
 	skin          : [0,      0,     31,           ski         ], //yay -
 	beard         : [1,      0,     31,           bea         ], //yay -
 	hair          : [1,     31,      1,           hai         ], //bugged !! -later test: now okay! hackfix works... yay!
-	age           : [2,      0,     31,           age         ], //yay -
+	age           : [7,      0,     31,           age         ], //yay -
 	hair_color    : [3,      0,     10,           col         ], //yay - 
 
 	fk42          : [5,      0,      2,           fk42        ], //yay -
@@ -358,7 +358,7 @@
 	fk23          : [5,      0,      2,           fk23        ], //yay -
 	fk22          : [5,      0,      2,           fk22        ], //yay -
 	fk21          : [5,      0,      2,           fk21        ], //yay -
-	
+
 	fk20          : [5,      0,      2,           fk20        ], //yay -
 	fk19          : [5,      0,      2,           fk19        ], //yay -
 	fk18          : [5,      0,      2,           fk18        ], //yay -
@@ -381,7 +381,21 @@
 	fk01          : [5,      0,      2,           fk01        ], //yay -
 	fk00          : [5,      0,      2,           fk00        ], //yay -
 }
-	
+/*
+
+ face_key_1 = 180000041
+ face_key_2 = 36db79b6db6db6fb
+                                                 2
+                                 1<---------------
+                  <---------------
+0x000000018000004136db79b6db6db6fb7fffff6d77bf36db0000000000000000
+  _______180000041
+       (0)        36db79b6db6db6fb
+                        (1)       ffffffffffffffff
+                                        (2)       ----------------
+                                                         (3)
+                                                       (unused)
+*/
 	/* handlers */
 	
 	app.onchange=function(e){
@@ -392,11 +406,6 @@
 			_parse(thash.value);
 			break;
 			
-		//case flseed:		
-		//case riseed: 
-		//case teseed:
-		//break;
-		
 		default:
 			_(e.target.id+" has changed");
 	}
@@ -512,30 +521,13 @@
 			return false; //doesn't validates
 		}
 		
-		for (var i=1; i<=8; i++){ // 4 64-bit chunks == 8 32-bit chunks
-			hash[i-1] = /*parseInt(*/e.substr(-8*i,8)/*, 16).toString(2)*/;
-			
-			//hash[i] = String('00000000000000000000000000000000'+
-			
-			//parseInt(e.substr((-1*i*8)-8,8), 16).toString(2)
-			
-			//).slice(-32);
-			
-			
-			//hash[i-1] = String('00000000000000000000000000000000'+hash[i-1]
-			//											).slice(hash[i-1].length);
-			
-						//hash[i] = String('00000000000000000000000000000000'+
-			
-			//parseInt(e.substr((-1*i*8)-8,8), 16).toString(2)
-			
-			//).slice(-32);
-			
+		for (var i=1; i<=4; i++){ // 4 64-bit chunks == 8 32-bit chunks
+			hash[i-1] = /*parseInt(*/e.substr(-16*i,16)/*, 16).toString(2)*/;
 		}
 		//https://ricochen.wordpress.com/2010/04/24/javascript-zero-padding-numbers/
 		//String('00000'+n).slice(-5);
 		_(e);
-		_(hash[7]+hash[6]+hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
+		_(hash[0]+hash[1]+hash[2]+hash[3]+hash[4]);
 		
 		
 		for (var key in struct) {
@@ -548,13 +540,6 @@
  		 shift    = struct[key][1];
  		 num_bits = struct[key][2];
  		 
- 		//shift * key, num_bits // no! :X
-		
-		
- 	
-		//_bin = parseInt(hash[ key_no ], 16).toString(2);
-		//_bin = hash[i-1] = String('00000000000000000000000000000000'+_bin
-		//							).slice(_bin.length);
 		_bin = hash[ key_no ].fromhex().tobin()
 		_bin = _bin.pad(_bin.length);
 		
@@ -564,12 +549,6 @@
 		basb= _cut.length;
 		_("     base: "+base);
 		_("    shift: "+shift);
-		//_("bas-shift: "+(base-shift));
-		//_(" pad: "+(32-basb));
-		//_(32-base);
-		//_(32-shift);
-		//_((32-_bin.length)-(32-shift));
-		//_(base+" base - shift "+shift);
 		
 		
 		_('||    Do:  '  + ('-').repeat( (32-base) ) + _bin );
@@ -596,45 +575,11 @@
 			struct[key][3].checked=_bool;
 		//}
 		
-		//if (key=="seed_3"){
-		//	flseed.value=_dec;
-		//}
-		//if (key=="seed_2"){
-		//	riseed.value=_dec;
-		//}
-		//if (key=="seed_1"){
-		//	teseed.value=_dec;
-		//}
-		
 		}
 		
-		//for(var i=0; i<e.length; i+8){
-			//_(e.substr(-1*i,8));
-			
-
-			
-		//}
 		
 	}
-	//0x555555554444444433333333222222221111111100000000
-	
-	//0x00000001 324a9cba 0005194a 000041ef 00005ae8 00003c55
-	
-	//hexString = yourNumber.toString(16);
-	//yourNumber = parseInt(hexString, 16);
 
-
-	/*
-	//! turns decimal numbers into hexacecimal notation used by the terrain keys
-	function _hex(thingie){
-		return parseInt(thingie).toString(16);
-	}
-	//! turns hexadecimal numbers into decimal notation
-	function _dec(thingie){
-		return parseInt(thingie, 16);
-	}
-	*/
-	
 	//! dbg----
 	window.onload=function(){
 		if(window.location.hash==''){

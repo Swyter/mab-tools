@@ -62,9 +62,9 @@
 	
 	input,select{
 		width:230px;
-		-webkit-user-select:all;
-		-m//oz-user-select:all;
-		-o-user-select:all;
+		-webkit-user-select:unset;
+		-m//oz-user-select:unset;
+		-o-user-select:unset;
 		
 		font-family:times,serif;
 		text-transform: lowercase;
@@ -479,18 +479,18 @@
 		}
 	}
 	
-	app.onkeydown=function(e)
-	{
-		/* swy: only react to the Enter key */
-		if (e.keyIdentifier == 'Enter' || e.keyCode == 13) //firefux doesn't supprts keyIdentifier, of course :(
-		{
-			//if (e.target!=flseed && e.target!=riseed && e.target!=teseed){return 0;}
-			_("boom");
-			//! http://stackoverflow.com/a/6005163
-			e.target.value = Math.floor(Math.random() * ( 65535 /* even better, 4 ones, as the game does 1048575/* use half of the bitmask instead 2147483647*/ + 1));
-			app.onchange(e); // we've to force a new state so the app knows that the randomization has been launched by the user :)
-		}
-	}
+//	app.onkeydown=function(e)
+//	{
+//		/* swy: only react to the Enter key */
+//		if (e.keyIdentifier == 'Enter' || e.keyCode == 13) //firefux doesn't supprts keyIdentifier, of course :(
+//		{
+//			//if (e.target!=flseed && e.target!=riseed && e.target!=teseed){return 0;}
+//			_("boom");
+//			//! http://stackoverflow.com/a/6005163
+//			e.target.value = Math.floor(Math.random() * ( 65535 /* even better, 4 ones, as the game does 1048575/* use half of the bitmask instead 2147483647*/ + 1));
+//			app.onchange(e); // we've to force a new state so the app knows that the randomization has been launched by the user :)
+//		}
+//	}
 	
 	function _parse(e)
 	{
@@ -502,7 +502,7 @@
 		}
 		
 		for (var i=1; i<=4; i++) // 4 64-bit chunks == 8 32-bit chunks
-			hash[i-1] = /*parseInt(*/e.substr(-16*i,16)/*, 16).toString(2)*/;
+			hash[3-(i-1)] = /*parseInt(*/e.substr(-16*i,16)/*, 16).toString(2)*/;
 
 		//https://ricochen.wordpress.com/2010/04/24/javascript-zero-padding-numbers/
 		//String('00000'+n).slice(-5);

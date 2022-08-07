@@ -273,46 +273,112 @@
 	/* get elements */
 	thash=$('thash');
 	
-	riv=$('riv');
-	sha=$('sha');
-	dee=$('dee');
-	gra=$('gra');
+	ski=$('ski');
+	bea=$('bea');
+	hai=$('hai');
+
+	age=$('age');
+	col=$('col');
 	
-	pol=$('pol');
-	ter=$('ter');
-	
-	veg=$('veg');
-	rug=$('rug');
-	val=$('val');
-	hil=$('hil');
-	siy=$('siy');
-	six=$('six');
-	
-	flseed=$('flseed');
-	riseed=$('riseed');
-	teseed=$('teseed');
+	fk42=$('fk42');
+	fk41=$('fk41');
+	fk40=$('fk40');
+	fk39=$('fk39');
+	fk38=$('fk38');
+	fk37=$('fk37');
+	fk36=$('fk36');
+	fk35=$('fk35');
+	fk34=$('fk34');
+	fk33=$('fk33');
+	fk32=$('fk32');
+	fk31=$('fk31');
+	fk30=$('fk30');
+	fk29=$('fk29');
+	fk28=$('fk28');
+	fk27=$('fk27');
+	fk26=$('fk26');
+	fk25=$('fk25');
+	fk24=$('fk24');
+	fk23=$('fk23');
+	fk22=$('fk22');
+	fk21=$('fk21');
+	fk20=$('fk20');
+	fk19=$('fk19');
+	fk18=$('fk18');
+	fk17=$('fk17');
+	fk16=$('fk16');
+	fk15=$('fk15');
+	fk14=$('fk14');
+	fk13=$('fk13');
+	fk12=$('fk12');
+	fk11=$('fk11');
+	fk10=$('fk10');
+	fk09=$('fk09');
+	fk08=$('fk08');
+	fk07=$('fk07');
+	fk06=$('fk06');
+	fk05=$('fk05');
+	fk04=$('fk04');
+	fk03=$('fk03');
+	fk02=$('fk02');
+	fk01=$('fk01');
+	fk00=$('fk00');
 	
 	/* basic functions */
 	
 	var hash   = {}
 	var struct = {
     //value       //key no. //shift //num bits     //input        //WORKING FINE?
-	seed_1         : [0,      0,     31,           teseed      ], //yay -
-	seed_2         : [1,      0,     31,           riseed      ], //yay -
-	deep_water     : [1,     31,      1,           dee         ], //bugged !! -later test: now okay! hackfix works... yay!
-	seed_3         : [2,      0,     31,           flseed      ], //yay -
-	size_x         : [3,      0,     10,           six         ], //yay - 
-	size_y         : [3,     10,     10,           siy         ], //yay - 
-	shade_occluded : [3,     30,      1,           sha         ], //bugged !! -later test: now okay! hackfix works... yay!
-	place_river    : [3,     31,      1,           riv         ], //bugged !! -later test: now okay! hackfix works... yay!
-	valley         : [4,      0,      7,           val         ], //yay -
-	hill_height    : [4,      7,      7,           hil         ], //yay -
-	ruggedness     : [4,     14,      7,           rug         ], //yay -
-	vegetation     : [4,     21,      7,           veg         ], //yay - 
-	region_type    : [4,     28,      4,           ter         ], //bugged with more than 1 hex digit -later test: now okay! hackfix works... yay!
-	region_detail  : [5,      0,      2,           pol         ], //yay -
-	disable_grass  : [5,      2,      2,           ski         ]  //bugged - activates shade occluded!! :( -later test: now okay! hackfix works... yay!
-	}
+	skin          : [0,      0,     31,           ski         ], //yay -
+	beard         : [1,      0,     31,           bea      ], //yay -
+	hair          : [1,     31,      1,           hai         ], //bugged !! -later test: now okay! hackfix works... yay!
+	age           : [2,      0,     31,           age      ], //yay -
+	hair_color    : [3,      0,     10,           col         ], //yay - 
+
+	fk42          : [5,      0,      2,           fk42        ], //yay -
+	fk41          : [5,      0,      2,           fk41        ], //yay -
+	fk40          : [5,      0,      2,           fk40        ], //yay -
+	fk39          : [5,      0,      2,           fk39        ], //yay -
+	fk38          : [5,      0,      2,           fk38        ], //yay -
+	fk37          : [5,      0,      2,           fk37        ], //yay -
+	fk36          : [5,      0,      2,           fk36        ], //yay -
+	fk35          : [5,      0,      2,           fk35        ], //yay -
+	fk34          : [5,      0,      2,           fk34        ], //yay -
+	fk33          : [5,      0,      2,           fk33        ], //yay -
+	fk32          : [5,      0,      2,           fk32        ], //yay -
+	fk31          : [5,      0,      2,           fk31        ], //yay -
+	fk30          : [5,      0,      2,           fk30        ], //yay -
+	fk29          : [5,      0,      2,           fk29        ], //yay -
+	fk28          : [5,      0,      2,           fk28        ], //yay -
+	fk27          : [5,      0,      2,           fk27        ], //yay -
+	fk26          : [5,      0,      2,           fk26        ], //yay -
+	fk25          : [5,      0,      2,           fk25        ], //yay -
+	fk24          : [5,      0,      2,           fk24        ], //yay -
+	fk23          : [5,      0,      2,           fk23        ], //yay -
+	fk22          : [5,      0,      2,           fk22        ], //yay -
+	fk21          : [5,      0,      2,           fk21        ], //yay -
+	fk20          : [5,      0,      2,           fk20        ], //yay -
+	fk19          : [5,      0,      2,           fk19        ], //yay -
+	fk18          : [5,      0,      2,           fk18        ], //yay -
+	fk17          : [5,      0,      2,           fk17        ], //yay -
+	fk16          : [5,      0,      2,           fk16        ], //yay -
+	fk15          : [5,      0,      2,           fk15        ], //yay -
+	fk14          : [5,      0,      2,           fk14        ], //yay -
+	fk13          : [5,      0,      2,           fk13        ], //yay -
+	fk12          : [5,      0,      2,           fk12        ], //yay -
+	fk11          : [5,      0,      2,           fk11        ], //yay -
+	fk10          : [5,      0,      2,           fk10        ], //yay -
+	fk09          : [5,      0,      2,           fk09        ], //yay -
+	fk08          : [5,      0,      2,           fk08        ], //yay -
+	fk07          : [5,      0,      2,           fk07        ], //yay -
+	fk06          : [5,      0,      2,           fk06        ], //yay -
+	fk05          : [5,      0,      2,           fk05        ], //yay -
+	fk04          : [5,      0,      2,           fk04        ], //yay -
+	fk03          : [5,      0,      2,           fk03        ], //yay -
+	fk02          : [5,      0,      2,           fk02        ], //yay -
+	fk01          : [5,      0,      2,           fk01        ], //yay -
+	fk00          : [5,      0,      2,           fk00        ], //yay -
+}
 	
 	/* handlers */
 	
@@ -428,7 +494,7 @@
 	app.onkeydown=function(e){
 	
 		if (e.keyIdentifier == 'Enter' || e.keyCode == 13){ //firefux doesn't supprts keyIdentifier, of course :(
-		if (e.target!=flseed && e.target!=riseed && e.target!=teseed){return 0;}
+		//if (e.target!=flseed && e.target!=riseed && e.target!=teseed){return 0;}
 		_("boom");
 		//! http://stackoverflow.com/a/6005163
 		e.target.value = Math.floor(Math.random() * ( 65535 /* even better, 4 ones, as the game does 1048575/* use half of the bitmask instead 2147483647*/ + 1));

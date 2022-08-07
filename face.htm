@@ -581,5 +581,17 @@
 		thash.value = def;
 		_parse(def);
 	}
+
+	document.body.ondrop = function(e)
+	{
+		console.log(e);
+		console.log(e.dataTransfer.files[0])
+		e.preventDefault();
+	}
+
+	document.body.ondragover = function(e)
+	{
+		console.log(e);
+	}
 	</script>
 </body></html>

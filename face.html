@@ -702,9 +702,9 @@
 
 				case 'READ_RACE_NAME':
 				{
-					race_count = line[0];
+					cur_race_idx = line[1];
 					race[cur_race_idx]={};
-					race[cur_race_idx]["name"] = line[1];
+					race[cur_race_idx]["name"] = line[0];
 					state = 'READ_RACE_MESHES';
 				}
 				break;
@@ -810,7 +810,38 @@
 					for (i = 0, idx = 1; i < sounds_count; i++, idx +=2)
 						race[cur_race_idx]["sounds"].push({type: constant_lookup[line[idx]], name: line[idx + 1]});
 
-					state = 'asdf';
+					state = 'READ_RACE_SKELETON';
+				}
+				break;
+
+				case 'READ_RACE_SKELETON':
+				{
+					race[cur_race_idx]["skeleton"] = { name: line[0], scale: line[1] };
+					state = 'READ_RACE_UNK';
+				}
+				break;
+
+				case 'READ_RACE_UNK':
+				{
+					state = 'READ_RACE_RESTRICTIONS_COUNT';
+				}
+				break;
+
+				case 'READ_RACE_RESTRICTIONS_COUNT':
+				{
+                    cur_restrictions_count = line[0];
+					state = 'READ_RACE_RESTRICTIONS';
+				}
+
+				break;
+
+				case 'READ_RACE_RESTRICTIONS':
+				{
+                    if (line[0]<=0)
+                        continue;
+
+                    if (--cur_restrictions_count <= 1)
+						state = 'READ_RACE_NAME';
 				}
 			}
 			

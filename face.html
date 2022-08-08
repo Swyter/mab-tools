@@ -796,14 +796,14 @@
 
 				case 'READ_RACE_FACE_MATERIALS':
 				{
-					race[cur_race_idx]["mat_face"] = [];
+					race[cur_race_idx]["mat_skin"] = [];
 					face_mat_count = line[0];
                     var size_of_cur_colors_block = 0;
 
 					for (i = 0, idx = 1; i < face_mat_count; i++, idx += 5 + size_of_cur_colors_block)
                     {
                         size_of_cur_colors_block = +line[idx + 3]; /* swy: convert to number, careful about this */
-						race[cur_race_idx]["mat_face"].push(line[idx]);
+						race[cur_race_idx]["mat_skin"].push(line[idx]);
                     }
 
 					state = 'READ_RACE_SOUNDS';
@@ -885,8 +885,8 @@
 
             /* swy: usually a skin only uses a subset of the available face keys,
                     hide the rest if they go beyond what's available */
-            if ((cur_index + 1) <= race[0].face_keys.length)
-                cur_label.textContent = race[0].face_keys[cur_index].tag;
+            if ((cur_index + 1) <= race[1].face_keys.length)
+                cur_label.textContent = race[1].face_keys[cur_index].tag;
             else
                 cur_label.textContent = "<hidden>";
         }
@@ -910,14 +910,14 @@
             {
                 var opt = document.createElement('option');
                 opt.textContent = cur;
-                opt.value = fill_options.indexOf(cur);
+                opt.value       = fill_options.indexOf(cur);
                 sel.appendChild(opt);
             }
         }
 
-        replace_with_combobox("skin",  race[0].mat_face);
-        replace_with_combobox("beard", race[0].mat_beard);
-        replace_with_combobox("hair",  race[0].mat_hair);
+        replace_with_combobox("skin",  race[1].mat_skin);
+        replace_with_combobox("beard", race[1].mat_beard);
+        replace_with_combobox("hair",  race[1].mat_hair);
 
 		console.log(e);
 	}

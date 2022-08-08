@@ -680,9 +680,10 @@
 
 				case 'READ_RACE_NAME':
 				{
-					cur_race_idx = +line[1];
+					cur_race_idx++;
 					race[cur_race_idx]={};
 					race[cur_race_idx]["name"] = line[0];
+                    race[cur_race_idx]["unk_number"] = +line[1];
 					state = 'READ_RACE_MESHES';
 				}
 				break;
@@ -937,6 +938,7 @@
                 console.warn(`swy: error while reading the drag-and-drop text...`, e);
 
             parse_skins_txt(e.target.result);
+            set_up_dyn_interface()
         }
         reader.readAsText(e.dataTransfer.files[0]);
 	}

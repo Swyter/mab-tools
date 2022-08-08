@@ -19,7 +19,7 @@
 	}
 	body{
 		width: 777px;
-		white-space: pre-line;
+		wh---ite-space: pre-line;
 		margin: 0 auto;
 		padding:45px;
 		/*box-shadow:0 0 6px gray;*/
@@ -210,8 +210,13 @@
     }
 
     div#right-block {
-        width: 38%;
+        width: 65%;
         float: left;
+        white-space: pre-line;
+    }
+
+    div#right-block input, div#right-block select {
+        width: 200px;
     }
     div#left-block {
         display: block;
@@ -226,17 +231,27 @@
     }
 
     div#droparea {
+        white-space: pre-line;
         display: table;
         clear: both;
+    }
+
+    div#ascii {
+        white-space: pre-line;
+        position: sticky;
+        top: 0;
+        z-index: 99;
+        background: #6d675e;
     }
 	</style>
 </head>
 <body>
+    <div id="ascii">
 	<h3>— the one and only —</h3>
 	<h1>face code generator</h1>
 	<h2>who needs the game, anyway?<span>Ten year anniversary!</span></h2>
 	<input id="thash" type="text" placeholder="~Paste your hash here~" data-kpxc-id="thash" value="0x00000001324a9cba0005194a000041ef00005ae800003c55">
-	
+	</div>
     <div id="right-block">
         <label for="ski">skin         </label>  <input type="number" id="ski" min="0" max="63" value="0">
         <label for="bea">beard        </label>  <input type="number" id="bea" min="0" max="63" value="0">

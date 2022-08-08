@@ -640,21 +640,6 @@
 		_parse(def);
 	}
 
-    droparea = document.querySelector("div#droparea")
-
-	droparea.ondrop = function(e)
-	{
-		console.log(e);
-		console.log(e.dataTransfer.files[0])
-		e.preventDefault();
-	}
-
-	droparea.ondragover = function(e)
-	{
-		console.log(e);
-        e.preventDefault();
-	}
-
 	race = [];
     function parse_skins_txt(text_file)
     {
@@ -679,7 +664,10 @@
 					if (state == 'MAGIC' && linetxt == 'skins_file version 1')
 						state = 'READ_RACE_COUNT';
 					else
+                    {
 						console.warn(`swy: bad file magic value: ${linetxt}`);
+                        break;
+                    }
 				}
 				break;
 
@@ -860,21 +848,8 @@
 		}
     }
 
-	xhr = new XMLHttpRequest;
-	xhr.open('GET', 'https://gist.githubusercontent.com/Swyter/0b03cdae54886afc5ff2e51f3d8f1223/raw/383bc333829c2867132a9737d2079798c38cd73c/skins.txt');
-	xhr.onloadend = function(e)
-	{
-		if (e.target.readyState != e.target.DONE)
-			return;
-
-		if (e.target.status != 200)
-        {
-            console.warn(`swy: couldn't download the file`, e);
-			return;
-        }
-
-        parse_skins_txt(e.target.response);
-
+    function set_up_dyn_interface()
+    {
         /* swy: convert the NodeList into an array so that we can reverse what's already reversed */
         var labels = document.querySelectorAll(`label[for^=fk]`);
         labels = Array.from(labels).reverse();
@@ -918,10 +893,54 @@
         replace_with_combobox("skin",  race[1].mat_skin);
         replace_with_combobox("beard", race[1].mat_beard);
         replace_with_combobox("hair",  race[1].mat_hair);
+    }
 
+	xhr = new XMLHttpRequest;
+	xhr.open('GET', 'https://gist.githubusercontent.com/Swyter/0b03cdae54886afc5ff2e51f3d8f1223/raw/383bc333829c2867132a9737d2079798c38cd73c/skins.txt');
+	xhr.onloadend = function(e)
+	{
+		if (e.target.readyState != e.target.DONE)
+			return;
+
+		if (e.target.status != 200)
+        {
+            console.warn(`swy: couldn't download the file`, e);
+			return;
+        }
+
+        parse_skins_txt(e.target.response);
+        set_up_dyn_interface()
 		console.log(e);
 	}
 	xhr.send();
+
+
+    droparea = document.querySelector("div#droparea")
+
+	droparea.ondrop = function(e)
+	{
+        e.preventDefault();
+		console.log(e);
+		console.log(e.dataTransfer.files[0], e.dataTransfer.files[0].kind);
+
+        const reader = new FileReader();
+        reader.onload = function(e)
+        {
+            console.log(e);
+
+            if (e.target.readyState != reader.DONE)
+                console.warn(`swy: error while reading the drag-and-drop text...`, e);
+
+            parse_skins_txt(e.target.result);
+        }
+        reader.readAsText(e.dataTransfer.files[0]);
+	}
+
+    droparea.ondragover = function(e)
+	{
+		console.log(e);
+        e.preventDefault();
+	}
 
 	</script>
 </body></html>

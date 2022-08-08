@@ -891,38 +891,33 @@
                 cur_label.textContent = "<hidden>";
         }
 
-        var sel = document.createElement('select'); sel.id = ski.id; struct["skin"][3] = sel;
-        ski.replaceWith(sel); ski = sel;
-
-        for (var cur of race[0].mat_face)
+        function replace_with_combobox(input_elem_name, fill_options)
         {
-            var opt = document.createElement('option');
-            opt.textContent = cur;
-            opt.value = race[0].mat_face.indexOf(cur);
-            sel.appendChild(opt);
+            original_elem = struct[input_elem_name][3];
+            original_id   = original_elem.id;
+
+            var sel = document.createElement('select'); sel.id = original_id;
+            original_elem.replaceWith(sel);
+
+            /* swy: replace the reference that is used to map input elements to code fields */
+            struct[input_elem_name][3] = sel;
+
+            /* swy: take advantage that the global variable (window is the global context)
+                    has the same name as the tag id and replace it globally, too */
+            window[original_id] = sel;
+
+            for (var cur of fill_options)
+            {
+                var opt = document.createElement('option');
+                opt.textContent = cur;
+                opt.value = fill_options.indexOf(cur);
+                sel.appendChild(opt);
+            }
         }
 
-        var sel = document.createElement('select'); sel.id = bea.id; struct["beard"][3] = sel;
-        bea.replaceWith(sel); bea = sel;
-
-        for (var cur of race[0].mat_beard)
-        {
-            var opt = document.createElement('option');
-            opt.textContent = cur;
-            opt.value = race[0].mat_beard.indexOf(cur);
-            sel.appendChild(opt);
-        }
-
-        var sel = document.createElement('select'); sel.id = hai.id; struct["hair"][3] = sel;
-        hai.replaceWith(sel); hai = sel;
-
-        for (var cur of race[0].mat_hair)
-        {
-            var opt = document.createElement('option');
-            opt.textContent = cur;
-            opt.value = race[0].mat_hair.indexOf(cur);
-            sel.appendChild(opt);
-        }
+        replace_with_combobox("skin",  race[0].mat_face);
+        replace_with_combobox("beard", race[0].mat_beard);
+        replace_with_combobox("hair",  race[0].mat_hair);
 
 		console.log(e);
 	}

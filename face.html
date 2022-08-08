@@ -832,10 +832,10 @@
 
 				case 'READ_RACE_RESTRICTIONS':
 				{
-                    if (line[0] <= 0)
+                    if (line[0] == undefined)
                         continue;
 
-                    if (--cur_restrictions_count <= 1)
+                    if (cur_restrictions_count-- <= 0)
                     {
                         console.warn(line);
 
@@ -882,6 +882,9 @@
             /* swy: take advantage that the global variable (window is the global context)
                     has the same name as the tag id and replace it globally, too */
             window[original_id] = sel;
+
+            if (!fill_options || fill_options.length == 0)
+                console.error(`swy: seems like the skins.txt parser broke and no ${input_elem_name} options are returned.`, fill_options);
 
             for (var cur of fill_options)
             {

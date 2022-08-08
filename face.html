@@ -891,33 +891,36 @@
                 cur_label.textContent = "<hidden>";
         }
 
-        var sel = document.createElement('select');
+        var sel = document.createElement('select'); sel.id = ski.id; struct["skin"][3] = sel;
         ski.replaceWith(sel); ski = sel;
 
         for (var cur of race[0].mat_face)
         {
             var opt = document.createElement('option');
             opt.textContent = cur;
+            opt.value = race[0].mat_face.indexOf(cur);
             sel.appendChild(opt);
         }
 
-        var sel = document.createElement('select');
+        var sel = document.createElement('select'); sel.id = bea.id; struct["beard"][3] = sel;
         bea.replaceWith(sel); bea = sel;
 
         for (var cur of race[0].mat_beard)
         {
             var opt = document.createElement('option');
             opt.textContent = cur;
+            opt.value = race[0].mat_beard.indexOf(cur);
             sel.appendChild(opt);
         }
 
-        var sel = document.createElement('select');
+        var sel = document.createElement('select'); sel.id = hai.id; struct["hair"][3] = sel;
         hai.replaceWith(sel); hai = sel;
 
         for (var cur of race[0].mat_hair)
         {
             var opt = document.createElement('option');
             opt.textContent = cur;
+            opt.value = race[0].mat_hair.indexOf(cur);
             sel.appendChild(opt);
         }
 

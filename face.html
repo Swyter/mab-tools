@@ -912,6 +912,7 @@
         replace_with_combobox("hair",  race_to_use.mat_hair);
     }
 
+    /* swy: download and use Warband Native's version of skins.txt */
 	xhr = new XMLHttpRequest;
 	xhr.open('GET', 'https://gist.githubusercontent.com/Swyter/0b03cdae54886afc5ff2e51f3d8f1223/raw/383bc333829c2867132a9737d2079798c38cd73c/skins.txt');
 	xhr.onloadend = function(e)
@@ -931,34 +932,46 @@
 	}
 	xhr.send();
 
-
+    /* swy: grab/load a user-provided skins.txt via drag-and-drop */
     droparea = document.querySelector("div#droparea")
-
 	droparea.ondrop = function(e)
 	{
         e.preventDefault();
 		console.log(e);
-		console.log(e.dataTransfer.files[0], e.dataTransfer.files[0].kind);
+        console.log(e.dataTransfer.files[0], e.dataTransfer.files[0].kind);
 
-        const reader = new FileReader();
-        reader.onload = function(e)
+        //if (e.dataTransfer.files.length != 1)
+        //{
+        //    alert("Please only drop one single skins.txt file.");
+        //}
+
+        for (var cur_file of e.dataTransfer.files)
         {
-            console.log(e);
+            console.log("swy: dropped file:", cur_file.name, cur_file.type, cur_file);
 
-            if (e.target.readyState != reader.DONE)
-                console.warn(`swy: error while reading the drag-and-drop text...`, e);
+            if (cur_file.type != 'text/plain' || cur_file.name != 'skins.txt')
+                continue;
 
-            parse_skins_txt(e.target.result);
-            set_up_dyn_interface()
+            console.warn("swy: this file seems right...");
+
+            const reader = new FileReader();
+            reader.onload = function(e)
+            {
+                console.log(e);
+
+                if (e.target.readyState != reader.DONE)
+                    console.warn(`swy: error while reading the drag-and-drop text...`, e);
+
+                parse_skins_txt(e.target.result);
+                set_up_dyn_interface()
+            }
+            reader.readAsText(cur_file);
+
+            break;
         }
-        reader.readAsText(e.dataTransfer.files[0]);
 	}
-
-    droparea.ondragover = function(e)
-	{
-		console.log(e);
-        e.preventDefault();
-	}
+    /* swy: we need to handle this or the dropped file will replace the current page */
+    droparea.ondragover = function(e) { e.preventDefault();	}
 
 	</script>
 </body></html>

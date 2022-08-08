@@ -56,12 +56,12 @@
 		display: inline-block;
 		text-align: right;
 		text-shadow: 1px 1px black;
-		margin-left: 88px;
+		m--argin-left: 88px;
 		-moz-user-select:none; /* firefux clumsy behavior fix */
 	}
 	
 	input,select{
-		width:230px;
+		width:120px;
 		-webkit-user-select:unset;
 		-m//oz-user-select:unset;
 		-o-user-select:unset;
@@ -219,7 +219,15 @@
         grid-column: unset;
         float: right;
         position: relative;
-        top: -84px;
+        t--op: -84px;
+        height: 673px;
+        overflow: hidden scroll;
+        white-space: normal;
+    }
+
+    div#droparea {
+        display: table;
+        clear: both;
     }
 	</style>
 </head>
@@ -291,7 +299,7 @@
         Drag and drop here your mod's <tt>skins.txt</tt> file to use it as template...
         
         <label>choose a race: <select id=race disabled></select></label>
-        <button id=reset disabled>reset and view raw fields</button>
+        <button id=reset disabled>reset and view all raw fields</button>
     </div>
 	<script type="text/javascript">
 	/* basic helpers */

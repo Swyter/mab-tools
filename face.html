@@ -655,27 +655,17 @@
         e.preventDefault();
 	}
 
-	state = 'MAGIC';
-	race_count = 0;
-	cur_race_idx = 0;
-	cur_hair_count = 0;
-	cur_beard_count = 0;
 	race = [];
+    function parse_skins_txt(text_file)
+    {
+        state = 'MAGIC';
 
-	xhr = new XMLHttpRequest;
-	xhr.responseType = 'text/plain';
-	xhr.open('GET', 'https://gist.githubusercontent.com/Swyter/0b03cdae54886afc5ff2e51f3d8f1223/raw/383bc333829c2867132a9737d2079798c38cd73c/skins.txt');
-	xhr.onloadend = function(e)
-	{
-		if (e.target.readyState != e.target.DONE)
-			return;
+        race_count = 0;
+        cur_race_idx = 0;
+        cur_hair_count = 0;
+        cur_beard_count = 0;
 
-		if (e.target.status != 200)
-			return;
-
-		console.log(e);
-
-		txt = e.target.response.split('\n');
+		txt = text_file.split('\n');
 
 		for (var linetxt of txt)
 		{
@@ -832,7 +822,6 @@
                     cur_restrictions_count = line[0];
 					state = 'READ_RACE_RESTRICTIONS';
 				}
-
 				break;
 
 				case 'READ_RACE_RESTRICTIONS':
@@ -841,11 +830,35 @@
                         continue;
 
                     if (--cur_restrictions_count <= 1)
+                    {
+                        /* swy: we're done for this entry, start parsing the next one, if any */
+                        console.log(">> parsed race: ", race[cur_race_idx]);
 						state = 'READ_RACE_NAME';
+                    }
 				}
+                break;
 			}
 			
 		}
+    }
+
+
+
+
+	xhr = new XMLHttpRequest;
+	xhr.responseType = 'text/plain';
+	xhr.open('GET', 'https://gist.githubusercontent.com/Swyter/0b03cdae54886afc5ff2e51f3d8f1223/raw/383bc333829c2867132a9737d2079798c38cd73c/skins.txt');
+	xhr.onloadend = function(e)
+	{
+		if (e.target.readyState != e.target.DONE)
+			return;
+
+		if (e.target.status != 200)
+			return;
+
+        parse_skins_txt(e.target.response);
+
+		console.log(e);
 	}
 	xhr.send();
 

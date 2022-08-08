@@ -940,11 +940,6 @@
 		console.log(e);
         console.log(e.dataTransfer.files[0], e.dataTransfer.files[0].kind);
 
-        //if (e.dataTransfer.files.length != 1)
-        //{
-        //    alert("Please only drop one single skins.txt file.");
-        //}
-
         for (var cur_file of e.dataTransfer.files)
         {
             console.log("swy: dropped file:", cur_file.name, cur_file.type, cur_file);
@@ -966,9 +961,10 @@
                 set_up_dyn_interface()
             }
             reader.readAsText(cur_file);
-
-            break;
+            return;
         }
+
+        alert("Please only drop one single «skins.txt» file from any Mount&Blade 1.011 or Warband-based mod.");
 	}
     /* swy: we need to handle this or the dropped file will replace the current page */
     droparea.ondragover = function(e) { e.preventDefault();	}

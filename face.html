@@ -658,18 +658,18 @@
 	race = [];
     function parse_skins_txt(text_file)
     {
-        state = 'MAGIC';
+        var state = 'MAGIC';
 
-        race_count = 0;
-        cur_race_idx = 0;
-        cur_hair_count = 0;
-        cur_beard_count = 0;
+        var race_count = 0;
+        var cur_race_idx = 0;
+        var cur_hair_count = 0;
+        var cur_beard_count = 0;
 
-		txt = text_file.split('\n');
+		var txt = text_file.split('\n');
 
 		for (var linetxt of txt)
 		{
-			line = linetxt.replace(/[\t ]+/g, ' ').replace(/^[ ]*/g, '').replace(/[ ]*$/g, '').split(' ');
+			var line = linetxt.replace(/[\t ]+/g, ' ').replace(/^[ ]*/g, '').replace(/[ ]*$/g, '').split(' ');
 			console.log(line);
 
 			switch (state)
@@ -842,11 +842,7 @@
 		}
     }
 
-
-
-
 	xhr = new XMLHttpRequest;
-	xhr.responseType = 'text/plain';
 	xhr.open('GET', 'https://gist.githubusercontent.com/Swyter/0b03cdae54886afc5ff2e51f3d8f1223/raw/383bc333829c2867132a9737d2079798c38cd73c/skins.txt');
 	xhr.onloadend = function(e)
 	{
@@ -857,6 +853,10 @@
 			return;
 
         parse_skins_txt(e.target.response);
+
+        var labels = document.querySelectorAll(`label[for^=fk]`);
+
+        labels[0].textContent = race[0].name;
 
 		console.log(e);
 	}

@@ -758,7 +758,59 @@
 					race[cur_race_idx]["mesh_beard"].push(line[0]);
 
 					if (--cur_beard_count <= 0)
-						state = 'asdf';
+						state = 'READ_RACE_HAIR_MATERIALS';
+				}
+				break;
+
+				case 'READ_RACE_HAIR_MATERIALS':
+				{
+					race[cur_race_idx]["mat_hair"] = [];
+					hair_mat_count = line[0];
+
+					/* swy: skip the empty line */
+					if (hair_mat_count <= 0)
+						continue;
+
+					for (i = 0; i < hair_mat_count; i++)
+						race[cur_race_idx]["mat_hair"].push(line[1 + i]);
+
+					state = 'READ_RACE_BEARD_MATERIALS';
+				}
+				break;
+
+				case 'READ_RACE_BEARD_MATERIALS':
+				{
+					race[cur_race_idx]["mat_beard"] = [];
+					beard_mat_count = line[0];
+
+					for (i = 0; i < beard_mat_count; i++)
+						race[cur_race_idx]["mat_beard"].push(line[1 + i]);
+
+					state = 'READ_RACE_FACE_MATERIALS';
+				}
+				break;
+
+				case 'READ_RACE_FACE_MATERIALS':
+				{
+					race[cur_race_idx]["mat_face"] = [];
+					face_mat_count = line[0];
+
+					for (i = 0; i < face_mat_count; i++)
+						race[cur_race_idx]["mat_face"].push(line[1 + i]);
+
+					state = 'READ_RACE_SOUNDS';
+				}
+				break;
+
+				case 'READ_RACE_SOUNDS':
+				{
+					race[cur_race_idx]["sounds"] = [];
+					sounds_count = line[0];
+
+					for (i = 0, idx = 1; i < sounds_count; i++, idx +=2)
+						race[cur_race_idx]["sounds"].push({type: line[idx], name: line[idx + 1]});
+
+					state = 'asdf';
 				}
 			}
 			

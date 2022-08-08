@@ -871,9 +871,21 @@
 
         parse_skins_txt(e.target.response);
 
+        /* swy: convert the NodeList into an array so that we can reverse what's already reversed */
         var labels = document.querySelectorAll(`label[for^=fk]`);
+        labels = Array.from(labels).reverse();
 
-        labels[0].textContent = race[0].name;
+        for (var cur_label of labels)
+        {
+            var cur_index = labels.indexOf(cur_label);
+
+            /* swy: usually a skin only uses a subset of the available face keys,
+                    hide the rest if they go beyond what's available */
+            if ((cur_index + 1) <= race[0].face_keys.length)
+                cur_label.textContent = race[0].face_keys[cur_index].tag;
+            else
+                cur_label.textContent = "hidden";
+        }
 
 		console.log(e);
 	}

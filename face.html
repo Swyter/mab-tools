@@ -659,6 +659,7 @@
 	race_count = 0;
 	cur_race_idx = 0;
 	cur_hair_count = 0;
+	cur_beard_count = 0;
 	race = [];
 
 	xhr = new XMLHttpRequest;
@@ -678,7 +679,7 @@
 
 		for (var linetxt of txt)
 		{
-			line = linetxt.replace(/[\t ]+/g, ' ').replace(/^ /g, '').split(' ');
+			line = linetxt.replace(/[\t ]+/g, ' ').replace(/^[ ]*/g, '').replace(/[ ]*$/g, '').split(' ');
 			console.log(line);
 
 			switch (state)
@@ -738,7 +739,26 @@
 					for (i = 0; i < cur_hair_count; i++)
 						race[cur_race_idx]["mesh_hair"].push(line[i]);
 
+					state = 'READ_RACE_BEARD_COUNT';
+				}
+				break;
+
+				case 'READ_RACE_BEARD_COUNT':
+				{
+					cur_beard_count = line[0];
 					state = 'READ_RACE_BEARD';
+				}
+				break;
+
+				case 'READ_RACE_BEARD':
+				{
+					if (!race[cur_race_idx]["mesh_beard"])
+						race[cur_race_idx]["mesh_beard"] = [];
+
+					race[cur_race_idx]["mesh_beard"].push(line[0]);
+
+					if (--cur_beard_count <= 0)
+						state = 'asdf';
 				}
 			}
 			

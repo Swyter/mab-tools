@@ -195,8 +195,16 @@
 	}
 
     div#droparea {
-
-        width: 400px; height: 500px; display: inline-block; position: absolute; bottom: 0, left: 0; background: red; border: 1px solid black;
+        width: 400px;
+        display: inline-block;
+        position: sticky;
+        bottom: 0; left: 0;
+        background: #884e2bb5;
+        border: 1px dotted #d5d5c4;
+        padding: 16px;
+        right: 0px;
+        border-radius: 4px;
+        bottom: 0;
     }
 
 	</style>
@@ -260,7 +268,7 @@
 	<label for="fk02">face key 02 </label>  <input id="fk02" type="range" min="0" max="7" value="0">
 	<label for="fk01">face key 01 </label>  <input id="fk01" type="range" min="0" max="7" value="0">
 	<label for="fk00">face key 00 </label>  <input id="fk00" type="range" min="0" max="7" value="0"> <!-- count: 1 - skin2 begins -->
-	<div id=droparea>Drag drop</div>
+	<div id=droparea>Drag and drop here your mod's <tt>skins.txt</tt> file to use it as template...</div>
 	<script type="text/javascript">
 	/* basic helpers */
 	app = document;
@@ -860,7 +868,7 @@
         var labels = document.querySelectorAll(`label[for^=fk]`);
         labels = Array.from(labels).reverse();
 
-        var race_to_use = race[6]; /* swy: orc on TLD */
+        var race_to_use = race[1]; /* swy: orc on TLD */
 
         if (!race_to_use)
         {
@@ -937,8 +945,7 @@
 	droparea.ondrop = function(e)
 	{
         e.preventDefault();
-		console.log(e);
-        console.log(e.dataTransfer.files[0], e.dataTransfer.files[0].kind);
+        console.log(e, e.dataTransfer.files[0], e.dataTransfer.files[0].kind);
 
         for (var cur_file of e.dataTransfer.files)
         {

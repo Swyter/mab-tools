@@ -802,8 +802,7 @@
 
 					for (i = 0, idx = 1; i < face_mat_count; i++, idx += 5 + size_of_cur_colors_block)
                     {
-                        size_of_cur_colors_block = +line[idx + 3];
-                        console.log("asdfasdf", size_of_cur_colors_block);
+                        size_of_cur_colors_block = +line[idx + 3]; /* swy: convert to number, careful about this */
 						race[cur_race_idx]["mat_face"].push(line[idx]);
                     }
 
@@ -901,7 +900,26 @@
             opt.textContent = cur;
             sel.appendChild(opt);
         }
-        
+
+        var sel = document.createElement('select');
+        bea.replaceWith(sel); bea = sel;
+
+        for (var cur of race[0].mat_beard)
+        {
+            var opt = document.createElement('option');
+            opt.textContent = cur;
+            sel.appendChild(opt);
+        }
+
+        var sel = document.createElement('select');
+        hai.replaceWith(sel); hai = sel;
+
+        for (var cur of race[0].mat_hair)
+        {
+            var opt = document.createElement('option');
+            opt.textContent = cur;
+            sel.appendChild(opt);
+        }
 
 		console.log(e);
 	}

@@ -884,8 +884,19 @@
             if ((cur_index + 1) <= race[0].face_keys.length)
                 cur_label.textContent = race[0].face_keys[cur_index].tag;
             else
-                cur_label.textContent = "hidden";
+                cur_label.textContent = "<hidden>";
         }
+
+        var sel = document.createElement('select');
+        ski.replaceWith(sel); ski = sel;
+
+        for (var cur of race[0].mat_face)
+        {
+            var opt = document.createElement('option');
+            opt.textContent = cur;
+            sel.appendChild(opt);
+        }
+        
 
 		console.log(e);
 	}

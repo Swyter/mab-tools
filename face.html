@@ -711,6 +711,13 @@
 				case 'READ_RACE_HEAD':
 				{
 					race[cur_race_idx]["mesh_head"] = line[0];
+                    race[cur_race_idx]["face_keys"] = [];
+
+                    var face_key_count = line[1];
+
+					for (i = 0, idx = 2; i < face_key_count; i++, idx += 5)
+						race[cur_race_idx]["face_keys"].push({id: line[idx], a: line[idx + 1], b: line[idx + 2], c: line[idx + 3], d: line[idx + 4] }); /* swy: the data starts at line[2] */
+
 					state = 'READ_RACE_HAIR_COUNT';
 				}
 				break;

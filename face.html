@@ -643,14 +643,14 @@
 	race = [];
     function parse_skins_txt(text_file)
     {
-        var state = 'MAGIC';
+        var state = 'MAGIC'; race = []; /* swy: reset the global race holder */
 
         var race_count = 0;
         var cur_race_idx = 0;
         var cur_hair_count = 0;
         var cur_beard_count = 0;
 
-		var txt = text_file.split('\n');
+		var txt = text_file.replace(/\r/g, '').split('\n');
 
 		for (var linetxt of txt)
 		{
@@ -673,14 +673,14 @@
 
 				case 'READ_RACE_COUNT':
 				{
-					race_count = line[0];
+					race_count = +line[0];
 					state = 'READ_RACE_NAME';
 				}
 				break;
 
 				case 'READ_RACE_NAME':
 				{
-					cur_race_idx = line[1];
+					cur_race_idx = +line[1];
 					race[cur_race_idx]={};
 					race[cur_race_idx]["name"] = line[0];
 					state = 'READ_RACE_MESHES';
@@ -719,7 +719,7 @@
 
 				case 'READ_RACE_HAIR_COUNT':
 				{
-					cur_hair_count = line[0];
+					cur_hair_count = +line[0];
 					state = 'READ_RACE_HAIR';
 				}
 				break;
@@ -737,7 +737,7 @@
 
 				case 'READ_RACE_BEARD_COUNT':
 				{
-					cur_beard_count = line[0];
+					cur_beard_count = +line[0];
 					state = 'READ_RACE_BEARD';
 				}
 				break;
@@ -773,7 +773,7 @@
 				case 'READ_RACE_BEARD_MATERIALS':
 				{
 					race[cur_race_idx]["mat_beard"] = [];
-					beard_mat_count = line[0];
+					beard_mat_count = +line[0];
 
 					for (i = 0, idx = 1; i < beard_mat_count; i++, idx += 1)
 						race[cur_race_idx]["mat_beard"].push(line[idx]); /* swy: the data starts at line[1] */
@@ -785,7 +785,7 @@
 				case 'READ_RACE_FACE_MATERIALS':
 				{
 					race[cur_race_idx]["mat_skin"] = [];
-					face_mat_count = line[0];
+					face_mat_count = +line[0];
                     var size_of_cur_colors_block = 0;
 
 					for (i = 0, idx = 1; i < face_mat_count; i++, idx += 5 + size_of_cur_colors_block)
@@ -825,18 +825,20 @@
 
 				case 'READ_RACE_RESTRICTIONS_COUNT':
 				{
-                    cur_restrictions_count = line[0];
+                    cur_restrictions_count = +line[0];
 					state = 'READ_RACE_RESTRICTIONS';
 				}
 				break;
 
 				case 'READ_RACE_RESTRICTIONS':
 				{
-                    if (line[0]<=0)
+                    if (line[0] <= 0)
                         continue;
 
                     if (--cur_restrictions_count <= 1)
                     {
+                        console.warn(line);
+
                         /* swy: we're done for this entry, start parsing the next one, if any */
                         console.log(">> parsed race: ", race[cur_race_idx]);
 						state = 'READ_RACE_NAME';

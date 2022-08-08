@@ -678,7 +678,7 @@
 
 		for (var linetxt of txt)
 		{
-			line = linetxt.split(' ');
+			line = linetxt.replace(/[\t ]+/g, ' ').replace(/^ /g, '').split(' ');
 			console.log(line);
 
 			switch (state)
@@ -702,12 +702,6 @@
 				case 'READ_RACE_NAME':
 				{
 					race_count = line[0];
-					state = 'READ_RACE';
-				}
-				break;
-
-				case 'READ_RACE':
-				{
 					race[cur_race_idx]={};
 					race[cur_race_idx]["name"] = line[1];
 					state = 'READ_RACE_MESHES';
@@ -744,7 +738,7 @@
 					for (i = 0; i < cur_hair_count; i++)
 						race[cur_race_idx]["mesh_hair"].push(line[i]);
 
-					//state = 'READ_RACE_HEAD';
+					state = 'READ_RACE_BEARD';
 				}
 			}
 			

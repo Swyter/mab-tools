@@ -315,8 +315,8 @@
         Drag and drop here your mod's <tt>skins.txt</tt> file to use it as template...
         
         <label>choose a race: <select id=racesel disabled></select></label>
-        <button id=tplusenat disabled>use «native» as template</button>
-        <button id=tpldelete disabled>delete saved race template and view raw fields</button>
+        <button id=usenat disabled>use «native» as template</button>
+        <button id=delsav disabled>delete saved race template and view raw fields</button>
     </div>
 	<script type="text/javascript">
 	/* basic helpers */
@@ -371,6 +371,9 @@
     racesel=$('racesel');
 	rnd=$('rnd');
     rst=$('rst');
+
+	usenat=$('usenat');
+    delsav=$('delsav');
 
 	/* basic functions */
 	
@@ -501,7 +504,7 @@
 
 		switch (e.target)
 		{
-            case rnd:
+            case rnd: /* swy: FIXME: hidden/empty/unused key morphs are set to zero by the game, same below */
                 /* swy: convert the NodeList into an array so that we can reverse what's already reversed */
                 var labels = document.querySelectorAll(`input[id^=fk]`);
                 labels = Array.from(labels).reverse();
@@ -509,6 +512,18 @@
                 for (var cur of labels)
                 {
                     cur.value = Math.random() * cur.max;
+					app.onchange({ target: cur });
+                }
+                break;
+
+            case rst:
+                /* swy: convert the NodeList into an array so that we can reverse what's already reversed */
+                var labels = document.querySelectorAll(`input[id^=fk]`);
+                labels = Array.from(labels).reverse();
+
+                for (var cur of labels)
+                {
+                    cur.value = (cur.max - .5) / 2; /* swy: the game rounds downwards and always ends up with 3 instead of 4 */
 					app.onchange({ target: cur });
                 }
                 break;

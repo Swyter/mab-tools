@@ -45,22 +45,43 @@
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#777766', endColorstr='#6d675e',GradientType=1 );
 	}
 	
-	label{
-		/*width:95px;
-		display: inline-block;
-		text-align:right;
-		text-shadow:1px 1px black;*/
-		
+	label {
 		width: inherit;
 		display: inline-block;
-		text-align: right;
 		text-shadow: 1px 1px black;
-		m--argin-left: 88px;
 		-moz-user-select:none; /* firefux clumsy behavior fix */
+        display: table-cell;
+        align-self: end;
+        vertical-align: middle;
 	}
+
+    div#right-block label, div#right-block > button {
+        padding: 6px;
+    }
+
+    div#right-block > section > button {
+        width: 50%; display: inline-block;
+        margin-right: 5px;
+    }
+
+    div#right-block > label > select, div#right-block input {
+        width: 240px;
+    }
+    
+    div#right-block {
+        align-self: center;
+        padding-right: 40px;
+    }
+
+    div#right-block section {
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+        margin-top: 18px;
+        margin-left: 79px;
+    }
 	
-	input,select{
-		width:120px;
+	input,select, button{
 		-webkit-user-select:unset;
 		-m//oz-user-select:unset;
 		-o-user-select:unset;
@@ -68,6 +89,12 @@
 		font-family:times,serif;
 		text-transform: lowercase;
 	}
+
+    input[type="range"] {
+        position: relative;
+        width: 120px;
+        top: 7px;
+    }
 	
 	input#thash{
 		width:100%;
@@ -179,19 +206,6 @@
 	input#thash{
 		border: double 4px #89A;
 	}
-	
-	input[type=range]:after{
-	 content:"{"attr(value)"}";
-		color: #eee;
-		display:inline;
-		text-align:center;
-		font-family:times,serif;
-		font-style: oblique;
-		text-transform: lowercase;
-		text-shadow: 1px 1px black;
-		position: relative;
-    	left: 30px;
-	}
 
     div#droparea {
         width: 324px;
@@ -210,27 +224,35 @@
     }
 
     div#right-block {
-        width: 40%;
+
         float: left;
-        white-space: pre-line;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: right;
+        padding: 5px;
     }
 
-    div#right-block input, div#right-block select {
+    div#right-block > input, div#right-block > select {
         width: 200px;
     }
     div#left-block {
         display: block;
-        width: 60%;
-        grid-column: unset;
-        float: right;
         position: relative;
-        height: 673px;
         overflow: hidden scroll;
         white-space: normal;
 
-        margin-top: 20px;
-        border-top: 1px dotted black;
-        background: linear-gradient(225deg, #858585 5%, transparent 30%);
+        margin-top: 2px;
+        border-top: 2px dotted #998;
+        background: linear-gradient(225deg, #9999884f 5%, transparent 30%);
+
+        padding: 41px;
+        padding-top: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: right;
+
+        height: calc( - 300px);
     }
 
     body:after {
@@ -242,7 +264,6 @@
     fieldset {
         border: 5px double #bb8266;
         white-space: initial;
-        margin-bottom: -16px;
     }
 
     div#ascii {
@@ -251,8 +272,8 @@
         z-index: 99;
     }
 
-    button {
-        padding: 4px;
+    button, select {
+        padding: 6px;
     }
 	</style>
 </head>
@@ -264,14 +285,14 @@
 	<input id="thash" type="text" placeholder="~Paste your hash here~" data-kpxc-id="thash" value="0x00000001324a9cba0005194a000041ef00005ae800003c55">
 	</div>
     <div id="right-block">
-        <label for="ski">skin         </label>  <input type="number" id="ski" min="0" max="63" value="0">
-        <label for="bea">beard        </label>  <input type="number" id="bea" min="0" max="63" value="0">
-        <label for="hai">hair         </label>  <input type="number" id="hai" min="0" max="63" value="0"> 
+        <label>skin           <input type="number" id="ski" min="0" max="63" value="0"> </label>
+        <label>beard          <input type="number" id="bea" min="0" max="63" value="0"> </label>
+        <label>hair           <input type="number" id="hai" min="0" max="63" value="0"> </label>
         
-        <label for="age">age          </label>  <input id="age" type="range" min="0" max="63" value="18">
-        <label for="col">hair color   </label>  <input id="col" type="range" min="0" max="63" value="42">
+        <label>age            <input id="age" type="range" min="0" max="63" value="18"> </label>
+        <label>hair color     <input id="col" type="range" min="0" max="63" value="42"> </label>
 
-        <button id=rnd>randomize</button> <button id=rst>reset</button>
+        <section><button id=rnd>randomize</button> <button id=rst>reset</button></section>
 
         <div id=droparea>
             Drag and drop here your mod's <tt>skins.txt</tt> file to use it as template...
@@ -287,51 +308,51 @@
 
 	<!--input type="range" min="0" max="50" value="25" step="5" /-->
     <div id="left-block">
-        <label for="fk42">face key 42 </label>  <input id="fk42" type="range" min="0" max="1" value="0"> <!-- count: 21 - cleared skin3 leftmost, only has one bit, i think -->
+        <label>face key 42  <input id="fk42" type="range" min="0" max="1" value="0"></label> <!-- count: 21 - cleared skin3 leftmost, only has one bit, i think -->
 
-        <label for="fk41">face key 41 </label>  <input id="fk41" type="range" min="0" max="7" value="0">
-        <label for="fk40">face key 40 </label>  <input id="fk40" type="range" min="0" max="7" value="0">
-        <label for="fk39">face key 39 </label>  <input id="fk39" type="range" min="0" max="7" value="0">
-        <label for="fk38">face key 38 </label>  <input id="fk38" type="range" min="0" max="7" value="0">
-        <label for="fk37">face key 37 </label>  <input id="fk37" type="range" min="0" max="7" value="0">
-        <label for="fk36">face key 36 </label>  <input id="fk36" type="range" min="0" max="7" value="0">
-        <label for="fk35">face key 35 </label>  <input id="fk35" type="range" min="0" max="7" value="0">
-        <label for="fk34">face key 34 </label>  <input id="fk34" type="range" min="0" max="7" value="0">
-        <label for="fk33">face key 33 </label>  <input id="fk33" type="range" min="0" max="7" value="0">
-        <label for="fk32">face key 32 </label>  <input id="fk32" type="range" min="0" max="7" value="0">
-        <label for="fk31">face key 31 </label>  <input id="fk31" type="range" min="0" max="7" value="0">
-        <label for="fk30">face key 30 </label>  <input id="fk30" type="range" min="0" max="7" value="0">
-        <label for="fk29">face key 29 </label>  <input id="fk29" type="range" min="0" max="7" value="0">
-        <label for="fk28">face key 28 </label>  <input id="fk28" type="range" min="0" max="7" value="0">
-        <label for="fk27">face key 27 </label>  <input id="fk27" type="range" min="0" max="7" value="0">
-        <label for="fk26">face key 26 </label>  <input id="fk26" type="range" min="0" max="7" value="0">
-        <label for="fk25">face key 25 </label>  <input id="fk25" type="range" min="0" max="7" value="0">
-        <label for="fk24">face key 24 </label>  <input id="fk24" type="range" min="0" max="7" value="0">
-        <label for="fk23">face key 23 </label>  <input id="fk23" type="range" min="0" max="7" value="0">
-        <label for="fk22">face key 22 </label>  <input id="fk22" type="range" min="0" max="7" value="0">
-        <label for="fk21">face key 21 </label>  <input id="fk21" type="range" min="0" max="7" value="0"> <!-- count: 22 - skin_3 begins -->
+        <label>face key 41  <input id="fk41" type="range" min="0" max="7" value="0"></label>
+        <label>face key 40  <input id="fk40" type="range" min="0" max="7" value="0"></label>
+        <label>face key 39  <input id="fk39" type="range" min="0" max="7" value="0"></label>
+        <label>face key 38  <input id="fk38" type="range" min="0" max="7" value="0"></label>
+        <label>face key 37  <input id="fk37" type="range" min="0" max="7" value="0"></label>
+        <label>face key 36  <input id="fk36" type="range" min="0" max="7" value="0"></label>
+        <label>face key 35  <input id="fk35" type="range" min="0" max="7" value="0"></label>
+        <label>face key 34  <input id="fk34" type="range" min="0" max="7" value="0"></label>
+        <label>face key 33  <input id="fk33" type="range" min="0" max="7" value="0"></label>
+        <label>face key 32  <input id="fk32" type="range" min="0" max="7" value="0"></label>
+        <label>face key 31  <input id="fk31" type="range" min="0" max="7" value="0"></label>
+        <label>face key 30  <input id="fk30" type="range" min="0" max="7" value="0"></label>
+        <label>face key 29  <input id="fk29" type="range" min="0" max="7" value="0"></label>
+        <label>face key 28  <input id="fk28" type="range" min="0" max="7" value="0"></label>
+        <label>face key 27  <input id="fk27" type="range" min="0" max="7" value="0"></label>
+        <label>face key 26  <input id="fk26" type="range" min="0" max="7" value="0"></label>
+        <label>face key 25  <input id="fk25" type="range" min="0" max="7" value="0"></label>
+        <label>face key 24  <input id="fk24" type="range" min="0" max="7" value="0"></label>
+        <label>face key 23  <input id="fk23" type="range" min="0" max="7" value="0"></label>
+        <label>face key 22  <input id="fk22" type="range" min="0" max="7" value="0"></label>
+        <label>face key 21  <input id="fk21" type="range" min="0" max="7" value="0"></label> <!-- count: 22 - skin_3 begins -->
 
-        <label for="fk20">face key 20 </label>  <input id="fk20" type="range" min="0" max="7" value="0"> <!-- count: 21 - cleared skin2 leftmost -->
-        <label for="fk19">face key 19 </label>  <input id="fk19" type="range" min="0" max="7" value="0">
-        <label for="fk18">face key 18 </label>  <input id="fk18" type="range" min="0" max="7" value="0">
-        <label for="fk17">face key 17 </label>  <input id="fk17" type="range" min="0" max="7" value="0">
-        <label for="fk16">face key 16 </label>  <input id="fk16" type="range" min="0" max="7" value="0">
-        <label for="fk15">face key 15 </label>  <input id="fk15" type="range" min="0" max="7" value="0">
-        <label for="fk14">face key 14 </label>  <input id="fk14" type="range" min="0" max="7" value="0">
-        <label for="fk13">face key 13 </label>  <input id="fk13" type="range" min="0" max="7" value="0">
-        <label for="fk12">face key 12 </label>  <input id="fk12" type="range" min="0" max="7" value="0">
-        <label for="fk11">face key 11 </label>  <input id="fk11" type="range" min="0" max="7" value="0">
-        <label for="fk10">face key 10 </label>  <input id="fk10" type="range" min="0" max="7" value="0">
-        <label for="fk09">face key 09 </label>  <input id="fk09" type="range" min="0" max="7" value="0">
-        <label for="fk08">face key 08 </label>  <input id="fk08" type="range" min="0" max="7" value="0">
-        <label for="fk07">face key 07 </label>  <input id="fk07" type="range" min="0" max="7" value="0">
-        <label for="fk06">face key 06 </label>  <input id="fk06" type="range" min="0" max="7" value="0">
-        <label for="fk05">face key 05 </label>  <input id="fk05" type="range" min="0" max="7" value="0">
-        <label for="fk04">face key 04 </label>  <input id="fk04" type="range" min="0" max="7" value="0">
-        <label for="fk03">face key 03 </label>  <input id="fk03" type="range" min="0" max="7" value="0">
-        <label for="fk02">face key 02 </label>  <input id="fk02" type="range" min="0" max="7" value="0">
-        <label for="fk01">face key 01 </label>  <input id="fk01" type="range" min="0" max="7" value="0">
-        <label for="fk00">face key 00 </label>  <input id="fk00" type="range" min="0" max="7" value="0"> <!-- count: 1 - skin2 begins -->
+        <label>face key 20  <input id="fk20" type="range" min="0" max="7" value="0"></label> <!-- count: 21 - cleared skin2 leftmost -->
+        <label>face key 19  <input id="fk19" type="range" min="0" max="7" value="0"></label>
+        <label>face key 18  <input id="fk18" type="range" min="0" max="7" value="0"></label>
+        <label>face key 17  <input id="fk17" type="range" min="0" max="7" value="0"></label>
+        <label>face key 16  <input id="fk16" type="range" min="0" max="7" value="0"></label>
+        <label>face key 15  <input id="fk15" type="range" min="0" max="7" value="0"></label>
+        <label>face key 14  <input id="fk14" type="range" min="0" max="7" value="0"></label>
+        <label>face key 13  <input id="fk13" type="range" min="0" max="7" value="0"></label>
+        <label>face key 12  <input id="fk12" type="range" min="0" max="7" value="0"></label>
+        <label>face key 11  <input id="fk11" type="range" min="0" max="7" value="0"></label>
+        <label>face key 10  <input id="fk10" type="range" min="0" max="7" value="0"></label>
+        <label>face key 09  <input id="fk09" type="range" min="0" max="7" value="0"></label>
+        <label>face key 08  <input id="fk08" type="range" min="0" max="7" value="0"></label>
+        <label>face key 07  <input id="fk07" type="range" min="0" max="7" value="0"></label>
+        <label>face key 06  <input id="fk06" type="range" min="0" max="7" value="0"></label>
+        <label>face key 05  <input id="fk05" type="range" min="0" max="7" value="0"></label>
+        <label>face key 04  <input id="fk04" type="range" min="0" max="7" value="0"></label>
+        <label>face key 03  <input id="fk03" type="range" min="0" max="7" value="0"></label>
+        <label>face key 02  <input id="fk02" type="range" min="0" max="7" value="0"></label>
+        <label>face key 01  <input id="fk01" type="range" min="0" max="7" value="0"></label>
+        <label>face key 00  <input id="fk00" type="range" min="0" max="7" value="0"></label> <!-- count: 1 - skin2 begins -->
 	</div>
 	<script type="text/javascript">
 	/* basic helpers */
@@ -526,7 +547,7 @@
 
                 for (var cur of labels)
                 {
-                    associated_label = document.querySelector(`label[for='${cur.id}'`);
+                    associated_label = cur.parentNode;
                     if (associated_label && associated_label.textContent == '<hidden>')
                         cur.value = 0;
                     else
@@ -560,7 +581,7 @@
 
                 for (var cur of labels)
                 {
-					associated_label = document.querySelector(`label[for='${cur.id}'`);
+					associated_label = cur.parentNode;
                     if (associated_label && associated_label.textContent == '<hidden>')
                         cur.value = 0;
                     else
@@ -1012,7 +1033,7 @@
     function set_up_dyn_interface()
     {
         /* swy: convert the NodeList into an array so that we can reverse what's already reversed */
-        var labels = document.querySelectorAll(`label[for^=fk]`);
+        var labels = document.querySelectorAll(`div#left-block label`);
         labels = Array.from(labels).reverse();
 
         var race_to_use = race[localStorage.cur_race_idx]; /* swy: orc on TLD */
@@ -1030,9 +1051,9 @@
             /* swy: usually a skin only uses a subset of the available face keys,
                     hide the rest if they go beyond what's available */
             if ((cur_index + 1) <= race_to_use.face_keys.length)
-                cur_label.textContent = race_to_use.face_keys[cur_index].tag;
+                cur_label.childNodes[0].nodeValue = race_to_use.face_keys[cur_index].tag + " ";
             else
-                cur_label.textContent = "<hidden>";
+                cur_label.childNodes[0].nodeValue = "<hidden> ";
         }
 
         function replace_with_combobox(input_elem_name, fill_options)

@@ -56,7 +56,7 @@
         width: max-content;
 	}
 
-    div#right-block label, div#right-block > button {
+    div#right-block label, div#right-block > button, div#right-block input[type=number] {
         padding: 6px;
     }
 
@@ -67,7 +67,6 @@
 
     div#right-block > label > select, div#right-block input {
         width: 240px;
-        padding: 6px;
     }
     
     div#right-block {
@@ -551,7 +550,7 @@
                 for (var cur of labels)
                 {
                     associated_label = cur.parentNode;
-                    if (associated_label && associated_label.textContent == '<hidden>')
+                    if (associated_label && associated_label.textContent == '<hidden> ')
                         cur.value = 0;
                     else
                         cur.value = Math.random() * cur.max;
@@ -560,14 +559,18 @@
 
                 /* swy: make it only randomize when we actually have a combobox with the maximum amount
                         of meshes, at least for now. I don't think it would make too much sense */
-                if (ski.options)
+                if (ski.options && ski.options.length > 0)
                 {
                     ski.value = ski.options[Math.round(Math.random() * Math.max(ski.options.length - 1, 0))].value;
                     app.onchange({ target: ski });
-
+                }
+                if (bea.options && bea.options.length > 0)
+                {
                     bea.value = bea.options[Math.round(Math.random() * Math.max(bea.options.length - 1, 0))].value;
                     app.onchange({ target: bea });
-
+                }
+                if (hai.options && hai.options.length > 0)
+                {
                     hai.value = hai.options[Math.round(Math.random() * Math.max(hai.options.length - 1, 0))].value;
                     app.onchange({ target: hai });
                 }
@@ -585,7 +588,7 @@
                 for (var cur of labels)
                 {
 					associated_label = cur.parentNode;
-                    if (associated_label && associated_label.textContent == '<hidden>')
+                    if (associated_label && associated_label.textContent == '<hidden> ')
                         cur.value = 0;
                     else
 	                    cur.value = (cur.max - .5) / 2; /* swy: the game rounds downwards and always ends up with 3 instead of 4 */
@@ -1054,9 +1057,9 @@
             /* swy: usually a skin only uses a subset of the available face keys,
                     hide the rest if they go beyond what's available */
             if ((cur_index + 1) <= race_to_use.face_keys.length)
-                cur_label.childNodes[0].nodeValue = race_to_use.face_keys[cur_index].tag + " ";
+                cur_label.childNodes[0].nodeValue = race_to_use.face_keys[cur_index].tag + ' ';
             else
-                cur_label.childNodes[0].nodeValue = "<hidden> ";
+                cur_label.childNodes[0].nodeValue = '<hidden> ';
         }
 
         function replace_with_combobox(input_elem_name, fill_options)

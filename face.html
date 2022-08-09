@@ -504,16 +504,32 @@
 
 		switch (e.target)
 		{
-            case rnd: /* swy: FIXME: hidden/empty/unused key morphs are set to zero by the game, same below */
+            case rnd: /* swy: hidden/empty/unused key morphs are set to zero by the game, same below */
                 /* swy: convert the NodeList into an array so that we can reverse what's already reversed */
                 var labels = document.querySelectorAll(`input[id^=fk]`);
                 labels = Array.from(labels).reverse();
 
                 for (var cur of labels)
                 {
-                    cur.value = Math.random() * cur.max;
+                    associated_label = document.querySelector(`label[for='${cur.id}'`);
+                    if (associated_label && associated_label.textContent == '<hidden>')
+                        cur.value = 0;
+                    else
+                        cur.value = Math.random() * cur.max;
 					app.onchange({ target: cur });
                 }
+
+				ski.value = ski.options[Math.round(Math.random() * (ski.options.length - 1))].value;
+				app.onchange({ target: ski });
+
+				bea.value = bea.options[Math.round(Math.random() * (bea.options.length - 1))].value;
+				app.onchange({ target: bea });
+
+				hai.value = hai.options[Math.round(Math.random() * (hai.options.length - 1))].value;
+				app.onchange({ target: hai });
+
+				col.value = Math.random() * col.max;
+				app.onchange({ target: col });
                 break;
 
             case rst:
@@ -523,7 +539,11 @@
 
                 for (var cur of labels)
                 {
-                    cur.value = (cur.max - .5) / 2; /* swy: the game rounds downwards and always ends up with 3 instead of 4 */
+					associated_label = document.querySelector(`label[for='${cur.id}'`);
+                    if (associated_label && associated_label.textContent == '<hidden>')
+                        cur.value = 0;
+                    else
+	                    cur.value = (cur.max - .5) / 2; /* swy: the game rounds downwards and always ends up with 3 instead of 4 */
 					app.onchange({ target: cur });
                 }
                 break;

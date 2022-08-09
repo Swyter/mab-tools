@@ -547,6 +547,16 @@
 					app.onchange({ target: cur });
                 }
                 break;
+            case usenat:
+                download_and_set_up_native_skins();
+                break;
+            case delsav:
+                delete localStorage.race;
+                delete localStorage.race_ver;
+                window.location.hash = thash.value;
+                localStorage.raw_view = true;
+                location.reload();
+                break;
 			default:
 				_(e.target.id+" has changed");
 		}
@@ -761,7 +771,6 @@
 		_parse(def);
 	}
 
-	race = [];
     function parse_skins_txt(text_file)
     {
         var state = 'MAGIC'; race = []; /* swy: reset the global race holder */
@@ -973,6 +982,9 @@
 			}
 			
 		}
+
+        localStorage.race = JSON.stringify(race);
+        localStorage.race_ver = 20220809; /* swy: so that we can reset the saved that should we change the format */
     }
 
     function set_up_dyn_interface()
@@ -1039,6 +1051,10 @@
         for (var i in race)
         {
 			var cur = race[i]; /* swy: doesn't for of work here, it returns undefined. wtfbbq?? */
+
+            if (cur == undefined)
+                continue;
+
             console.log(cur.name, cur);
 
             var opt = document.createElement('option');
@@ -1048,28 +1064,51 @@
         }
         sel.value = localStorage.cur_race_idx;
         racesel = sel;
+
+        /* -- */
+
+        usenat.disabled = false;
+        delsav.disabled = false;
     }
 
-    /* swy: download and use Warband Native's version of skins.txt */
-	xhr = new XMLHttpRequest;
-	xhr.open('GET', 'https://gist.githubusercontent.com/Swyter/0b03cdae54886afc5ff2e51f3d8f1223/raw/383bc333829c2867132a9737d2079798c38cd73c/skins.txt');
-	xhr.onloadend = function(e)
-	{
-		if (e.target.readyState != e.target.DONE)
-			return;
-
-		if (e.target.status != 200)
+    function download_and_set_up_native_skins()
+    {
+        /* swy: download and use Warband Native's version of skins.txt */
+        xhr = new XMLHttpRequest;
+        xhr.open('GET', 'https://gist.githubusercontent.com/Swyter/0b03cdae54886afc5ff2e51f3d8f1223/raw/383bc333829c2867132a9737d2079798c38cd73c/skins.txt');
+        xhr.onloadend = function(e)
         {
-            console.warn(`swy: couldn't download the file`, e);
-			return;
+            if (e.target.readyState != e.target.DONE)
+                return;
+
+            if (e.target.status != 200)
+            {
+                console.warn(`swy: couldn't download the file`, e);
+                return;
+            }
+
+            parse_skins_txt(e.target.response);
+
+            set_up_dyn_interface();
+            console.log(e);
         }
+        xhr.send();
+    }
 
-        parse_skins_txt(e.target.response);
+    
+    race = [];
 
-        set_up_dyn_interface();
-		console.log(e);
-	}
-	xhr.send();
+    if (!localStorage.raw_view)
+    {
+        if (localStorage.race_ver && localStorage.race)
+        {
+            race = JSON.parse(localStorage.race)
+            set_up_dyn_interface();
+        }
+        else
+            download_and_set_up_native_skins();
+    }
+
 
     /* swy: grab/load a user-provided skins.txt via drag-and-drop */
     droparea = document.querySelector("div#droparea")

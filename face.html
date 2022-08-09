@@ -504,7 +504,7 @@
 
 		switch (e.target)
 		{
-            case rnd: /* swy: hidden/empty/unused key morphs are set to zero by the game, same below */
+            case rnd: /* swy: the age slider doesn't move, hidden/empty/unused key morphs are set to zero by the game, same below */
                 /* swy: convert the NodeList into an array so that we can reverse what's already reversed */
                 var labels = document.querySelectorAll(`input[id^=fk]`);
                 labels = Array.from(labels).reverse();
@@ -519,17 +519,23 @@
 					app.onchange({ target: cur });
                 }
 
-				ski.value = ski.options[Math.round(Math.random() * Math.max(ski.options.length - 1, 0))].value;
-				app.onchange({ target: ski });
+                /* swy: make it only randomize when we actually have a combobox with the maximum amount
+                        of meshes, at least for now. I don't think it would make too much sense */
+                if (ski.options)
+                {
+                    ski.value = ski.options[Math.round(Math.random() * Math.max(ski.options.length - 1, 0))].value;
+                    app.onchange({ target: ski });
 
-				bea.value = bea.options[Math.round(Math.random() * Math.max(bea.options.length - 1, 0))].value;
-				app.onchange({ target: bea });
+                    bea.value = bea.options[Math.round(Math.random() * Math.max(bea.options.length - 1, 0))].value;
+                    app.onchange({ target: bea });
 
-				hai.value = hai.options[Math.round(Math.random() * Math.max(hai.options.length - 1, 0))].value;
-				app.onchange({ target: hai });
+                    hai.value = hai.options[Math.round(Math.random() * Math.max(hai.options.length - 1, 0))].value;
+                    app.onchange({ target: hai });
+                }
 
-				col.value = Math.random() * col.max;
-				app.onchange({ target: col });
+                col.value = Math.random() * col.max;
+                app.onchange({ target: col });
+
                 break;
 
             case rst:
@@ -985,6 +991,7 @@
 
         localStorage.race = JSON.stringify(race);
         localStorage.race_ver = 20220809; /* swy: so that we can reset the saved that should we change the format */
+        localStorage.raw_view = false;
     }
 
     function set_up_dyn_interface()
@@ -1062,11 +1069,14 @@
             opt.value       = race.indexOf(cur);
             sel.appendChild(opt);
         }
+
         sel.value = localStorage.cur_race_idx;
         racesel = sel;
 
         /* -- */
 
+        /* swy: we've populated the interface contents with the template; toggle on both buttons,
+                so that we can delete the template or go back to Native's skins.txt */
         usenat.disabled = false;
         delsav.disabled = false;
     }
@@ -1098,8 +1108,10 @@
     
     race = [];
 
-    if (!localStorage.raw_view)
+    if (!localStorage.raw_view || localStorage.raw_view == 'false')
     {
+        /* swy: do we have some persistently-saved data from a mod in store? use it, otherwise it's probably the first time
+                someone loads the tool and downloading the Native mod's skins.txt seems like a good idea */
         if (localStorage.race_ver && localStorage.race)
         {
             race = JSON.parse(localStorage.race)
@@ -1107,6 +1119,13 @@
         }
         else
             download_and_set_up_native_skins();
+    }
+    else
+    {
+        /* swy: we're in raw mode; let the user download the Native template by toggling it on,
+                but as there's no data to delete, gray out that button */
+        usenat.disabled = false;
+        delsav.disabled = true;
     }
 
 

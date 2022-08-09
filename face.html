@@ -313,7 +313,7 @@
     <div id=droparea>
         Drag and drop here your mod's <tt>skins.txt</tt> file to use it as template...
         
-        <label>choose a race: <select id=race disabled></select></label>
+        <label>choose a race: <select id=racesel disabled></select></label>
         <button id=reset disabled>reset and view all raw fields</button>
     </div>
 	<script type="text/javascript">
@@ -365,6 +365,8 @@
 	fk23=$('fk23');	fk02=$('fk02');
 	fk22=$('fk22');	fk01=$('fk01');
 	fk21=$('fk21');	fk00=$('fk00');
+
+    racesel=$('racesel');
 	
 	/* basic functions */
 	
@@ -498,7 +500,10 @@
 				_('a new hash has arrived!');
 				_parse(thash.value);
 				break;
-				
+			case racesel:
+                localStorage.cur_race_idx = e.target.value;
+                set_up_dyn_interface();
+                break;
 			default:
 				_(e.target.id+" has changed");
 		}
@@ -699,7 +704,7 @@
     function parse_skins_txt(text_file)
     {
         var state = 'MAGIC'; race = []; /* swy: reset the global race holder */
-
+        localStorage.cur_race_idx = 1;
         var race_count = 0;
         var cur_race_idx = 0;
         var cur_hair_count = 0;
@@ -915,7 +920,7 @@
         var labels = document.querySelectorAll(`label[for^=fk]`);
         labels = Array.from(labels).reverse();
 
-        var race_to_use = race[1]; /* swy: orc on TLD */
+        var race_to_use = race[localStorage.cur_race_idx]; /* swy: orc on TLD */
 
         if (!race_to_use)
         {
@@ -963,8 +968,25 @@
         }
 
         replace_with_combobox("skin",  race_to_use.mat_skin);
-        replace_with_combobox("beard", race_to_use.mat_beard);
-        replace_with_combobox("hair",  race_to_use.mat_hair);
+        replace_with_combobox("beard", race_to_use.mesh_beard);
+        replace_with_combobox("hair",  race_to_use.mesh_hair);
+
+
+        var sel = document.createElement('select'); sel.id = racesel;
+        racesel.replaceWith(sel);
+
+        for (var i in race)
+        {
+			var cur = race[i]; /* swy: doesn't for of work here, it returns undefined. wtfbbq?? */
+            console.log(cur.name, cur);
+
+            var opt = document.createElement('option');
+            opt.textContent = cur.name;
+            opt.value       = race.indexOf(cur);
+            sel.appendChild(opt);
+        }
+        sel.value = localStorage.cur_race_idx;
+        racesel = sel;
     }
 
     /* swy: download and use Warband Native's version of skins.txt */
@@ -982,7 +1004,8 @@
         }
 
         parse_skins_txt(e.target.response);
-        set_up_dyn_interface()
+
+        set_up_dyn_interface();
 		console.log(e);
 	}
 	xhr.send();

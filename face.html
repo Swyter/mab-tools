@@ -52,7 +52,7 @@
 		text-align:right;
 		text-shadow:1px 1px black;*/
 		
-		width: 114px;
+		width: inherit;
 		display: inline-block;
 		text-align: right;
 		text-shadow: 1px 1px black;
@@ -210,7 +210,7 @@
     }
 
     div#right-block {
-        width: 65%;
+        width: 40%;
         float: left;
         white-space: pre-line;
     }
@@ -220,28 +220,33 @@
     }
     div#left-block {
         display: block;
-        width: 35%;
+        width: 60%;
         grid-column: unset;
         float: right;
         position: relative;
         t--op: -84px;
-        height: 673px;
+        height: 100%;
         overflow: hidden scroll;
         white-space: normal;
     }
 
     div#droparea {
-        white-space: pre-line;
         display: table;
         clear: both;
     }
 
+    fieldset {
+        border: 5px double #bb8266;
+    }
+
     div#ascii {
         white-space: pre-line;
-        position: sticky;
         top: 0;
         z-index: 99;
-        background: #6d675e;
+    }
+
+    button {
+        padding: 4px;
     }
 	</style>
 </head>
@@ -259,6 +264,7 @@
         
         <label for="age">age          </label>  <input id="age" type="range" min="0" max="63" value="18">
         <label for="col">hair color   </label>  <input id="col" type="range" min="0" max="63" value="42">
+
         <button id=rnd>randomize</button> <button id=rst>reset</button>
     </div>
 
@@ -315,8 +321,11 @@
         Drag and drop here your mod's <tt>skins.txt</tt> file to use it as template...
         
         <label>choose a race: <select id=racesel disabled></select></label>
-        <button id=usenat disabled>use «native» as template</button>
-        <button id=delsav disabled>delete saved race template and view raw fields</button>
+        <fieldset>
+            <legend>template stuff</legend>
+            <button id=usenat disabled>use «native» as template</button>
+            <button id=delsav disabled>delete saved race template and view raw fields</button>
+        </fieldset>
     </div>
 	<script type="text/javascript">
 	/* basic helpers */

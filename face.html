@@ -519,13 +519,13 @@
 					app.onchange({ target: cur });
                 }
 
-				ski.value = ski.options[Math.round(Math.random() * (ski.options.length - 1))].value;
+				ski.value = ski.options[Math.round(Math.random() * Math.max(ski.options.length - 1, 0))].value;
 				app.onchange({ target: ski });
 
-				bea.value = bea.options[Math.round(Math.random() * (bea.options.length - 1))].value;
+				bea.value = bea.options[Math.round(Math.random() * Math.max(bea.options.length - 1, 0))].value;
 				app.onchange({ target: bea });
 
-				hai.value = hai.options[Math.round(Math.random() * (hai.options.length - 1))].value;
+				hai.value = hai.options[Math.round(Math.random() * Math.max(hai.options.length - 1, 0))].value;
 				app.onchange({ target: hai });
 
 				col.value = Math.random() * col.max;

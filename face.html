@@ -861,7 +861,6 @@
                     if (!line || line[0] == undefined || line.length < 2)
                         continue;
 
-					cur_race_idx++;
 					race[cur_race_idx]={};
 					race[cur_race_idx]["name"] = line[0];
                     race[cur_race_idx]["unk_number"] = +line[1];
@@ -1024,6 +1023,7 @@
                         /* swy: we're done for this entry, start parsing the next one, if any */
                         console.log(">> parsed race: ", race[cur_race_idx]);
 						state = 'READ_RACE_NAME';
+                        cur_race_idx++; /* swy: self-increment here in the tail instead of doing it in the head, just before creating the next entry; if we self-increment in READ_RACE_NAME we'll end up with index zero (race[0] is always {}) empty. we could also initialize the index to -1 so that ends up as 0 the first time around */
                     }
 				}
                 break;

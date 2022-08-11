@@ -713,6 +713,11 @@
             
             thash.value='0x'+(hash[0] + hash[1] + hash[2] + hash[3]);
             //_parse(thash.value);
+
+            /* swy: update the URL so that the user can click backwards and forwards and get undo and redo functionality,
+                    while also having a nice copy-able permalink with the current state */
+            if (window.location.hash != thash.value)
+                window.location.hash = thash.value;
             break;
         }
     }

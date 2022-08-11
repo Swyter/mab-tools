@@ -277,6 +277,10 @@
     button, select {
         padding: 6px;
     }
+
+    /* swy: make it clear when the input code is wrong by reddening the input background,
+            see the pattern and maxlength/minlength attributes in thash <input> */
+    :invalid { background: rgb(238, 203, 203); }
     </style>
 </head>
 <body>
@@ -284,7 +288,7 @@
     <h3>— the one and only —</h3>
     <h1>face code generator</h1>
     <h2>who needs the game, anyway?<span>Ten year anniversary!</span></h2>
-    <input id="thash" type="text" placeholder="~Paste your hash here~" data-kpxc-id="thash" value="0x00000001324a9cba0005194a000041ef00005ae800003c55">
+    <input id="thash" type="text" placeholder="~Paste your hash here~" data-kpxc-id="thash" value="0x000000000000000036db6db6db6db6dbb6db6db6db6db6db0000000000000000" autofocus maxlength=66 minlength=66 pattern='0x[0-9a-f]{64}' title='Insert some hexadecimal 64-digit face code starting with the «0x» prefix.'>
     </div>
     <div id="right-block">
         <label>skin           <input type="number" id="ski" min="0" max="63" value="0"> </label>
@@ -605,8 +609,6 @@
                 localStorage.raw_view = true;
                 location.reload();
                 break;
-            default:
-                _(e.target.id+" has changed");
         }
     }
 

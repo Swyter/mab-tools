@@ -580,7 +580,8 @@
                 }
 
                 col.value = Math.random() * col.max;
-                app.onchange({ target: col });
+                /* swy: event included a custom forcedhashchange set to true to force an URL hash change at the end, but not for every field being set */
+                app.onchange({ target: col, forcedhashchange: true });
 
                 break;
 
@@ -598,6 +599,8 @@
                         cur.value = (cur.max - .5) / 2; /* swy: the game rounds downwards and always ends up with 3 instead of 4 */
                     app.onchange({ target: cur });
                 }
+                /* swy: fake event to force an URL hash change at the end, but not for every field being set */
+                app.onchange({ target: fk00, forcedhashchange: true });
                 break;
             case usenat:
                 download_and_set_up_native_skins();
@@ -713,13 +716,20 @@
             
             thash.value='0x'+(hash[0] + hash[1] + hash[2] + hash[3]);
             //_parse(thash.value);
-
-            /* swy: update the URL so that the user can click backwards and forwards and get undo and redo functionality,
-                    while also having a nice copy-able permalink with the current state */
-            if (window.location.hash != thash.value)
-                window.location.hash = thash.value;
             break;
         }
+
+        /* swy: update the URL so that the user can click backwards and forwards and get undo and redo functionality,
+                while also having a nice copy-able permalink with the current state.
+                
+                real events from the browser will have [e.type == 'change'], while our fake events will usually only
+                have {.target = <element>}, this is done intentionally so that we don't trigger hash changes for automatic
+                updates from buttons like the randomizer, that refresh multiple fields in one and we don't want to save each mini-step
+                
+                to force a hash change we add a very custom .forcedhashchange field that overrides this, at the end of these automated input changes */
+        if (e.type == 'change' || e.forcedhashchange)
+            if (window.location.hash != thash.value)
+                window.location.hash = thash.value;
     }
     
 //	app.onkeydown=function(e)

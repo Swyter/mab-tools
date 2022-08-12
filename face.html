@@ -915,6 +915,7 @@
                 case 'READ_RACE_HAIR':
                 {
                     race[cur_race_idx]["mesh_hair"] = [];
+                    race[cur_race_idx]["mesh_hair"].push('[None]'); /* swy: add a dummy one to let the user pick bald */
 
                     for (i = 0; i < cur_hair_count; i++)
                         race[cur_race_idx]["mesh_hair"].push(line[i]);
@@ -933,7 +934,10 @@
                 case 'READ_RACE_BEARD':
                 {
                     if (!race[cur_race_idx]["mesh_beard"])
+                    {
                         race[cur_race_idx]["mesh_beard"] = [];
+                        race[cur_race_idx]["mesh_beard"].push('[None]');
+                    }
 
                     race[cur_race_idx]["mesh_beard"].push(line[0]);
 
@@ -1039,7 +1043,7 @@
         }
 
         localStorage.race = JSON.stringify(race);
-        localStorage.race_ver = 20220809; /* swy: so that we can reset the saved that should we change the format */
+        localStorage.race_ver = 20220812; /* swy: so that we can reset the saved that should we change the format */
         localStorage.raw_view = false;
     }
 
@@ -1161,7 +1165,7 @@
     {
         /* swy: do we have some persistently-saved data from a mod in store? use it, otherwise it's probably the first time
                 someone loads the tool and downloading the Native mod's skins.txt seems like a good idea */
-        if (localStorage.race_ver && localStorage.race)
+        if (localStorage.race_ver && localStorage.race_ver >= 20220812 && localStorage.race)
         {
             race = JSON.parse(localStorage.race)
             set_up_dyn_interface();

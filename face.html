@@ -240,7 +240,7 @@
     div#left-block {
         display: block;
         position: relative;
-        overflow: hidden scroll;
+        /* overflow: hidden scroll; */
         white-space: normal;
 
         margin-top: 2px;
@@ -248,13 +248,12 @@
         border-right: 2px dotted #998;
         background: linear-gradient(245deg, #9999884f 5%, transparent 43%);
 
-        padding: 41px;
+        padding: 20px;
         padding-top: 0;
         display: flex;
         flex-direction: column;
         justify-content: right;
-
-        height: calc( - 300px);
+        border-radius: 3px;
     }
 
     body:after {
@@ -272,6 +271,7 @@
         white-space: pre-line;
         top: 0;
         z-index: 99;
+        height: 185px;
     }
 
     button, select {
@@ -738,7 +738,7 @@
     function _parse(e)
     {
         e=e.replace('0x','');
-        if (e.length != 64)
+        if (e.length != 64 || thash.matches(":invalid"))
         {
             _("badly formatted hash :(");
             return false; //doesn't validate

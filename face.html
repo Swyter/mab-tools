@@ -939,10 +939,13 @@
                         race[cur_race_idx]["mesh_beard"].push('[None]');
                     }
 
-                    race[cur_race_idx]["mesh_beard"].push(line[0]);
-
-                    if (--cur_beard_count <= 0)
+                    if (cur_beard_count-- <= 0)
+                    {
                         state = 'READ_RACE_HAIR_MATERIALS';
+                        continue; /* swy: it's important that we don't add an extra, dummy "" when cur_beard_count is zero, like for women agents */
+                    }
+
+                    race[cur_race_idx]["mesh_beard"].push(line[0]);
                 }
                 break;
 
@@ -1043,7 +1046,7 @@
         }
 
         localStorage.race = JSON.stringify(race);
-        localStorage.race_ver = 20220812; /* swy: so that we can reset the saved that should we change the format */
+        localStorage.race_ver = 20220813; /* swy: so that we can reset the saved that should we change the format */
         localStorage.raw_view = false;
     }
 
@@ -1165,7 +1168,7 @@
     {
         /* swy: do we have some persistently-saved data from a mod in store? use it, otherwise it's probably the first time
                 someone loads the tool and downloading the Native mod's skins.txt seems like a good idea */
-        if (localStorage.race_ver && localStorage.race_ver >= 20220812 && localStorage.race)
+        if (localStorage.race_ver && localStorage.race_ver >= 20220813 && localStorage.race)
         {
             race = JSON.parse(localStorage.race)
             set_up_dyn_interface();

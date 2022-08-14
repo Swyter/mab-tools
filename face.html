@@ -605,8 +605,12 @@
                 app.onchange({ target: fk00, forcedhashchange: true });
                 break;
             case usenat:
-                download_and_set_up_native_skins();
-                location.reload(); /* swy: reload the page to indirectly re-run the _parse() routine, otherwise the combobox values don't refresh to match the free-form inputs they replace and hold their default values; the current code should be saved in the URL hash */
+                download_and_set_up_native_skins(function()
+                {
+                    /* swy: reload the page to indirectly re-run the _parse() routine, otherwise the combobox values don't refresh to match the free-form inputs
+                            they replace and hold their default values; the current code should be saved in the URL hash */
+                    _parse(thash.value); /* swy: using location.reload(); makes the comboboxes blink and is less fast */
+                });
                 break;
             case delsav:
                 delete localStorage.race;
@@ -1151,7 +1155,7 @@
         delsav.disabled = false;
     }
 
-    function download_and_set_up_native_skins()
+    function download_and_set_up_native_skins(callback)
     {
         /* swy: download and use Warband Native's version of skins.txt */
         xhr = new XMLHttpRequest;
@@ -1163,7 +1167,8 @@
 
             if (e.target.status != 200)
             {
-                console.warn(`swy: couldn't download the file`, e);
+                console.warn(`swy: couldn't download the «skins.txt» file`, e);
+                alert(`Error: Couldn't download the Native «skins.txt» file from:\r\n ${e.target.responseURL}`);
                 return;
             }
 
@@ -1171,6 +1176,12 @@
 
             set_up_dyn_interface();
             console.log(e);
+
+            /* swy: this is useful as a sort of poor man's JS promise construct, to do external
+                    work afterwards this async function actually finishes, and not before,
+                    downloading it will take a while after the original function returns */
+            if (callback)
+                callback();
         }
         xhr.send();
     }

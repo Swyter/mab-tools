@@ -606,6 +606,7 @@
                 break;
             case usenat:
                 download_and_set_up_native_skins();
+                location.reload(); /* swy: reload the page to indirectly re-run the _parse() routine, otherwise the combobox values don't refresh to match the free-form inputs they replace and hold their default values; the current code should be saved in the URL hash */
                 break;
             case delsav:
                 delete localStorage.race;

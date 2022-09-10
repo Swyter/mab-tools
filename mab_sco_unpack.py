@@ -21,23 +21,23 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
     object_type = ['prop', 'entry', 'item', 'unused', 'plant', 'passage']
 
     for i in range(object_count):
-        type   = unpack('<I', f.read(4))[0]
-        id     = unpack('<I', f.read(4))[0]
-        unk    = unpack('<I', f.read(4))[0]
+        type   = unpack('<I',  f.read(4    ))[0]
+        id     = unpack('<I',  f.read(4    ))[0]
+        unk    = unpack('<I',  f.read(4    ))[0]
         mtx_a  = unpack('<3f', f.read(4 * 3))
         mtx_b  = unpack('<3f', f.read(4 * 3))
         mtx_c  = unpack('<3f', f.read(4 * 3))
         pos    = unpack('<3f', f.read(4 * 3))
         str    = read_rgltag()
 
-        entry_no     = unpack('<I', f.read(4))[0]
-        menu_item_no = unpack('<I', f.read(4))[0]
+        entry_no     = unpack('<I',  f.read(4    ))[0]
+        menu_item_no = unpack('<I',  f.read(4    ))[0]
         scale        = unpack('<3f', f.read(4 * 3))
 
         object = {
             'type': object_type[type],
             'id': id,
-            'unk': unk,
+            'unk': '%0#x' % unk,
             'mtx': [mtx_a, mtx_b, mtx_c],
             'pos': pos,
             'str': str,
@@ -50,4 +50,4 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
         mission_objects.append(object)
 
 
-print(json.dumps(obj=mission_objects, indent=4))
+print(json.dumps(obj=mission_objects, indent=2, ensure_ascii=False))

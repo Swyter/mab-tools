@@ -67,8 +67,13 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
     face_count = unpack('<I', f.read(4))[0]
 
     for i in range(face_count):
-        face = unpack('<5I', f.read(4 * 5))
+        edge_count = unpack('<I', f.read(4))[0]
+        face = unpack(f'<{edge_count}I', f.read(4 * edge_count))
+        edge = unpack(f'<{edge_count}I', f.read(4 * edge_count))
+        has_more = unpack('<I', f.read(4))[0]
 
-        ai_mesh['faces'].append(face)
+        ai_mesh_id = has_more and unpack('<I', f.read(4))[0] or 0
+
+        ai_mesh['faces'].append({'edge_count': edge_count, 'face': face, 'edge': edge, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
 
 print(json.dumps(obj=mission_objects, indent=2, ensure_ascii=False))

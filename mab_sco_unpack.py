@@ -4,7 +4,8 @@ def read_rgltag():
     size = unpack('<I', f.read(4))[0]
     if not size:
         return ''
-    str = unpack(size + 's', f.read(size))[0]
+
+    str = unpack(f'{size}s', f.read(size))[0].decode('utf-8')
     return str
 
 
@@ -14,16 +15,31 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
 
     object_count = unpack('<I', f.read(4))[0]
 
+    mission_objects = []
 
-    type = unpack('<I', f.read(4))[0]
-    id   = unpack('<I', f.read(4))[0]
-    unk  = unpack('<I', f.read(4))[0]
-    mtx  = unpack('<f<f<f', f.read(4 * 3))[0]
+    for i in range(object_count):
+        type = unpack('<I', f.read(4))[0]
+        id   = unpack('<I', f.read(4))[0]
+        unk  = unpack('<I', f.read(4))[0]
+        mtx_a  = unpack('<3f', f.read(4 * 3))
+        mtx_b  = unpack('<3f', f.read(4 * 3))
+        mtx_c  = unpack('<3f', f.read(4 * 3))
 
-    pos          = unpack('<f<f<f', f.read(4 * 3))[0]
+        pos          = unpack('<3f', f.read(4 * 3))
 
-    entry_no     = unpack('<I', f.read(4))[0]
-    menu_item_no = unpack('<I', f.read(4))[0]
-    scale        = unpack('<f<f<f', f.read(4 * 3))[0]
+        str = read_rgltag()
 
-    print(magic)
+        entry_no     = unpack('<I', f.read(4))[0]
+        menu_item_no = unpack('<I', f.read(4))[0]
+        scale        = unpack('<3f', f.read(4 * 3))
+
+        object = {
+            type: type,
+            id: id,
+            unk: unk,
+            mtx: [mtx_a, mtx_b, mtx_c]
+        }
+
+        print(magic)
+        mission_objects.append(object)
+

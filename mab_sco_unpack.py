@@ -1,4 +1,5 @@
 from struct import *
+import json
 
 def read_rgltag():
     size = unpack('<I', f.read(4))[0]
@@ -17,24 +18,24 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
 
     mission_objects = []
 
+    object_type = ['prop', 'entry', 'item', 'unused', 'plant', 'passage']
+
     for i in range(object_count):
-        type = unpack('<I', f.read(4))[0]
-        id   = unpack('<I', f.read(4))[0]
-        unk  = unpack('<I', f.read(4))[0]
+        type   = unpack('<I', f.read(4))[0]
+        id     = unpack('<I', f.read(4))[0]
+        unk    = unpack('<I', f.read(4))[0]
         mtx_a  = unpack('<3f', f.read(4 * 3))
         mtx_b  = unpack('<3f', f.read(4 * 3))
         mtx_c  = unpack('<3f', f.read(4 * 3))
-
-        pos          = unpack('<3f', f.read(4 * 3))
-
-        str = read_rgltag()
+        pos    = unpack('<3f', f.read(4 * 3))
+        str    = read_rgltag()
 
         entry_no     = unpack('<I', f.read(4))[0]
         menu_item_no = unpack('<I', f.read(4))[0]
         scale        = unpack('<3f', f.read(4 * 3))
 
         object = {
-            'type': type,
+            'type': object_type[type],
             'id': id,
             'unk': unk,
             'mtx': [mtx_a, mtx_b, mtx_c],
@@ -45,6 +46,8 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
             'scale': scale,
         }
 
-        print(magic)
+        print(i, object_type[type], str, entry_no)
         mission_objects.append(object)
 
+
+print(json.dumps(obj=mission_objects, indent=4))

@@ -34,10 +34,15 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
         scale        = unpack('<3f', f.read(4 * 3))
 
         object = {
-            type: type,
-            id: id,
-            unk: unk,
-            mtx: [mtx_a, mtx_b, mtx_c]
+            'type': type,
+            'id': id,
+            'unk': unk,
+            'mtx': [mtx_a, mtx_b, mtx_c],
+            'pos': pos,
+            'str': str,
+            'entry_no': entry_no,
+            'menu_entry_no': menu_item_no,
+            'scale': scale,
         }
 
         print(magic)

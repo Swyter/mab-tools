@@ -49,17 +49,26 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
         print(i, object_type[type], str, entry_no)
         mission_objects.append(object)
     
-    ai_mesh = []
+    ai_mesh = {'vertices': [], 'edges': [], 'faces': []}
 
     section_size = unpack('<I', f.read(4))[0]
     vertex_count = unpack('<I', f.read(4))[0]
 
-    vtx = unpack('<3f', f.read(4 * 3))
+    for i in range(vertex_count):
+        vertex = unpack('<3f', f.read(4 * 3))
+        ai_mesh['vertices'].append(vertex)
 
     edge_count = unpack('<I', f.read(4))[0]
-    edge = unpack('<5I', f.read(4 * 5))
+
+    for i in range(edge_count):
+        edge = unpack('<5I', f.read(4 * 5))
+        ai_mesh['edges'].append(edge)
 
     face_count = unpack('<I', f.read(4))[0]
-    face = unpack('<5I', f.read(4 * 5))
+
+    for i in range(face_count):
+        face = unpack('<5I', f.read(4 * 5))
+
+        ai_mesh['faces'].append(face)
 
 print(json.dumps(obj=mission_objects, indent=2, ensure_ascii=False))

@@ -1,5 +1,5 @@
 from struct import *
-import json
+import json, os
 
 def read_rgltag():
     size = unpack('<I', f.read(4))[0]
@@ -10,7 +10,13 @@ def read_rgltag():
     return str
 
 
-with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale.sco', mode='rb') as f:
+path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale.sco'
+
+scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
+
+os.makedirs(scene_file, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
+
+with open(path, mode='rb') as f:
     magic = unpack('<I', f.read(4))[0]; assert(magic == 0xFFFFFD33)
     versi = unpack('<I', f.read(4))[0]; assert(versi == 4)
 
@@ -125,8 +131,9 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
 
                 ground[layer_str].append(elem)
 
+            # swy: floating point grayscale with the raw terrain height at each point
             if layer_str == 'ground_elevation':
-                with open(f"{layer_str}.pfm", mode='wb') as fw:
+                with open(f"{scene_file}/{layer_str}.pfm", mode='wb') as fw:
                     # swy: format spec at http://netpbm.sourceforge.net/doc/pfm.html;
                     #      small three-line ASCII header with binary floats afterwards. e.g.: 
                     #      Pf
@@ -136,8 +143,10 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
 
                     flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
                     fw.write(pack(f'<{scene_width * scene_height}f', *flattened_list))
+
+            # swy: unsigned byte (0-254) grayscale with the amount of paint
             elif not layer_str == 'ground_leveling':
-                with open(f"{layer_str}.pgm", mode='wb') as fw:
+                with open(f"{scene_file}/{layer_str}.pgm", mode='wb') as fw:
                     # swy: format spec at http://netpbm.sourceforge.net/doc/pgm.html;
                     #      small three-line ASCII header with binary floats afterwards. e.g.: 
                     #      P5
@@ -148,4 +157,8 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
                     flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
                     fw.write(pack(f'<{scene_width * scene_height}B', *flattened_list))
 
-print(json.dumps(obj=mission_objects, indent=2, ensure_ascii=False))
+js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
+print(js)
+
+with open(f"{scene_file}/mission_objects.json", mode='w') as fw:
+    fw.write(js)

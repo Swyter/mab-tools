@@ -126,12 +126,26 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
                 ground[layer_str].append(elem)
 
             if layer_str == 'ground_elevation':
-                with open("test.pfm", mode='wb') as f:
-                    # swy: format spec; small three-line ASCII header with binary floats afterwards: http://netpbm.sourceforge.net/doc/pfm.html
-                    f.write(f'Pf\n{scene_width} {scene_height}\n-1.000\n'.encode('utf-8')) # swy: PF has color, Pf is grayscale. align the first binary bytes to 16 bytes with the extra .000 in the ASCII part, make the number negative to let the program that we're using little-endian
+                with open(f"{layer_str}.pfm", mode='wb') as fw:
+                    # swy: format spec at http://netpbm.sourceforge.net/doc/pfm.html;
+                    #      small three-line ASCII header with binary floats afterwards. e.g.: 
+                    #      Pf
+                    #      71 71
+                    #      -1.000
+                    fw.write(f'Pf\n{scene_width} {scene_height}\n-1.000\n'.encode('utf-8')) # swy: PF has RGB color, Pf is grayscale. align the first binary bytes to 16 bytes with the extra padded .000 in the ASCII part, make the number negative to let the program know that we're using little-endian floats
 
                     flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
-                    f.write(pack(f'<{scene_width * scene_height}f', *flattened_list))
+                    fw.write(pack(f'<{scene_width * scene_height}f', *flattened_list))
+            elif not layer_str == 'ground_leveling':
+                with open(f"{layer_str}.pgm", mode='wb') as fw:
+                    # swy: format spec at http://netpbm.sourceforge.net/doc/pgm.html;
+                    #      small three-line ASCII header with binary floats afterwards. e.g.: 
+                    #      P5
+                    #      71 71
+                    #      255
+                    fw.write(f'P5\n{scene_width} {scene_height}\n255\n'.encode('utf-8'))
 
+                    flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
+                    fw.write(pack(f'<{scene_width * scene_height}B', *flattened_list))
 
 print(json.dumps(obj=mission_objects, indent=2, ensure_ascii=False))

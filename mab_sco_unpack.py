@@ -127,7 +127,8 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
 
             if layer_str == 'ground_elevation':
                 with open("test.pfm", mode='wb') as f:
-                    f.write(f'Pf\n{scene_width} {scene_height}\n-1.000\n'.encode('utf-8')) # swy: align the first binary bytes to 16 bytes with the extra .000 in the ASCII part, make the number negative to let the program that we're using little-endian
+                    # swy: format spec; small three-line ASCII header with binary floats afterwards: http://netpbm.sourceforge.net/doc/pfm.html
+                    f.write(f'Pf\n{scene_width} {scene_height}\n-1.000\n'.encode('utf-8')) # swy: PF has color, Pf is grayscale. align the first binary bytes to 16 bytes with the extra .000 in the ASCII part, make the number negative to let the program that we're using little-endian
 
                     flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
                     f.write(pack(f'<{scene_width * scene_height}f', *flattened_list))

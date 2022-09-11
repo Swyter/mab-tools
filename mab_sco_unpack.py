@@ -51,7 +51,7 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
     
     ai_mesh = {'vertices': [], 'edges': [], 'faces': []}
 
-    section_size = unpack('<I', f.read(4))[0]
+    ai_mesh_section_size = unpack('<I', f.read(4))[0]
     vertex_count = unpack('<I', f.read(4))[0]
 
     for i in range(vertex_count):
@@ -75,5 +75,20 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
         ai_mesh_id = has_more and unpack('<I', f.read(4))[0] or 0
 
         ai_mesh['faces'].append({'edge_count': edge_count, 'face': face, 'edge': edge, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
+
+
+    terrain_magic = unpack('<I', f.read(4))[0]; assert(terrain_magic == 0xFF4AD1A6)
+    terrain_section_size = unpack('<I', f.read(4))[0]
+    num_layers = unpack('<I', f.read(4))[0]
+    scene_width = unpack('<I', f.read(4))[0]
+    scene_height = unpack('<I', f.read(4))[0]
+
+    ground = []
+
+    for i in range(num_layers):
+        index = unpack('<I', f.read(4))[0]
+        layer_str = read_rgltag()
+        enabled = unpack('<I', f.read(4))[0]
+
 
 print(json.dumps(obj=mission_objects, indent=2, ensure_ascii=False))

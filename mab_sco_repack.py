@@ -4,7 +4,7 @@ import json, os
 def write_rgltag(str):
     str_enc = str.encode('utf-8'); str_enc_len = len(str_enc)
     f.write(pack('<I', str_enc_len))
-    pack(f'{str_enc_len}s', str_enc)
+    f.write(pack(f'{str_enc_len}s', str_enc))
 
 
 path = './scn_advcamp_dale.sco'
@@ -27,16 +27,16 @@ with open(path, mode='wb') as f:
     for i, object in enumerate(mission_objects):
         f.write(pack('<I',  object_type[object["type"]]))
         f.write(pack('<I',  object["id"]))
-        f.write(pack('<I',  int(object["garbage"])))
-        f.write(pack('<3f', object["mtx_a"]))
-        f.write(pack('<3f', object["mtx_b"]))
-        f.write(pack('<3f', object["mtx_c"]))
-        f.write(pack('<3f', object["pos"]))
+        f.write(pack('<I',  int(object["garbage"], 16)))
+        f.write(pack('<3f', *object["rotation_matrix"][0]))
+        f.write(pack('<3f', *object["rotation_matrix"][1]))
+        f.write(pack('<3f', *object["rotation_matrix"][2]))
+        f.write(pack('<3f', *object["pos"]))
         write_rgltag(object["str"])
 
         f.write(pack('<I',  object["entry_no"]))
-        f.write(pack('<I',  object["menu_item_no"]))
-        f.write(pack('<3f', object["scale"]))
+        f.write(pack('<I',  object["menu_entry_no"]))
+        f.write(pack('<3f', *object["scale"]))
     
     exit()
 

@@ -119,6 +119,12 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
                 else:
                     elem = unpack(f'<{elem_count}B', f.read(1 * elem_count))
 
+
+                if layer_str == 'ground_elevation':
+                    with open("test.pfm", mode='wb') as f:
+                        f.write(f'PF\n{scene_width} {scene_height}\n1.0\n'.encode('utf-8'))
+                        f.write(pack(f'<{elem_count}f', *elem))
+
                 ground[layer_str].append(elem)
 
 

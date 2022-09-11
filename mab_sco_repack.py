@@ -1,60 +1,45 @@
 from struct import *
 import json, os
 
-def read_rgltag():
-    size = unpack('<I', f.read(4))[0]
-    if not size:
-        return ''
-
-    str = unpack(f'{size}s', f.read(size))[0].decode('utf-8')
-    return str
+def write_rgltag(str):
+    str_enc = str.encode('utf-8'); str_enc_len = len(str_enc)
+    f.write(pack('<I', str_enc_len))
+    pack(f'{str_enc_len}s', str_enc)
 
 
-path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale.sco'
+path = './scn_advcamp_dale.sco'
 
 scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
 
-os.makedirs(scene_file, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
+with open(path, mode='wb') as f:
+    f.write(pack('<I', 0xFFFFFD33))
+    f.write(pack('<I', 4))
 
-with open(path, mode='rb') as f:
-    magic = unpack('<I', f.read(4))[0]; assert(magic == 0xFFFFFD33)
-    versi = unpack('<I', f.read(4))[0]; assert(versi == 4)
+    with open(f"{scene_file}/mission_objects.json") as f_json:
+       mission_objects = json.load(f_json)
 
-    object_count = unpack('<I', f.read(4))[0]
+    object_count = len(mission_objects)
 
-    mission_objects = []
+    f.write(pack('<I', object_count))
 
-    object_type = ['prop', 'entry', 'item', 'unused', 'plant', 'passage']
+    object_type = {'prop': 0, 'entry': 1, 'item': 2, 'unused': 3, 'plant': 4, 'passage': 5}
 
-    for i in range(object_count):
-        type    = unpack('<I',  f.read(4    ))[0]
-        id      = unpack('<I',  f.read(4    ))[0]
-        garbage = unpack('<I',  f.read(4    ))[0]
-        mtx_a   = unpack('<3f', f.read(4 * 3))
-        mtx_b   = unpack('<3f', f.read(4 * 3))
-        mtx_c   = unpack('<3f', f.read(4 * 3))
-        pos     = unpack('<3f', f.read(4 * 3))
-        str     = read_rgltag()
+    for i, object in enumerate(mission_objects):
+        f.write(pack('<I',  object_type[object["type"]]))
+        f.write(pack('<I',  object["id"]))
+        f.write(pack('<I',  int(object["garbage"])))
+        f.write(pack('<3f', object["mtx_a"]))
+        f.write(pack('<3f', object["mtx_b"]))
+        f.write(pack('<3f', object["mtx_c"]))
+        f.write(pack('<3f', object["pos"]))
+        write_rgltag(object["str"])
 
-        entry_no     = unpack('<I',  f.read(4    ))[0]
-        menu_item_no = unpack('<I',  f.read(4    ))[0]
-        scale        = unpack('<3f', f.read(4 * 3))
-
-        object = {
-            'type': object_type[type],
-            'id': id,
-            'garbage': '%0#x' % garbage,
-            'rotation_matrix': [mtx_a, mtx_b, mtx_c],
-            'pos': pos,
-            'str': str,
-            'entry_no': entry_no,
-            'menu_entry_no': menu_item_no,
-            'scale': scale,
-        }
-
-        print(i, object_type[type], str, entry_no)
-        mission_objects.append(object)
+        f.write(pack('<I',  object["entry_no"]))
+        f.write(pack('<I',  object["menu_item_no"]))
+        f.write(pack('<3f', object["scale"]))
     
+    exit()
+
     ai_mesh = {'vertices': [], 'edges': [], 'faces': []}
 
     ai_mesh_section_size = unpack('<I', f.read(4))[0]

@@ -110,7 +110,10 @@ with open(path, mode='rb') as f:
                 rle = unpack('<I', f.read(4))[0]
 
                 if rle:
-                    ground[layer_str].append(([0] * rle))
+                    if layer_str == 'ground_leveling':
+                        ground[layer_str].append(([0xFFFFFF] * rle)) # swy: make empty RGB vertex paint cells white
+                    else:
+                        ground[layer_str].append(([       0] * rle)) # swy: otherwise make them pure black
 
                 remaining_blocks -= rle
 

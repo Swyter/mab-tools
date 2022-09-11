@@ -150,9 +150,11 @@ with open(path, mode='rb') as f:
 
                     # swy: reverse the row ordering because the PFM format is from bottom to top, unlike every other NetPBM one, of course :)
                     for i in reversed(range(scene_height)):
-                        reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width]
+                        reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width] # swy: grab one "line" worth of data from the farthest point, and add it first; sort them backwards
 
                     fw.write(pack(f'<{scene_width * scene_height}f', *reversed_list))
+
+            # swy: Red/Green/Blue vertex coloring/terrain tinting
             elif layer_str == 'ground_leveling':
                 with open(f"{scene_file}/layer_{layer_str}.ppm", mode='wb') as fw:
                     # swy: format spec at http://netpbm.sourceforge.net/doc/ppm.html; scanlines from left to right, from TOP to bottom
@@ -166,7 +168,8 @@ with open(path, mode='rb') as f:
 
                     for elem in flattened_list:
                         fw.write(pack(f'<3B', (elem >> 8*2) & 0xFF, (elem >> 8*1) & 0xFF, (elem >> 8*0) & 0xFF))
-            # swy: unsigned byte (0-254) grayscale with the amount of paint
+
+            # swy: unsigned byte (0-254) grayscale with the amount of paint for this material/layer
             elif not layer_str == 'ground_leveling':
                 with open(f"{scene_file}/layer_{layer_str}.pgm", mode='wb') as fw:
                     # swy: format spec at http://netpbm.sourceforge.net/doc/pgm.html; scanlines from left to right, from TOP to bottom

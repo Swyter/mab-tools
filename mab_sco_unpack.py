@@ -155,8 +155,8 @@ with open(path, mode='rb') as f:
                     flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
 
                     for elem in flattened_list:
-                        print(hex(elem), hex((elem >> 8*3) & 0xF), hex((elem >> 8*2) & 0xF), hex((elem >> 8*1) & 0xF))
-                        fw.write(pack(f'<3B', (elem >> 8*3) & 0xF, (elem >> 8*2) & 0xF, (elem >> 8*1) & 0xF))
+                        print(hex(elem), hex((elem >> 8*3) & 0xFF), hex((elem >> 8*2) & 0xFF), hex((elem >> 8*1) & 0xFF))
+                        fw.write(pack(f'<3B', (elem >> 8*3) & 0xFF, (elem >> 8*2) & 0xFF, (elem >> 8*1) & 0xFF))
             # swy: unsigned byte (0-254) grayscale with the amount of paint
             elif not layer_str == 'ground_leveling':
                 with open(f"{scene_file}/layer_{layer_str}.pgm", mode='wb') as fw:

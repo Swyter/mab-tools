@@ -44,6 +44,18 @@ with open(path, mode='wb') as f:
     f.write(pack('<I', 0)) # edge_count
     f.write(pack('<I', 0)) # face_count
 
+    ground_layer_look_up = {
+        'gray_stone.pgm': 0, 'brown_stone.pgm': 1, 'turf.pgm': 2, 'steppe.pgm': 3, 'snow.pgm': 4, 'earth.pgm': 5, 'desert.pgm': 6, 'forest.pgm': 7,
+        'pebbles.pgm': 8, 'village.pgm': 9, 'path.pgm': 10, 'ground_elevation.pfm': -7793, 'ground_leveling.ppm': -12565
+    }
+
+    last_scene_width, last_scene_height = 0
+
+    for i, ground_layer in enumerate(ground_layer_look_up):
+
+        with open(f"{scene_file}/{ground_layer}") as f_image:
+            print(ground_layer)
+
 
     f.write(pack('<I', 0xFF4AD1A6)) # swy: terrain_magic value
     f.write(pack('<I', 4*4)) # swy: terrain_section_size

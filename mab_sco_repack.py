@@ -12,8 +12,8 @@ path = './scn_advcamp_dale.sco'
 scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
 
 with open(path, mode='wb') as f:
-    f.write(pack('<I', 0xFFFFFD33))
-    f.write(pack('<I', 4))
+    f.write(pack('<I', 0xFFFFFD33)) # swy: magic value
+    f.write(pack('<I', 4)) # swy: SCO file version
 
     with open(f"{scene_file}/mission_objects.json") as f_json:
        mission_objects = json.load(f_json)
@@ -34,10 +34,15 @@ with open(path, mode='wb') as f:
         f.write(pack('<3f', *object["pos"]))
         write_rgltag(object["str"])
 
-        f.write(pack('<I',  object["entry_no"]))
-        f.write(pack('<I',  object["menu_entry_no"]))
+        f.write(pack('<I',   object["entry_no"]))
+        f.write(pack('<I',   object["menu_entry_no"]))
         f.write(pack('<3f', *object["scale"]))
     
+    f.write(pack('<I', 4*4)) # ai_mesh_section_size
+    f.write(pack('<I', 0)) # vertex_count
+    f.write(pack('<I', 0)) # edge_count
+    f.write(pack('<I', 0)) # face_count
+
     exit()
 
     ai_mesh = {'vertices': [], 'edges': [], 'faces': []}

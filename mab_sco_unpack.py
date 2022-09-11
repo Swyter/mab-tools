@@ -10,7 +10,7 @@ def read_rgltag():
     return str
 
 
-path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale.sco'
+path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_center.sco'
 
 scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
 
@@ -27,14 +27,14 @@ with open(path, mode='rb') as f:
     object_type = ['prop', 'entry', 'item', 'unused', 'plant', 'passage']
 
     for i in range(object_count):
-        type   = unpack('<I',  f.read(4    ))[0]
-        id     = unpack('<I',  f.read(4    ))[0]
-        unk    = unpack('<I',  f.read(4    ))[0]
-        mtx_a  = unpack('<3f', f.read(4 * 3))
-        mtx_b  = unpack('<3f', f.read(4 * 3))
-        mtx_c  = unpack('<3f', f.read(4 * 3))
-        pos    = unpack('<3f', f.read(4 * 3))
-        str    = read_rgltag()
+        type    = unpack('<I',  f.read(4    ))[0]
+        id      = unpack('<I',  f.read(4    ))[0]
+        garbage = unpack('<I',  f.read(4    ))[0]
+        mtx_a   = unpack('<3f', f.read(4 * 3))
+        mtx_b   = unpack('<3f', f.read(4 * 3))
+        mtx_c   = unpack('<3f', f.read(4 * 3))
+        pos     = unpack('<3f', f.read(4 * 3))
+        str     = read_rgltag()
 
         entry_no     = unpack('<I',  f.read(4    ))[0]
         menu_item_no = unpack('<I',  f.read(4    ))[0]
@@ -43,8 +43,8 @@ with open(path, mode='rb') as f:
         object = {
             'type': object_type[type],
             'id': id,
-            'unk': '%0#x' % unk,
-            'mtx': [mtx_a, mtx_b, mtx_c],
+            'garbage': '%0#x' % garbage,
+            'rotation_matrix': [mtx_a, mtx_b, mtx_c],
             'pos': pos,
             'str': str,
             'entry_no': entry_no,
@@ -122,18 +122,18 @@ with open(path, mode='rb') as f:
                 remaining_blocks -= elem_count
 
                 if layer_str == 'ground_elevation':
-                    elem = unpack(f'<{elem_count}f', f.read(4 * elem_count))
+                    elem = unpack(f'<{elem_count}f', f.read(4 * elem_count)) # swy: 4-byte float
                 elif layer_str == 'ground_leveling':
-                    elem = unpack(f'<{elem_count}I', f.read(4 * elem_count))
+                    elem = unpack(f'<{elem_count}I', f.read(4 * elem_count)) # swy: 4-byte unsigned integer (uint) that holds vertex coloring
                 else:
-                    elem = unpack(f'<{elem_count}B', f.read(1 * elem_count))
+                    elem = unpack(f'<{elem_count}B', f.read(1 * elem_count)) # swy: 1 unsigned byte
 
 
                 ground[layer_str].append(elem)
 
             # swy: floating point grayscale with the raw terrain height at each point
             if layer_str == 'ground_elevation':
-                with open(f"{scene_file}/{layer_str}.pfm", mode='wb') as fw:
+                with open(f"{scene_file}/layer_{layer_str}.pfm", mode='wb') as fw:
                     # swy: format spec at http://netpbm.sourceforge.net/doc/pfm.html;
                     #      small three-line ASCII header with binary floats afterwards. e.g.: 
                     #      Pf
@@ -146,7 +146,7 @@ with open(path, mode='rb') as f:
 
             # swy: unsigned byte (0-254) grayscale with the amount of paint
             elif not layer_str == 'ground_leveling':
-                with open(f"{scene_file}/{layer_str}.pgm", mode='wb') as fw:
+                with open(f"{scene_file}/layer_{layer_str}.pgm", mode='wb') as fw:
                     # swy: format spec at http://netpbm.sourceforge.net/doc/pgm.html;
                     #      small three-line ASCII header with binary floats afterwards. e.g.: 
                     #      P5

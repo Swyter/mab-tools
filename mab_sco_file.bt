@@ -39,7 +39,7 @@ string read_rgltag(struct rgltag& _thing)
         return _thing.s;
 }
 
-typedef union { uint val <format=hex>; struct { byte r,g,b,a; } chan; } rglcolor;
+typedef union { uint val <format=hex>; struct { ubyte r,g,b,a; } chan; } rglcolor;
 
 
 struct

@@ -83,12 +83,43 @@ with open('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_
     scene_width = unpack('<I', f.read(4))[0]
     scene_height = unpack('<I', f.read(4))[0]
 
-    ground = []
+    block_count = scene_width * scene_height
+
+    ground = {}
 
     for i in range(num_layers):
         index = unpack('<I', f.read(4))[0]
         layer_str = read_rgltag()
         enabled = unpack('<I', f.read(4))[0]
+
+
+        ground[layer_str] = []
+
+        print(">> ", index, layer_str, enabled)
+
+        if enabled:
+            remaining_blocks = block_count
+
+            while remaining_blocks > 0:
+                rle = unpack('<I', f.read(4))[0]
+
+                remaining_blocks -= rle
+
+                if remaining_blocks <= 0:
+                    break
+
+                elem_count = unpack('<I', f.read(4))[0]
+
+                remaining_blocks -= elem_count
+
+                if layer_str == 'ground_elevation':
+                    elem = unpack(f'<{elem_count}f', f.read(4 * elem_count))
+                elif layer_str == 'ground_leveling':
+                    elem = unpack(f'<{elem_count}I', f.read(4 * elem_count))
+                else:
+                    elem = unpack(f'<{elem_count}B', f.read(1 * elem_count))
+
+                ground[layer_str].append(elem)
 
 
 print(json.dumps(obj=mission_objects, indent=2, ensure_ascii=False))

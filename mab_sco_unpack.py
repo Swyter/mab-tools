@@ -10,7 +10,7 @@ def read_rgltag():
     return str
 
 
-path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_village_rohan.sco'
+path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale.sco'
 
 scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
 
@@ -134,7 +134,7 @@ with open(path, mode='rb') as f:
 
                 ground[layer_str].append(elem)
 
-            # swy: floating point grayscale with the raw terrain height at each point
+            # swy: floating point grayscale with the raw terrain height at each point. Note: Photoshop 2017 wrongly loads these files vertically flipped
             if layer_str == 'ground_elevation':
                 with open(f"{scene_file}/layer_{layer_str}.pfm", mode='wb') as fw:
                     # swy: format spec at http://netpbm.sourceforge.net/doc/pfm.html; scanlines from left to right, from BOTTOM to top
@@ -145,12 +145,11 @@ with open(path, mode='rb') as f:
                     fw.write(f'Pf\n{scene_width} {scene_height}\n-1.000\n'.encode('utf-8')) # swy: PF has RGB color, Pf is grayscale. align the first binary bytes to 16 bytes with the extra padded .000 in the ASCII part, make the number negative to let the program know that we're using little-endian floats
 
                     flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
-
                     reversed_list = []
 
                     # swy: reverse the row ordering because the PFM format is from bottom to top, unlike every other NetPBM one, of course :)
                     for i in reversed(range(scene_height)):
-                        reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width] # swy: grab one "line" worth of data from the farthest point, and add it first; sort them backwards
+                        reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width][::-1] # swy: grab one "line" worth of data from the farthest point, and add it first; sort them backwards
 
                     fw.write(pack(f'<{scene_width * scene_height}f', *reversed_list))
 
@@ -165,8 +164,12 @@ with open(path, mode='rb') as f:
                     fw.write(f'P6\n{scene_width} {scene_height}\n255\n'.encode('utf-8'))
 
                     flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
+                    reversed_list = []
+                    # swy: flip or mirror each row from right-to-left to left-to-right
+                    for i in range(scene_height):
+                        reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width][::-1]
 
-                    for elem in flattened_list:
+                    for elem in reversed_list:
                         fw.write(pack(f'<3B', (elem >> 8*2) & 0xFF, (elem >> 8*1) & 0xFF, (elem >> 8*0) & 0xFF))
 
             # swy: unsigned byte (0-254) grayscale with the amount of paint for this material/layer
@@ -180,7 +183,12 @@ with open(path, mode='rb') as f:
                     fw.write(f'P5\n{scene_width} {scene_height}\n255\n'.encode('utf-8'))
 
                     flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
-                    fw.write(pack(f'<{scene_width * scene_height}B', *flattened_list))
+                    reversed_list = []
+                    # swy: flip or mirror each row from right-to-left to left-to-right
+                    for i in range(scene_height):
+                        reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width][::-1]
+
+                    fw.write(pack(f'<{scene_width * scene_height}B', *reversed_list))
 
 js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
 print(js)

@@ -10,7 +10,7 @@ def read_rgltag():
     return str
 
 
-path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_lebennin_coast_3.sco'
+path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_village_rohan.sco'
 
 scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
 
@@ -137,7 +137,7 @@ with open(path, mode='rb') as f:
             # swy: floating point grayscale with the raw terrain height at each point
             if layer_str == 'ground_elevation':
                 with open(f"{scene_file}/layer_{layer_str}.pfm", mode='wb') as fw:
-                    # swy: format spec at http://netpbm.sourceforge.net/doc/pfm.html;
+                    # swy: format spec at http://netpbm.sourceforge.net/doc/pfm.html; scanlines from left to right, from BOTTOM to top
                     #      small three-line ASCII header with binary floats afterwards. e.g.: 
                     #      Pf
                     #      71 71
@@ -145,12 +145,19 @@ with open(path, mode='rb') as f:
                     fw.write(f'Pf\n{scene_width} {scene_height}\n-1.000\n'.encode('utf-8')) # swy: PF has RGB color, Pf is grayscale. align the first binary bytes to 16 bytes with the extra padded .000 in the ASCII part, make the number negative to let the program know that we're using little-endian floats
 
                     flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
-                    fw.write(pack(f'<{scene_width * scene_height}f', *flattened_list))
+
+                    reversed_list = []
+
+                    # swy: reverse the row ordering because the PFM format is from bottom to top, unlike every other NetPBM one, of course :)
+                    for i in reversed(range(scene_height)):
+                        reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width]
+
+                    fw.write(pack(f'<{scene_width * scene_height}f', *reversed_list))
             elif layer_str == 'ground_leveling':
                 with open(f"{scene_file}/layer_{layer_str}.ppm", mode='wb') as fw:
-                    # swy: format spec at http://netpbm.sourceforge.net/doc/pgm.html;
+                    # swy: format spec at http://netpbm.sourceforge.net/doc/ppm.html; scanlines from left to right, from TOP to bottom
                     #      small three-line ASCII header with binary floats afterwards. e.g.: 
-                    #      P5
+                    #      P6
                     #      71 71
                     #      255
                     fw.write(f'P6\n{scene_width} {scene_height}\n255\n'.encode('utf-8'))
@@ -162,7 +169,7 @@ with open(path, mode='rb') as f:
             # swy: unsigned byte (0-254) grayscale with the amount of paint
             elif not layer_str == 'ground_leveling':
                 with open(f"{scene_file}/layer_{layer_str}.pgm", mode='wb') as fw:
-                    # swy: format spec at http://netpbm.sourceforge.net/doc/pgm.html;
+                    # swy: format spec at http://netpbm.sourceforge.net/doc/pgm.html; scanlines from left to right, from TOP to bottom
                     #      small three-line ASCII header with binary floats afterwards. e.g.: 
                     #      P5
                     #      71 71

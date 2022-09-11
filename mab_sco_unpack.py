@@ -143,7 +143,17 @@ with open(path, mode='rb') as f:
 
                     flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
                     fw.write(pack(f'<{scene_width * scene_height}f', *flattened_list))
+            elif layer_str == 'ground_leveling':
+                with open(f"{scene_file}/layer_{layer_str}.pgm", mode='wb') as fw:
+                    # swy: format spec at http://netpbm.sourceforge.net/doc/pgm.html;
+                    #      small three-line ASCII header with binary floats afterwards. e.g.: 
+                    #      P5
+                    #      71 71
+                    #      255
+                    fw.write(f'P6\n{scene_width} {scene_height}\n255\n'.encode('utf-8'))
 
+                    flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
+                    fw.write(pack(f'<{scene_width * scene_height}I', *flattened_list))
             # swy: unsigned byte (0-254) grayscale with the amount of paint
             elif not layer_str == 'ground_leveling':
                 with open(f"{scene_file}/layer_{layer_str}.pgm", mode='wb') as fw:

@@ -8,6 +8,7 @@ def write_rgltag(str):
 
 
 path = './scn_advcamp_dale.sco'
+path_to_source_sco_to_grab_aimesh_and_terrain_from = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale.sco'
 
 scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
 
@@ -49,7 +50,27 @@ with open(path, mode='wb') as f:
         'pebbles.pgm': 8, 'village.pgm': 9, 'path.pgm': 10, 'ground_elevation.pfm': -7793, 'ground_leveling.ppm': -12565
     }
 
-    last_scene_width, last_scene_height = 0
+    # swy: copy the AI mesh and ground stuff over from the other SCO file
+    with open(path_to_source_sco_to_grab_aimesh_and_terrain_from, mode='rb') as wf:
+        magic = unpack('<I', wf.read(4))[0]; assert(magic == 0xFFFFFD33)
+        versi = unpack('<I', wf.read(4))[0]; assert(versi == 4)
+
+        object_count = unpack('<I', wf.read(4))[0]
+
+        for i in range(object_count):
+            print(i, "offset a", hex(wf.tell()))
+            wf.seek(0x3c, os.SEEK_CUR);
+            rgltag_len = unpack('<I', wf.read(4))[0]
+            wf.seek(rgltag_len + (4*2) + (4*3), os.SEEK_CUR);
+            print(i, "offset b", hex(wf.tell()))
+
+        print("offset", hex(wf.tell()))
+        f.write(wf.read())
+    exit()
+
+
+
+    last_scene_width = 0; last_scene_height = 0
 
     for i, ground_layer in enumerate(ground_layer_look_up):
 

@@ -6,18 +6,21 @@ def write_rgltag(str):
     f.write(pack('<I', str_enc_len))
     f.write(pack(f'{str_enc_len}s', str_enc))
 
-# swy: target/output SCO file location with the combined data, for a «scn_advcamp_dale.sco»
-#      it will read the unpacked data from a «scn_advcamp_dale» in the same folder as this script
+# swy: source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data
+#      from a «scn_advcamp_dale» directory in the same folder as this script
 path  = './scn_advcamp_dale.sco'
 
 # swy: donor SCO with the AI mesh and terrain stuff you want to copy over to the file above;
 #      probably the original SCO file, it can't be the same file you want to write to
 donor = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale_rgb_mod.sco'
 
+# swy: target/output SCO file location with the combined data
+output = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale.sco'
+
 scene_file =  path.replace('\\', '/').split('/')[-1].split('.')[0]
 donor_file = donor.replace('\\', '/').split('/')[-1].split('.')[0]
 
-with open(path, mode='wb') as f:
+with open(output, mode='wb') as f:
     f.write(pack('<I', 0xFFFFFD33)) # swy: magic value
     f.write(pack('<I', 4)) # swy: SCO file version
 

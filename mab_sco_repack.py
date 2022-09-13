@@ -6,11 +6,16 @@ def write_rgltag(str):
     f.write(pack('<I', str_enc_len))
     f.write(pack(f'{str_enc_len}s', str_enc))
 
+# swy: target/output SCO file location with the combined data, for a «scn_advcamp_dale.sco»
+#      it will read the unpacked data from a «scn_advcamp_dale» in the same folder as this script
+path  = './scn_advcamp_dale.sco'
 
-path = './scn_advcamp_dale.sco'
-path_to_source_sco_to_grab_aimesh_and_terrain_from = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale.sco'
+# swy: donor SCO with the AI mesh and terrain stuff you want to copy over to the file above;
+#      probably the original SCO file, it can't be the same file you want to write to
+donor = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale_rgb_mod.sco'
 
-scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
+scene_file =  path.replace('\\', '/').split('/')[-1].split('.')[0]
+donor_file = donor.replace('\\', '/').split('/')[-1].split('.')[0]
 
 with open(path, mode='wb') as f:
     f.write(pack('<I', 0xFFFFFD33)) # swy: magic value
@@ -39,11 +44,11 @@ with open(path, mode='wb') as f:
         f.write(pack('<I',   object["menu_entry_no"]))
         f.write(pack('<3f', *object["scale"]))
     
-    # swy: stub this AI mesh section for now; this is empty
-    f.write(pack('<I', 4*3)) # ai_mesh_section_size
-    f.write(pack('<I', 0)) # vertex_count
-    f.write(pack('<I', 0)) # edge_count
-    f.write(pack('<I', 0)) # face_count
+#   # swy: stub this AI mesh section for now; this is empty
+#   f.write(pack('<I', 4*3)) # ai_mesh_section_size
+#   f.write(pack('<I', 0)) # vertex_count
+#   f.write(pack('<I', 0)) # edge_count
+#   f.write(pack('<I', 0)) # face_count
 
     ground_layer_look_up = {
         'gray_stone.pgm': 0, 'brown_stone.pgm': 1, 'turf.pgm': 2, 'steppe.pgm': 3, 'snow.pgm': 4, 'earth.pgm': 5, 'desert.pgm': 6, 'forest.pgm': 7,
@@ -51,20 +56,22 @@ with open(path, mode='wb') as f:
     }
 
     # swy: copy the AI mesh and ground stuff over from the other SCO file
-    with open(path_to_source_sco_to_grab_aimesh_and_terrain_from, mode='rb') as wf:
+    with open(donor, mode='rb') as wf:
         magic = unpack('<I', wf.read(4))[0]; assert(magic == 0xFFFFFD33)
         versi = unpack('<I', wf.read(4))[0]; assert(versi == 4)
 
+        # swy: walk over all the mission object/scene prop entries;
+        #      due to the text/strings each of them takes a variable amount of bytes
         object_count = unpack('<I', wf.read(4))[0]
 
         for i in range(object_count):
-            print(i, "offset a", hex(wf.tell()))
             wf.seek(0x3c, os.SEEK_CUR);
             rgltag_len = unpack('<I', wf.read(4))[0]
             wf.seek(rgltag_len + (4*2) + (4*3), os.SEEK_CUR);
-            print(i, "offset b", hex(wf.tell()))
 
-        print("offset", hex(wf.tell()))
+        # swy: we've reached the end of the mission object section; the AI mesh chunk starts here.
+        #      copy and paste the rest of the file
+        print(f"[i] AI mesh of donor {donor_file} starts at offset; copying from here onwards:", hex(wf.tell()))
         f.write(wf.read())
     exit()
 

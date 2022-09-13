@@ -68,9 +68,9 @@ with open(output, mode='wb') as f:
         object_count = unpack('<I', wf.read(4))[0]
 
         for i in range(object_count):
-            wf.seek(0x3c, os.SEEK_CUR);
+            wf.seek(4 + 4 + 4 + (4*3) + (4*3) + (4*3) + (4*3), os.SEEK_CUR);
             rgltag_len = unpack('<I', wf.read(4))[0]
-            wf.seek(rgltag_len + (4*2) + (4*3), os.SEEK_CUR);
+            wf.seek(rgltag_len + 4 + 4 + (4*3), os.SEEK_CUR);
 
         # swy: we've reached the end of the mission object section; the AI mesh chunk starts here.
         #      copy and paste the rest of the file

@@ -84,15 +84,23 @@ with open(output, mode='wb') as f:
 
         try:
             with open(f"{scene_file}/layer_{ground_layer}", 'rb') as f_image:
-                ext = ground_layer.split('.')[1]
+                ext = ground_layer.split('.')[1].lower()
+
                 ascii_header = [line.decode('utf-8').replace('\n', '').replace('\r', '').split(' ')  for line in [f_image.readline(),f_image.readline(),f_image.readline()]]
-                magic=ascii_header[0][0]
-                width =int(ascii_header[1][0])
-                height=int(ascii_header[1][1])
-                #if ext == 'pgm':
+                magic  =     ascii_header[0][0]
+                width  = int(ascii_header[1][0])
+                height = int(ascii_header[1][1])
+
+                print(f'[i] found {ground_layer}; type {magic}, {width} x {height}')
+                if   magic == 'P5' and ext == 'pgm':
+                    print('test pgm')
+                elif magic == 'P6' and ext == 'ppm':
+                    print('test ppm')
+                elif magic == 'Pf' and ext == 'pfm':
+                    print('test pfm')
                 #print(f_image.readline(),f_image.readline(),f_image.readline())
                 #print(ext, [h.decode('utf-8').replace('\n', '').replace('\r', '') for h in f_image.readlines()])
-                print(f'[i] found {ground_layer}; {magic} {width} x {height}')
+
 
         except FileNotFoundError:
             print(f'[!] no layer_{ground_layer} here, skipping...')

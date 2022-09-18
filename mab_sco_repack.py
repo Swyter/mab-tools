@@ -92,15 +92,14 @@ with open(output, mode='wb') as f:
                 width  = int(ascii_header[1][0])
                 height = int(ascii_header[1][1])
 
-                print(f'[i] found {ground_layer}; type {magic}, {width} x {height}')
+                maxval = float(ascii_header[2][0])
+
+                header_end_byte_offset = f_image.tell();                f_image.seek(0, io.SEEK_END)
+                bytes_remain = f_image.tell() - header_end_byte_offset; f_image.seek(header_end_byte_offset)
+
+                print(f'[i] found layer_{ground_layer}; type {magic}, {width} x {height}')
                 if magic == 'P5' and ext == 'pgm':
-                    header_maxval = float(ascii_header[2][0]); assert(header_maxval == 255)
-
-                    byte_offset = f_image.tell()
-                    f_image.seek(0, io.SEEK_END)
-                    bytes_remain = f_image.tell() - byte_offset
-                    f_image.seek(byte_offset)
-
+                    assert(maxval == 255)
                     bytes_to_read = width * height; assert(bytes_to_read == bytes_remain)
                     bytess = unpack(f'<{bytes_to_read}B', f_image.read(bytes_to_read))
                     print('test pgm')

@@ -79,7 +79,7 @@ with open(output, mode='wb') as f:
         'pebbles.pgm': 8, 'village.pgm': 9, 'path.pgm': 10, 'ground_elevation.pfm': -7793, 'ground_leveling.ppm': -12565
     }
 
-    last_scene_width = 0; last_scene_height = 0
+    last_scene_width = None; last_scene_height = None
 
     for i, ground_layer in enumerate(ground_layer_look_up):
 
@@ -96,6 +96,18 @@ with open(output, mode='wb') as f:
 
                 header_end_byte_offset = f_image.tell();                f_image.seek(0, io.SEEK_END)
                 bytes_remain = f_image.tell() - header_end_byte_offset; f_image.seek(header_end_byte_offset)
+
+                if not last_scene_width:
+                    last_scene_width = width
+                else:
+                    if last_scene_width != width:
+                        print('[e] the width of all layer images must match')
+                        
+                if not last_scene_height:
+                    last_scene_height = height
+                else:
+                    if last_scene_height != height:
+                        print('[e] the height of all layer images must match')
 
                 print(f'[i] found layer_{ground_layer}; type {magic}, {width} x {height}')
                 if magic == 'P5' and ext == 'pgm':

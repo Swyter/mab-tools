@@ -93,6 +93,9 @@ with open(output, mode='wb') as f:
 
                 print(f'[i] found {ground_layer}; type {magic}, {width} x {height}')
                 if   magic == 'P5' and ext == 'pgm':
+                    header_maxval = int(ascii_header[2][0])
+                    bytes_to_read = width * height
+                    bytess=unpack(f'<{bytes_to_read}B', f_image.read(bytes_to_read))
                     print('test pgm')
                 elif magic == 'P6' and ext == 'ppm':
                     print('test ppm')

@@ -1,3 +1,4 @@
+import re
 from struct import *
 import json, os
 
@@ -191,6 +192,8 @@ with open(path, mode='rb') as f:
                     fw.write(pack(f'<{scene_width * scene_height}B', *reversed_list))
 
 js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
+js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look
+
 print(js)
 
 with open(f"{scene_file}/mission_objects.json", mode='w') as fw:

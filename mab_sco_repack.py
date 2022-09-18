@@ -53,10 +53,6 @@ with open(output, mode='wb') as f:
 #   f.write(pack('<I', 0)) # edge_count
 #   f.write(pack('<I', 0)) # face_count
 
-    ground_layer_look_up = {
-        'gray_stone.pgm': 0, 'brown_stone.pgm': 1, 'turf.pgm': 2, 'steppe.pgm': 3, 'snow.pgm': 4, 'earth.pgm': 5, 'desert.pgm': 6, 'forest.pgm': 7,
-        'pebbles.pgm': 8, 'village.pgm': 9, 'path.pgm': 10, 'ground_elevation.pfm': -7793, 'ground_leveling.ppm': -12565
-    }
 
     # swy: copy the AI mesh and ground stuff over from the other SCO file
     with open(donor, mode='rb') as wf:
@@ -76,16 +72,30 @@ with open(output, mode='wb') as f:
         #      copy and paste the rest of the file
         print(f"[i] AI mesh of donor {donor_file} starts at offset; copying from here onwards:", hex(wf.tell()))
         f.write(wf.read())
-    exit()
 
-
+    ground_layer_look_up = {
+        'gray_stone.pgm': 0, 'brown_stone.pgm': 1, 'turf.pgm': 2, 'steppe.pgm': 3, 'snow.pgm': 4, 'earth.pgm': 5, 'desert.pgm': 6, 'forest.pgm': 7,
+        'pebbles.pgm': 8, 'village.pgm': 9, 'path.pgm': 10, 'ground_elevation.pfm': -7793, 'ground_leveling.ppm': -12565
+    }
 
     last_scene_width = 0; last_scene_height = 0
 
     for i, ground_layer in enumerate(ground_layer_look_up):
 
-        with open(f"{scene_file}/{ground_layer}") as f_image:
-            print(ground_layer)
+        try:
+            with open(f"{scene_file}/layer_{ground_layer}", 'rb') as f_image:
+                ext = ground_layer.split('.')[1]
+                ascii_header = [line.decode('utf-8').replace('\n', '').replace('\r', '').split(' ')  for line in [f_image.readline(),f_image.readline(),f_image.readline()]]
+                magic=ascii_header[0][0]
+                width =int(ascii_header[1][0])
+                height=int(ascii_header[1][1])
+                #if ext == 'pgm':
+                #print(f_image.readline(),f_image.readline(),f_image.readline())
+                #print(ext, [h.decode('utf-8').replace('\n', '').replace('\r', '') for h in f_image.readlines()])
+                print(f'[i] found {ground_layer}; {magic} {width} x {height}')
+
+        except FileNotFoundError:
+            print(f'[!] no layer_{ground_layer} here, skipping...')
 
 
     f.write(pack('<I', 0xFF4AD1A6)) # swy: terrain_magic value

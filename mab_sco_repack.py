@@ -1,5 +1,6 @@
+from email import header
 from struct import *
-import json, os
+import json, os, io
 
 def write_rgltag(str):
     str_enc = str.encode('utf-8'); str_enc_len = len(str_enc)
@@ -92,10 +93,16 @@ with open(output, mode='wb') as f:
                 height = int(ascii_header[1][1])
 
                 print(f'[i] found {ground_layer}; type {magic}, {width} x {height}')
-                if   magic == 'P5' and ext == 'pgm':
-                    header_maxval = int(ascii_header[2][0])
-                    bytes_to_read = width * height
-                    bytess=unpack(f'<{bytes_to_read}B', f_image.read(bytes_to_read))
+                if magic == 'P5' and ext == 'pgm':
+                    header_maxval = float(ascii_header[2][0]); assert(header_maxval == 255)
+
+                    byte_offset = f_image.tell()
+                    f_image.seek(0, io.SEEK_END)
+                    bytes_remain = f_image.tell() - byte_offset
+                    f_image.seek(byte_offset)
+
+                    bytes_to_read = width * height; assert(bytes_to_read == bytes_remain)
+                    bytess = unpack(f'<{bytes_to_read}B', f_image.read(bytes_to_read))
                     print('test pgm')
                 elif magic == 'P6' and ext == 'ppm':
                     print('test ppm')

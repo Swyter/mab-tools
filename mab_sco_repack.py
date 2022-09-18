@@ -100,19 +100,23 @@ with open(output, mode='wb') as f:
                 print(f'[i] found layer_{ground_layer}; type {magic}, {width} x {height}')
                 if magic == 'P5' and ext == 'pgm':
                     assert(maxval == 255)
-                    cells_to_read = width * height; assert(cells_to_read * 1 == bytes_remain)
+                    cells_to_read = width * height
+                    bytes_to_read = cells_to_read * 1; assert(cells_to_read == bytes_remain)
                     contents = unpack(f'<{cells_to_read}B', f_image.read(cells_to_read * 1))
                     print('test pgm')
                 elif magic == 'P6' and ext == 'ppm':
                     assert(maxval == 255)
-                    cells_to_read = width * height; assert(cells_to_read * 3 == bytes_remain)
-                    contents = unpack(f'<{cells_to_read*3}B', f_image.read(cells_to_read * 3))
+                    cells_to_read = width * height
+                    bytes_to_read = cells_to_read * 3; assert(bytes_to_read == bytes_remain)
+                    contents = unpack(f'<{cells_to_read*3}B', f_image.read(bytes_to_read))
                     print('test ppm')
                 elif magic == 'Pf' and ext == 'pfm':
-                    assert(maxval == -1.0)
-                    cells_to_read = width * height; assert(cells_to_read * 4 == bytes_remain)
-                    contents = unpack(f'<{cells_to_read}f', f_image.read(cells_to_read * 4))
+                    assert(maxval in [-1.0, 1.0])
+                    cells_to_read = width * height
+                    bytes_to_read = cells_to_read * 4; assert(bytes_to_read == bytes_remain)
+                    contents = unpack(f'{maxval < 0 and "<" or ">"}{cells_to_read}f', f_image.read(bytes_to_read))
                     print('test pfm')
+
                 #print(f_image.readline(),f_image.readline(),f_image.readline())
                 #print(ext, [h.decode('utf-8').replace('\n', '').replace('\r', '') for h in f_image.readlines()])
 

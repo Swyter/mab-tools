@@ -194,7 +194,7 @@ with open(path, mode='rb') as f:
 js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
 js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look
 
-print(js)
+#print(js)
 
 with open(f"{scene_file}/mission_objects.json", mode='w') as fw:
     fw.write(js)

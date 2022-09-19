@@ -11,7 +11,7 @@ def read_rgltag():
     return str
 
 
-path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale.sco'
+path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_isengard_center.sco'
 
 scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
 

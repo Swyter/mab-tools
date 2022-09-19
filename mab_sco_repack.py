@@ -9,14 +9,14 @@ def write_rgltag(str):
 
 # swy: source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data
 #      from a «scn_advcamp_dale» directory in the same folder as this script
-path  = './scn_advcamp_dale.sco'
+path  = './scn_isengard_center.sco'
 
 # swy: donor SCO with the AI mesh and terrain stuff you want to copy over to the file above;
 #      probably the original SCO file, it can't be the same file you want to write to
-donor = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale_rgb_mod.sco'
+donor = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_isengard_center_orig.sco'
 
 # swy: target/output SCO file location with the combined data
-output = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_advcamp_dale.sco'
+output = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_isengard_center.sco'
 
 scene_file =  path.replace('\\', '/').split('/')[-1].split('.')[0]
 donor_file = donor.replace('\\', '/').split('/')[-1].split('.')[0]
@@ -196,10 +196,11 @@ with open(output, mode='wb') as f:
     for i, ground_layer in enumerate(ground_layer_look_up):
         layer_name = ground_layer.split('.')[0].lower()
         layer_index = ground_layer_look_up[ground_layer]
-        layer_has_data = len(ground[layer_name]) > 0
+        layer_data_len = len(ground[layer_name])
+        layer_has_data = layer_data_len > 0
 
         f.write(pack('<i', layer_index))    # swy: index (signed)
-        write_rgltag(ground_layer)          # swy: layer_str
+        write_rgltag(layer_name)            # swy: layer_str
         f.write(pack('<I', layer_has_data)) # swy: enabled
 
         if not layer_has_data:
@@ -210,15 +211,42 @@ with open(output, mode='wb') as f:
         #      the game will add the same amount of zeros later, padding/inflating those empty zones while loading.
         #      funnily enough the game doesn't detect if creating/splitting into a new block has more overhead/wastes more bytes
         #      than just adding a few zeros like normal, if the string is short enough. this happens a lot ¯\_(ツ)_/¯
-        f.write(pack('<I',  0)) # swy: rle
-        f.write(pack('<I',  len(ground[layer_name]))) # swy: elem_count
+
+        first_zero = None
+        last_zero = None
+        in_a_string_of_zeroes = False
 
         if layer_name == 'ground_elevation':
-            f.write(pack(f'<{len(ground[layer_name])}f', *ground[layer_name]))
+            zero = False # swy: don't compress the floating point heightmap, use a single block
         elif layer_name == 'ground_leveling':
-            f.write(pack(f'>{len(ground[layer_name])}I', *ground[layer_name]))
+            zero = 0xFFFFFF00 # swy: opaque white
         else:
-            f.write(pack(f'<{len(ground[layer_name])}B', *ground[layer_name]))
+            zero = 0 # swy: everything else is grayscale; pure black
+
+        block_begins_at = 0
+
+        for i in range(layer_data_len):
+            is_zero = (ground[layer_name][i] == zero)
+
+            if block_begins_at == i and is_zero and not in_a_string_of_zeroes:
+                in_a_string_of_zeroes = True
+                first_zero = i
+            elif not is_zero and in_a_string_of_zeroes:
+                last_zero = i - 1
+                in_a_string_of_zeroes = False
+
+            elif not is_zero and not in_a_string_of_zeroes:
+                continue
+            elif (is_zero and not in_a_string_of_zeroes) or (i >= layer_data_len):
+                f.write(pack('<I', last_zero - first_zero)) # swy: rle
+                f.write(pack('<I', len(ground[layer_name]))) # swy: elem_count
+
+                if layer_name == 'ground_elevation':
+                    f.write(pack(f'<{len(ground[layer_name])}f', *ground[layer_name]))
+                elif layer_name == 'ground_leveling':
+                    f.write(pack(f'>{len(ground[layer_name])}I', *ground[layer_name]))
+                else:
+                    f.write(pack(f'<{len(ground[layer_name])}B', *ground[layer_name]))
 
 
 

@@ -71,9 +71,14 @@ with open(output, mode='wb') as f:
 
         # swy: we've reached the end of the mission object section; the AI mesh chunk starts here.
         #      copy and paste the rest of the file
-        print(f"[i] AI mesh of donor {donor_file} starts at offset; copying from here onwards:", hex(wf.tell()))
-        f.write(wf.read())
+        print(f"[i] AI mesh of donor {donor_file} starts at offset; copying from here onwards:", hex(wf.tell()), wf.peek(4))
 
+        ai_mesh_start_pos = wf.tell()
+        ai_mesh_section_size = unpack('<I', wf.read(4))[0]
+        wf.seek(ai_mesh_start_pos, io.SEEK_SET)
+        f.write(wf.read(ai_mesh_section_size + 4))
+
+    ground = {}
     ground_layer_look_up = {
         'gray_stone.pgm': 0, 'brown_stone.pgm': 1, 'turf.pgm': 2, 'steppe.pgm': 3, 'snow.pgm': 4, 'earth.pgm': 5, 'desert.pgm': 6, 'forest.pgm': 7,
         'pebbles.pgm': 8, 'village.pgm': 9, 'path.pgm': 10, 'ground_elevation.pfm': -7793, 'ground_leveling.ppm': -12565
@@ -82,16 +87,22 @@ with open(output, mode='wb') as f:
     last_scene_width = None; last_scene_height = None
 
     for i, ground_layer in enumerate(ground_layer_look_up):
+        layer_name = ground_layer.split('.')[0].lower()
+        ext        = ground_layer.split('.')[1].lower()
+        ground[layer_name] = []; contents = []
 
         try:
             with open(f"{scene_file}/layer_{ground_layer}", 'rb') as f_image:
-                ext = ground_layer.split('.')[1].lower()
-
                 # swy: grab the three ASCII lines that make out the header of these NetPBM formats; strip their carriage returns and split each line into words/tokens
                 ascii_header = [
                     line.decode('utf-8').replace('\n', '').replace('\r', '').split(' ')           \
                         for line in [ f_image.readline(), f_image.readline(), f_image.readline() ]
                 ]
+
+                if len(ascii_header) < 3 or len(ascii_header[1]) < 2 or len(ascii_header[2]) < 1:
+                    print(f'[e] invalid {ground_layer} header format; skipping')
+                    continue
+
                 magic  =       ascii_header[0][0]  # line 1, magic value
                 width  =   int(ascii_header[1][0]) # line 2, width and height
                 height =   int(ascii_header[1][1])
@@ -137,6 +148,8 @@ with open(output, mode='wb') as f:
                 else:
                     print(f'[e] Unknown NetPBM format, {magic}: use P5, P6 or Pf.'); exit(1)
 
+                ground[layer_name] = contents
+
         except FileNotFoundError:
             print(f'[!]    no layer_{ground_layer} here, skipping...')
 
@@ -146,3 +159,10 @@ with open(output, mode='wb') as f:
     f.write(pack('<I', 0)) # swy: num_layers
     f.write(pack('<I', 0)) # swy: scene_width value
     f.write(pack('<I', 0)) # swy: scene_height value
+
+    for i, ground_layer in enumerate(ground_layer_look_up):
+        layer_name = ground_layer.split('.')[0].lower()
+
+        f.write(pack('<I',  i))    # index
+        write_rgltag(ground_layer) # layer_str
+        f.write(pack('<I', len(ground[layer_name]) <= 0)) # enabled

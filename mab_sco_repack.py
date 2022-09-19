@@ -228,6 +228,9 @@ with open(output, mode='wb') as f:
         for i in range(layer_data_len):
             is_zero = (ground[layer_name][i] == zero)
 
+            if i == layer_data_len - 2012:
+                print("bp")
+
             if block_begins_at == i and is_zero and not in_a_string_of_zeroes:
                 in_a_string_of_zeroes = True
                 first_zero = i
@@ -235,8 +238,7 @@ with open(output, mode='wb') as f:
                 last_zero = i - 1
                 in_a_string_of_zeroes = False
 
-            if (i >= layer_data_len) or ((ground[layer_name][i + 1] == zero) and not in_a_string_of_zeroes):
-
+            if (i >= layer_data_len) or (i + 1 < layer_data_len and (ground[layer_name][i + 1] == zero) and not in_a_string_of_zeroes):
                 data_slice = ground[layer_name][last_zero + 1: i + 1]
                 amount_of_preceding_zeros = (last_zero - first_zero) + 1
 

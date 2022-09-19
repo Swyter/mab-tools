@@ -199,7 +199,13 @@ with open(output, mode='wb') as f:
         elif layer_name == 'ground_leveling':
             f.write(pack(f'<{len(ground[layer_name])}B', *ground[layer_name]))
             for i in range(int(len(ground[layer_name]) / 3)):
-                f.write(pack(f'<I', (ground[layer_name][(i * 3) + 0] << (8*1)) | (ground[layer_name][(i * 3) + 1] << (8*2)) | (ground[layer_name][(i * 3) + 2] << (8*3))))
+                r = (ground[layer_name][(i * 3) + 0] & 0xff)
+                g = (ground[layer_name][(i * 3) + 1] & 0xff)
+                b = 0 #(ground[layer_name][(i * 3) + 2] & 0xff)
+
+                packed_rgb = (r << (8*1)) | (g << (8*2)) | (b << (8*3))
+
+                f.write(pack(f'<I', packed_rgb))
         else:
             f.write(pack(f'<{len(ground[layer_name])}B', *ground[layer_name]))
 

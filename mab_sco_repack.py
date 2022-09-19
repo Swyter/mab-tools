@@ -241,14 +241,18 @@ with open(output, mode='wb') as f:
 
             if (i >= layer_last_idx) or (i <= layer_last_idx and (ground[layer_name][i + 1] == zero) and not in_a_string_of_zeroes):
 
-                if not first_zero:
-                    first_zero = 0
-
-                if not last_zero:
+                if first_zero and not last_zero and is_zero:
                     last_zero = i
+
+                if not first_zero or not last_zero:
+                    first_zero = -1
+                    last_zero  = -1
 
                 data_slice = ground[layer_name][last_zero + 1: i + 1]
                 amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1
+
+                if (amount_of_preceding_zeros < 0):
+                    print("bp")
 
                 f.write(pack('<I', amount_of_preceding_zeros)) # swy: rle
 
@@ -262,6 +266,7 @@ with open(output, mode='wb') as f:
                     else:
                         f.write(pack(f'<{len(data_slice)}B', *data_slice))
 
+                # swy: reset the state machine back, a new block may start at the next element
                 block_begins_at = i + 1
                 first_zero = None
                 last_zero = None

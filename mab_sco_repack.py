@@ -113,7 +113,7 @@ with open(output, mode='wb') as f:
                     if last_scene_height != height:
                         print('[e] the height of all layer images must match')
 
-                # swy: actually read and interpret the data depending on the format/sub-variant
+                # swy: actually read and interpret the binary data after the header, depending on the format/sub-variant
                 print(f'[i] found layer_{ground_layer}; type {magic}, {width} x {height}')
 
                 if magic == 'P5' and ext == 'pgm':
@@ -121,22 +121,24 @@ with open(output, mode='wb') as f:
                     cells_to_read = width * height
                     bytes_to_read = cells_to_read * 1; assert(cells_to_read == bytes_remain)
                     contents = unpack(f'<{cells_to_read}B', f_image.read(bytes_to_read))
-                    print('test pgm')
+
                 elif magic == 'P6' and ext == 'ppm':
                     assert(maxval == 255)
                     cells_to_read = width * height
                     bytes_to_read = cells_to_read * 3; assert(bytes_to_read == bytes_remain)
                     contents = unpack(f'<{cells_to_read*3}B', f_image.read(bytes_to_read))
-                    print('test ppm')
+
                 elif magic == 'Pf' and ext == 'pfm':
                     assert(maxval in [-1.0, 1.0])
                     cells_to_read = width * height
                     bytes_to_read = cells_to_read * 4; assert(bytes_to_read == bytes_remain)
                     contents = unpack(f'{maxval < 0.0 and "<" or ">"}{cells_to_read}f', f_image.read(bytes_to_read)) # swy: handle both big (1.0, '>f') and little-endian (-1.0, '<f') floats; just in case
-                    print('test pfm')
+
+                else:
+                    print(f'[e] Unknown NetPBM format, {magic}: use P5, P6 or Pf.'); exit(1)
 
         except FileNotFoundError:
-            print(f'[!] no layer_{ground_layer} here, skipping...')
+            print(f'[!]    no layer_{ground_layer} here, skipping...')
 
 
     f.write(pack('<I', 0xFF4AD1A6)) # swy: terrain_magic value

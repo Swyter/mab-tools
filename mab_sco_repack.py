@@ -163,10 +163,24 @@ with open(output, mode='wb') as f:
 
     for i, ground_layer in enumerate(ground_layer_look_up):
         layer_name = ground_layer.split('.')[0].lower()
+        layer_has_data = len(ground[layer_name]) > 0
 
-        f.write(pack('<I',  i))    # index
-        write_rgltag(ground_layer) # layer_str
-        f.write(pack('<I', 0)) # len(ground[layer_name]) <= 0)) # enabled
+        f.write(pack('<I',  i))             # swy: index
+        write_rgltag(ground_layer)          # swy: layer_str
+        f.write(pack('<I', layer_has_data)) # swy: enabled
+
+        if not layer_has_data:
+            continue
+
+        # swy: a layer is made out of multiple zero-value run-length encoded blocks
+        #      this means that long strings of zeros are counted and collapsed into the rle field,
+        #      the game will add the same amount of zeros later, padding/inflating those empty zones while loading.
+        #      funnily enough the game doesn't detect if creating/splitting into a new block has more overhead/wastes more bytes
+        #      than just adding a few zeros like normal, if the string is short enough. this happens a lot ¯\_(ツ)_/¯
+        f.write(pack('<I',  0)) # swy: rle
+        f.write(pack('<I',  0)) # swy: elem_count
+
+
 
     # swy: fill terrain_section_size afterwards, once we know how bit the section really is
     terrain_section_end_pos = f.tell()

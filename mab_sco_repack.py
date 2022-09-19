@@ -235,18 +235,25 @@ with open(output, mode='wb') as f:
                 last_zero = i - 1
                 in_a_string_of_zeroes = False
 
-            elif not is_zero and not in_a_string_of_zeroes:
-                continue
-            elif (is_zero and not in_a_string_of_zeroes) or (i >= layer_data_len):
-                f.write(pack('<I', last_zero - first_zero)) # swy: rle
-                f.write(pack('<I', len(ground[layer_name]))) # swy: elem_count
+            if (i >= layer_data_len) or ((ground[layer_name][i + 1] == zero) and not in_a_string_of_zeroes):
+
+                data_slice = ground[layer_name][last_zero + 1: i + 1]
+                amount_of_preceding_zeros = (last_zero - first_zero) + 1
+
+                f.write(pack('<I', amount_of_preceding_zeros)) # swy: rle
+                f.write(pack('<I', len(data_slice))) # swy: elem_count
 
                 if layer_name == 'ground_elevation':
-                    f.write(pack(f'<{len(ground[layer_name])}f', *ground[layer_name]))
+                    f.write(pack(f'<{len(data_slice)}f', *data_slice))
                 elif layer_name == 'ground_leveling':
-                    f.write(pack(f'>{len(ground[layer_name])}I', *ground[layer_name]))
+                    f.write(pack(f'>{len(data_slice)}I', *data_slice))
                 else:
-                    f.write(pack(f'<{len(ground[layer_name])}B', *ground[layer_name]))
+                    f.write(pack(f'<{len(data_slice)}B', *data_slice))
+
+                block_begins_at = i + 1
+                first_zero = None
+                last_zero = None
+                in_a_string_of_zeroes = False
 
 
 

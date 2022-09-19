@@ -163,9 +163,10 @@ with open(output, mode='wb') as f:
 
     for i, ground_layer in enumerate(ground_layer_look_up):
         layer_name = ground_layer.split('.')[0].lower()
+        layer_index = ground_layer_look_up[ground_layer]
         layer_has_data = len(ground[layer_name]) > 0
 
-        f.write(pack('<I',  i))             # swy: index
+        f.write(pack('<i', layer_index))    # swy: index (signed)
         write_rgltag(ground_layer)          # swy: layer_str
         f.write(pack('<I', layer_has_data)) # swy: enabled
 

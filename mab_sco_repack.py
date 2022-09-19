@@ -197,6 +197,7 @@ with open(output, mode='wb') as f:
         layer_name = ground_layer.split('.')[0].lower()
         layer_index = ground_layer_look_up[ground_layer]
         layer_data_len = len(ground[layer_name])
+        layer_last_idx = layer_data_len - 1
         layer_has_data = layer_data_len > 0
 
         f.write(pack('<i', layer_index))    # swy: index (signed)
@@ -238,19 +239,28 @@ with open(output, mode='wb') as f:
                 last_zero = i - 1
                 in_a_string_of_zeroes = False
 
-            if (i >= layer_data_len) or (i + 1 < layer_data_len and (ground[layer_name][i + 1] == zero) and not in_a_string_of_zeroes):
+            if (i >= layer_last_idx) or (i + 1 < layer_data_len and (ground[layer_name][i + 1] == zero) and not in_a_string_of_zeroes):
+
+                if not first_zero:
+                    first_zero = -1
+
+                if not last_zero:
+                    last_zero = i
+
                 data_slice = ground[layer_name][last_zero + 1: i + 1]
                 amount_of_preceding_zeros = (last_zero - first_zero) + 1
 
                 f.write(pack('<I', amount_of_preceding_zeros)) # swy: rle
-                f.write(pack('<I', len(data_slice))) # swy: elem_count
 
-                if layer_name == 'ground_elevation':
-                    f.write(pack(f'<{len(data_slice)}f', *data_slice))
-                elif layer_name == 'ground_leveling':
-                    f.write(pack(f'>{len(data_slice)}I', *data_slice))
-                else:
-                    f.write(pack(f'<{len(data_slice)}B', *data_slice))
+                if data_slice:
+                    f.write(pack('<I', len(data_slice))) # swy: elem_count
+
+                    if layer_name == 'ground_elevation':
+                        f.write(pack(f'<{len(data_slice)}f', *data_slice))
+                    elif layer_name == 'ground_leveling':
+                        f.write(pack(f'>{len(data_slice)}I', *data_slice))
+                    else:
+                        f.write(pack(f'<{len(data_slice)}B', *data_slice))
 
                 block_begins_at = i + 1
                 first_zero = None

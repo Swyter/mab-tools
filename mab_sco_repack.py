@@ -131,19 +131,32 @@ with open(output, mode='wb') as f:
                     assert(maxval == 255)
                     cells_to_read = width * height
                     bytes_to_read = cells_to_read * 1; assert(cells_to_read == bytes_remain)
-                    contents = unpack(f'<{cells_to_read}B', f_image.read(bytes_to_read))
+                    contents_orig = []; contents_orig = unpack(f'<{cells_to_read}B', f_image.read(bytes_to_read))
+
+                    # swy: flip or mirror each row from right-to-left to left-to-right
+                    for i in range(last_scene_height):
+                        contents += contents_orig[i*last_scene_width : (i*last_scene_width) + last_scene_width][::-1]
 
                 elif magic == 'P6' and ext == 'ppm':
                     assert(maxval == 255)
                     cells_to_read = width * height
                     bytes_to_read = cells_to_read * 3; assert(bytes_to_read == bytes_remain)
-                    contents = unpack(f'<{cells_to_read*3}B', f_image.read(bytes_to_read))
+                    contents_orig = []; contents_orig = unpack(f'<{cells_to_read*3}B', f_image.read(bytes_to_read))
+
+                    # swy: flip or mirror each row from right-to-left to left-to-right
+                    for i in range(last_scene_height):
+                        contents += contents_orig[i*last_scene_width : (i*last_scene_width) + last_scene_width][::-1]
 
                 elif magic == 'Pf' and ext == 'pfm':
                     assert(maxval in [-1.0, 1.0])
                     cells_to_read = width * height
                     bytes_to_read = cells_to_read * 4; assert(bytes_to_read == bytes_remain)
-                    contents = unpack(f'{maxval < 0.0 and "<" or ">"}{cells_to_read}f', f_image.read(bytes_to_read)) # swy: handle both big (1.0, '>f') and little-endian (-1.0, '<f') floats; just in case
+                    contents_orig = []; contents_orig = unpack(f'{maxval < 0.0 and "<" or ">"}{cells_to_read}f', f_image.read(bytes_to_read)) # swy: handle both big (1.0, '>f') and little-endian (-1.0, '<f') floats; just in case
+
+                    # swy: reverse the row ordering because the PFM format is from bottom to top, unlike every other NetPBM one, of course :)
+                    for i in reversed(range(last_scene_height)):
+                        contents += contents_orig[i*last_scene_width : (i*last_scene_width) + last_scene_width][::-1] # swy: grab one "line" worth of data from the farthest point, and add it first; sort them backwards
+
 
                 else:
                     print(f'[e] Unknown NetPBM format, {magic}: use P5, P6 or Pf.'); exit(1)

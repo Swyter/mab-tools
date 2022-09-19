@@ -178,7 +178,9 @@ with open(output, mode='wb') as f:
         #      funnily enough the game doesn't detect if creating/splitting into a new block has more overhead/wastes more bytes
         #      than just adding a few zeros like normal, if the string is short enough. this happens a lot ¯\_(ツ)_/¯
         f.write(pack('<I',  0)) # swy: rle
-        f.write(pack('<I',  0)) # swy: elem_count
+        f.write(pack('<I',  len(ground[layer_name]))) # swy: elem_count
+
+        f.write(pack(f'<{len(ground[layer_name])}B', *ground[layer_name]))
 
 
 

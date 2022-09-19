@@ -141,7 +141,16 @@ with open(output, mode='wb') as f:
                     assert(maxval == 255)
                     cells_to_read = width * height
                     bytes_to_read = cells_to_read * 3; assert(bytes_to_read == bytes_remain)
-                    contents_orig = []; contents_orig = unpack(f'<{cells_to_read*3}B', f_image.read(bytes_to_read))
+                    contents_orig = []; contents_orig_rgb_bytes = unpack(f'<{cells_to_read*3}B', f_image.read(bytes_to_read))
+
+
+                    for i in range(cells_to_read):
+                        r = (contents_orig_rgb_bytes[(i * 3) + 0] & 0xff)
+                        g = (contents_orig_rgb_bytes[(i * 3) + 1] & 0xff)
+                        b = (contents_orig_rgb_bytes[(i * 3) + 2] & 0xff)
+
+                        packed_rgb = (r << (8*1)) | (g << (8*2)) | (b << (8*3))
+                        contents_orig.append( packed_rgb)
 
                     # swy: flip or mirror each row from right-to-left to left-to-right
                     for i in range(last_scene_height):
@@ -197,15 +206,7 @@ with open(output, mode='wb') as f:
         if layer_name == 'ground_elevation':
             f.write(pack(f'<{len(ground[layer_name])}f', *ground[layer_name]))
         elif layer_name == 'ground_leveling':
-            f.write(pack(f'<{len(ground[layer_name])}B', *ground[layer_name]))
-            for i in range(int(len(ground[layer_name]) / 3)):
-                r = (ground[layer_name][(i * 3) + 0] & 0xff)
-                g = (ground[layer_name][(i * 3) + 1] & 0xff)
-                b = 0 #(ground[layer_name][(i * 3) + 2] & 0xff)
-
-                packed_rgb = (r << (8*1)) | (g << (8*2)) | (b << (8*3))
-
-                f.write(pack(f'<I', packed_rgb))
+            f.write(pack(f'<{len(ground[layer_name])}I', *ground[layer_name]))
         else:
             f.write(pack(f'<{len(ground[layer_name])}B', *ground[layer_name]))
 

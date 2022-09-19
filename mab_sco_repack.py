@@ -94,10 +94,18 @@ with open(output, mode='wb') as f:
         try:
             with open(f"{scene_file}/layer_{ground_layer}", 'rb') as f_image:
                 # swy: grab the three ASCII lines that make out the header of these NetPBM formats; strip their carriage returns and split each line into words/tokens
-                ascii_header = [
-                    line.decode('utf-8').replace('\n', '').replace('\r', '').split(' ')           \
-                        for line in [ f_image.readline(), f_image.readline(), f_image.readline() ]
-                ]
+                ascii_header = []
+
+                while True:
+                    line = f_image.readline()
+                    # swy: ignore dummy second (comment) lines like the funky '# Created by GIMP version 2.10.32 PNM plug-in'
+                    if line[0] == ord('#'):
+                        continue
+
+                    ascii_header += [line.decode('utf-8').replace('\n', '').replace('\r', '').split(' ')]
+
+                    if len(ascii_header) >= 3:
+                        break
 
                 if len(ascii_header) < 3 or len(ascii_header[1]) < 2 or len(ascii_header[2]) < 1:
                     print(f'[e] invalid {ground_layer} header format; skipping')
@@ -149,7 +157,7 @@ with open(output, mode='wb') as f:
                         b = (contents_orig_rgb_bytes[(i * 3) + 2] & 0xff)
 
                         packed_rgb = (r << (8*1)) | (g << (8*2)) | (b << (8*3))
-                        contents_orig.append( packed_rgb)
+                        contents_orig.append(packed_rgb)
 
                     # swy: flip or mirror each row from right-to-left to left-to-right
                     for i in range(last_scene_height):

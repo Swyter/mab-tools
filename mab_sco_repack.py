@@ -71,7 +71,7 @@ with open(output, mode='wb') as f:
 
         # swy: we've reached the end of the mission object section; the AI mesh chunk starts here.
         #      copy and paste the rest of the file
-        print(f"[i] AI mesh of donor {donor_file} starts at offset; copying from here onwards:", hex(wf.tell()), wf.peek(4))
+        print(f"[i] AI mesh of donor {donor_file} starts at offset; copying from here onwards:", hex(wf.tell()))
 
         ai_mesh_start_pos = wf.tell()
         ai_mesh_section_size = unpack('<I', wf.read(4))[0]
@@ -181,7 +181,12 @@ with open(output, mode='wb') as f:
         f.write(pack('<I',  0)) # swy: rle
         f.write(pack('<I',  len(ground[layer_name]))) # swy: elem_count
 
-        f.write(pack(f'<{len(ground[layer_name])}B', *ground[layer_name]))
+        if layer_name == 'ground_elevation':
+            f.write(pack(f'<{len(ground[layer_name])}f', *ground[layer_name]))
+        elif layer_name == 'ground_leveling':
+            f.write(pack(f'<{len(ground[layer_name])}B', *ground[layer_name]))
+        else:
+            f.write(pack(f'<{len(ground[layer_name])}B', *ground[layer_name]))
 
 
 

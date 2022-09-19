@@ -239,16 +239,16 @@ with open(output, mode='wb') as f:
                 last_zero = i - 1
                 in_a_string_of_zeroes = False
 
-            if (i >= layer_last_idx) or (i + 1 < layer_data_len and (ground[layer_name][i + 1] == zero) and not in_a_string_of_zeroes):
+            if (i >= layer_last_idx) or (i <= layer_last_idx and (ground[layer_name][i + 1] == zero) and not in_a_string_of_zeroes):
 
                 if not first_zero:
-                    first_zero = -1
+                    first_zero = 0
 
                 if not last_zero:
                     last_zero = i
 
                 data_slice = ground[layer_name][last_zero + 1: i + 1]
-                amount_of_preceding_zeros = (last_zero - first_zero) + 1
+                amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1
 
                 f.write(pack('<I', amount_of_preceding_zeros)) # swy: rle
 

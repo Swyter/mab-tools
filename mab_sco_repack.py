@@ -87,13 +87,17 @@ with open(output, mode='wb') as f:
             with open(f"{scene_file}/layer_{ground_layer}", 'rb') as f_image:
                 ext = ground_layer.split('.')[1].lower()
 
-                ascii_header = [line.decode('utf-8').replace('\n', '').replace('\r', '').split(' ')  for line in [f_image.readline(),f_image.readline(),f_image.readline()]]
-                magic  =     ascii_header[0][0]
-                width  = int(ascii_header[1][0])
-                height = int(ascii_header[1][1])
+                # swy: grab the three ASCII lines that make out the header of these NetPBM formats; strip their carriage returns and split each line into words/tokens
+                ascii_header = [
+                    line.decode('utf-8').replace('\n', '').replace('\r', '').split(' ')           \
+                        for line in [ f_image.readline(), f_image.readline(), f_image.readline() ]
+                ]
+                magic  =       ascii_header[0][0]  # line 1, magic value
+                width  =   int(ascii_header[1][0]) # line 2, width and height
+                height =   int(ascii_header[1][1])
+                maxval = float(ascii_header[2][0]) # line 3, extra thing
 
-                maxval = float(ascii_header[2][0])
-
+                # swy: grab how far away we are from the start after reading the ASCII part, use it to compute how many bytes the rest of the data takes
                 header_end_byte_offset = f_image.tell();                f_image.seek(0, io.SEEK_END)
                 bytes_remain = f_image.tell() - header_end_byte_offset; f_image.seek(header_end_byte_offset)
 
@@ -109,12 +113,14 @@ with open(output, mode='wb') as f:
                     if last_scene_height != height:
                         print('[e] the height of all layer images must match')
 
+                # swy: actually read and interpret the data depending on the format/sub-variant
                 print(f'[i] found layer_{ground_layer}; type {magic}, {width} x {height}')
+
                 if magic == 'P5' and ext == 'pgm':
                     assert(maxval == 255)
                     cells_to_read = width * height
                     bytes_to_read = cells_to_read * 1; assert(cells_to_read == bytes_remain)
-                    contents = unpack(f'<{cells_to_read}B', f_image.read(cells_to_read * 1))
+                    contents = unpack(f'<{cells_to_read}B', f_image.read(bytes_to_read))
                     print('test pgm')
                 elif magic == 'P6' and ext == 'ppm':
                     assert(maxval == 255)
@@ -126,12 +132,8 @@ with open(output, mode='wb') as f:
                     assert(maxval in [-1.0, 1.0])
                     cells_to_read = width * height
                     bytes_to_read = cells_to_read * 4; assert(bytes_to_read == bytes_remain)
-                    contents = unpack(f'{maxval < 0 and "<" or ">"}{cells_to_read}f', f_image.read(bytes_to_read))
+                    contents = unpack(f'{maxval < 0.0 and "<" or ">"}{cells_to_read}f', f_image.read(bytes_to_read)) # swy: handle both big (1.0, '>f') and little-endian (-1.0, '<f') floats; just in case
                     print('test pfm')
-
-                #print(f_image.readline(),f_image.readline(),f_image.readline())
-                #print(ext, [h.decode('utf-8').replace('\n', '').replace('\r', '') for h in f_image.readlines()])
-
 
         except FileNotFoundError:
             print(f'[!] no layer_{ground_layer} here, skipping...')

@@ -93,16 +93,19 @@ with open(output, mode='wb') as f:
 
         try:
             with open(f"{scene_file}/layer_{ground_layer}", 'rb') as f_image:
-                # swy: grab the three ASCII lines that make out the header of these NetPBM formats; strip their carriage returns and split each line into words/tokens
-                ascii_header = []
+                ascii_header = [] # swy: grab the three ASCII lines that make out the header of these NetPBM formats; strip their carriage returns and split each line into words/tokens
 
                 while True:
-                    line = f_image.readline()
+                    try:
+                        line = f_image.readline().decode('utf-8').replace('\n', '').replace('\r', '').replace('\t', ' ').strip()
+                    except UnicodeDecodeError:
+                        line = '' # swy: skip weird stuff or characters with wrong encoding
+
                     # swy: ignore dummy second (comment) lines like the funky '# Created by GIMP version 2.10.32 PNM plug-in'
-                    if line[0] == ord('#'):
+                    if not line or line[0] == '#' or line.startswith('--') or line[0] not in '0123456789+-.,P':
                         continue
 
-                    ascii_header += [line.decode('utf-8').replace('\n', '').replace('\r', '').split(' ')]
+                    ascii_header += [line.split(' ')]
 
                     if len(ascii_header) >= 3:
                         break

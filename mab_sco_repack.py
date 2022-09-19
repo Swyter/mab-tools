@@ -155,7 +155,8 @@ with open(output, mode='wb') as f:
 
 
     f.write(pack('<I', 0xFF4AD1A6)) # swy: terrain_magic value
-    f.write(pack('<I', 4*4)) # swy: terrain_section_size
+    terrain_section_size_start_pos = f.tell()
+    f.write(pack('<I', 0)) # swy: terrain_section_size, we go back and fix/overwrite this one at the end
     f.write(pack('<I', len(ground_layer_look_up))) # swy: num_layers
     f.write(pack('<I', last_scene_width)) # swy: scene_width value
     f.write(pack('<I', last_scene_height)) # swy: scene_height value
@@ -166,3 +167,8 @@ with open(output, mode='wb') as f:
         f.write(pack('<I',  i))    # index
         write_rgltag(ground_layer) # layer_str
         f.write(pack('<I', 0)) # len(ground[layer_name]) <= 0)) # enabled
+
+    # swy: fill terrain_section_size afterwards, once we know how bit the section really is
+    terrain_section_end_pos = f.tell()
+    f.seek(terrain_section_size_start_pos, io.SEEK_SET)
+    f.write(pack('<I', terrain_section_end_pos - (terrain_section_size_start_pos + 4)))

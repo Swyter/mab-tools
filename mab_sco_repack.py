@@ -156,13 +156,13 @@ with open(output, mode='wb') as f:
 
     f.write(pack('<I', 0xFF4AD1A6)) # swy: terrain_magic value
     f.write(pack('<I', 4*4)) # swy: terrain_section_size
-    f.write(pack('<I', 0)) # swy: num_layers
-    f.write(pack('<I', 0)) # swy: scene_width value
-    f.write(pack('<I', 0)) # swy: scene_height value
+    f.write(pack('<I', len(ground_layer_look_up))) # swy: num_layers
+    f.write(pack('<I', last_scene_width)) # swy: scene_width value
+    f.write(pack('<I', last_scene_height)) # swy: scene_height value
 
     for i, ground_layer in enumerate(ground_layer_look_up):
         layer_name = ground_layer.split('.')[0].lower()
 
         f.write(pack('<I',  i))    # index
         write_rgltag(ground_layer) # layer_str
-        f.write(pack('<I', len(ground[layer_name]) <= 0)) # enabled
+        f.write(pack('<I', 0)) # len(ground[layer_name]) <= 0)) # enabled

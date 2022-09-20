@@ -1,3 +1,4 @@
+import datetime
 import re
 from struct import *
 import json, os
@@ -30,7 +31,7 @@ def read_rgltag():
 #
 #         - the rest are optional PGM files which contain grayscale data for each of the painted ground
 #           textures for the limited set of hardcoded materials.
-path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege.sco'
+path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_edoras_siege.sco'
 
 scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
 
@@ -87,7 +88,7 @@ with open(path, mode='rb') as f:
     edge_count = unpack('<I', f.read(4))[0]
 
     for i in range(edge_count):
-        edge = unpack('<5I', f.read(4 * 5))
+        edge = unpack('<5i', f.read(4 * 5))
         ai_mesh['edges'].append(edge)
 
     face_count = unpack('<I', f.read(4))[0]
@@ -103,12 +104,13 @@ with open(path, mode='rb') as f:
         ai_mesh['faces'].append({'edge_count': edge_count, 'face': face, 'edge': edge, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
 
     with open(f"{scene_file}/ai_mesh.obj", mode='w') as fw:
+        fw.write(f'# Mount&Blade AI mesh exported by Swyter\'s SCO unpacker from\n# <{scene_file}.sco> on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
         for elem in ai_mesh['vertices']:
             fw.write('v %f %f %f\n' % (elem))
 
         for elem in ai_mesh['faces']:
             face_data = [vtx_idx + 1 for vtx_idx in elem['face']]
-            fw.write(f'f {" %u" * len(face_data)}\n' % tuple(face_data))
+            fw.write(f'f{" %u" * len(face_data)}\n' % tuple(face_data))
 
     terrain_magic = unpack('<I', f.read(4))[0]; assert(terrain_magic == 0xFF4AD1A6)
     terrain_section_size = unpack('<I', f.read(4))[0]

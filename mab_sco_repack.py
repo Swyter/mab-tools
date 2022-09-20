@@ -91,6 +91,8 @@ with open(output, mode='wb') as f:
         ext        = ground_layer.split('.')[1].lower()
         ground[layer_name] = []; contents = []
 
+        header_end_byte_offset = 0
+
         try:
             with open(f"{scene_file}/layer_{ground_layer}", 'rb') as f_image:
                 ascii_header = [] # swy: grab the three ASCII lines that make out the header of these NetPBM formats; strip their carriage returns and split each line into words/tokens
@@ -98,8 +100,10 @@ with open(output, mode='wb') as f:
                 while True:
                     try:
                         line = f_image.readline().decode('utf-8').replace('\n', '').replace('\r', '').replace('\t', ' ').strip()
+                        header_end_byte_offset = f_image.tell()
                     except UnicodeDecodeError:
                         line = '' # swy: skip weird stuff or characters with wrong encoding
+                        break
 
                     # swy: ignore dummy second (comment) lines like the funky '# Created by GIMP version 2.10.32 PNM plug-in'
                     if not line or line[0] == '#' or line.startswith('--') or line[0] not in '0123456789+-.,P':
@@ -107,33 +111,34 @@ with open(output, mode='wb') as f:
 
                     ascii_header += [line.split(' ')]
 
-                    if len(ascii_header) >= 3:
+                    ascii_header_flattened = [value.strip() for sub_list in ascii_header for value in sub_list if value != ''] # swy: photoshop exports width and height in different lines, and maxval in the fourth line, don't depend on the line position, only the 'token' order matters
+
+                    if len(ascii_header_flattened) > 4:
                         break
 
-                if len(ascii_header) < 3 or len(ascii_header[1]) < 2 or len(ascii_header[2]) < 1:
+                if ascii_header_flattened[0][0] != 'P':
                     print(f'[e] invalid {ground_layer} header format; skipping')
                     continue
 
-                magic  =       ascii_header[0][0]  # line 1, magic value
-                width  =   int(ascii_header[1][0]) # line 2, width and height
-                height =   int(ascii_header[1][1])
-                maxval = float(ascii_header[2][0]) # line 3, extra thing
+                magic  =       ascii_header_flattened[0]  # line 1, magic value
+                width  =   int(ascii_header_flattened[1]) # line 2, width and height
+                height =   int(ascii_header_flattened[2])
+                maxval = float(ascii_header_flattened[3]) # line 3, extra thing
 
                 # swy: grab how far away we are from the start after reading the ASCII part, use it to compute how many bytes the rest of the data takes
-                header_end_byte_offset = f_image.tell();                f_image.seek(0, io.SEEK_END)
-                bytes_remain = f_image.tell() - header_end_byte_offset; f_image.seek(header_end_byte_offset)
+                f_image.seek(0, io.SEEK_END); bytes_remain = f_image.tell() - header_end_byte_offset; f_image.seek(header_end_byte_offset)
 
                 if not last_scene_width:
                     last_scene_width = width
                 else:
                     if last_scene_width != width:
-                        print('[e] the width of all layer images must match')
+                        print('[e] the width of all layer images must match'); exit(2)
                         
                 if not last_scene_height:
                     last_scene_height = height
                 else:
                     if last_scene_height != height:
-                        print('[e] the height of all layer images must match')
+                        print('[e] the height of all layer images must match'); exit(2)
 
                 # swy: actually read and interpret the binary data after the header, depending on the format/sub-variant
                 print(f'[i] found layer_{ground_layer}; type {magic}, {width} x {height}')
@@ -185,7 +190,6 @@ with open(output, mode='wb') as f:
         except FileNotFoundError:
             print(f'[!]    no layer_{ground_layer} here, skipping...')
 
-
     f.write(pack('<I', 0xFF4AD1A6)) # swy: terrain_magic value
     terrain_section_size_start_pos = f.tell()
     f.write(pack('<I', 0)) # swy: terrain_section_size, we go back and fix/overwrite this one at the end
@@ -199,6 +203,8 @@ with open(output, mode='wb') as f:
         layer_data_len = len(ground[layer_name])
         layer_last_idx = layer_data_len - 1
         layer_has_data = layer_data_len > 0
+
+        print(f'[-] compressing and writing layer {layer_name}...')
 
         f.write(pack('<i', layer_index))    # swy: index (signed)
         write_rgltag(layer_name)            # swy: layer_str
@@ -296,3 +302,5 @@ with open(output, mode='wb') as f:
     terrain_section_end_pos = f.tell()
     f.seek(terrain_section_size_start_pos, io.SEEK_SET)
     f.write(pack('<I', terrain_section_end_pos - (terrain_section_size_start_pos + 4)))
+
+    print(f'[i] done!')

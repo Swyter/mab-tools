@@ -236,7 +236,7 @@ with open(output, mode='wb') as f:
             elif not is_zero and in_a_string_of_zeroes: # swy: if our block started and continued being all zeroes, note down where it ended
                 last_zero = i - 1
                 in_a_string_of_zeroes = False
-            elif not is_zero and not first_zero and not last_zero: # swy: if the block didn't start with zeroes at all, mark the variables to amount_of_preceding_zeros to return 0
+            elif not is_zero and not first_zero and not last_zero: # swy: if the block didn't start with zeroes at all, mark the variables in a way that amount_of_preceding_zeros gets set to 0
                 first_zero =  0
                 last_zero  = -1
 
@@ -286,13 +286,11 @@ with open(output, mode='wb') as f:
                 in_a_string_of_zeroes = False
                 write_block = False
 
-                # swy: there is no go-to in Python to rewind this loop and parse a possible first zero in the new block,
+                # swy: there is no goto in Python to rewind this loop and parse a possible first zero in the new block,
                 #      so duplicate the condition above that we wouldn't ever reach and call it a day
                 if is_zero:
                     in_a_string_of_zeroes = True
                     first_zero = i
-
-
 
     # swy: fill terrain_section_size afterwards, once we know how bit the section really is
     terrain_section_end_pos = f.tell()

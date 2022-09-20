@@ -91,8 +91,6 @@ with open(output, mode='wb') as f:
         ext        = ground_layer.split('.')[1].lower()
         ground[layer_name] = []; contents = []
 
-        header_end_byte_offset = 0
-
         try:
             with open(f"{scene_file}/layer_{ground_layer}", 'rb') as f_image:
                 ascii_header = [] # swy: grab the three ASCII lines that make out the header of these NetPBM formats; strip their carriage returns and split each line into words/tokens
@@ -110,9 +108,9 @@ with open(output, mode='wb') as f:
                         continue
 
                     ascii_header += [line.split(' ')]
-
                     ascii_header_flattened = [value.strip() for sub_list in ascii_header for value in sub_list if value != ''] # swy: photoshop exports width and height in different lines, and maxval in the fourth line, don't depend on the line position, only the 'token' order matters
 
+                    # swy: the format only has four tokens, that can be part of different lines or just separated by whitespace; this format is way too lax
                     if len(ascii_header_flattened) > 4:
                         break
 
@@ -233,8 +231,10 @@ with open(output, mode='wb') as f:
         block_begins_at = 0
         write_block = False
 
+        cur_layer_data = ground[layer_name]
+
         for i in range(layer_data_len):
-            is_zero = (ground[layer_name][i] == zero)
+            is_zero = (cur_layer_data[i] == zero)
 
             if block_begins_at == i and is_zero and not in_a_string_of_zeroes: # swy: if our block starts with zeroes, note it down
                 in_a_string_of_zeroes = True
@@ -267,7 +267,7 @@ with open(output, mode='wb') as f:
                 #      and we want a slice as big as the entire data array (i + 1)
                 last_slice_idx = last_zero == -1 and i + 1 or i
 
-                data_slice = ground[layer_name][last_zero + 1: last_slice_idx]
+                data_slice = cur_layer_data[last_zero + 1: last_slice_idx]
                 amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1
 
                 if (amount_of_preceding_zeros < 0):

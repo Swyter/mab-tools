@@ -230,16 +230,13 @@ with open(output, mode='wb') as f:
         for i in range(layer_data_len):
             is_zero = (ground[layer_name][i] == zero)
 
-            if i == layer_data_len - 2012:
-                print("bp")
-
-            if block_begins_at == i and is_zero and not in_a_string_of_zeroes:
+            if block_begins_at == i and is_zero and not in_a_string_of_zeroes: # swy: if our block starts with zeroes, note it down
                 in_a_string_of_zeroes = True
                 first_zero = i
-            elif not is_zero and in_a_string_of_zeroes:
+            elif not is_zero and in_a_string_of_zeroes: # swy: if our block started and continued being all zeroes, note down where it ended
                 last_zero = i - 1
                 in_a_string_of_zeroes = False
-            elif not is_zero and not first_zero and not last_zero:
+            elif not is_zero and not first_zero and not last_zero: # swy: if the block didn't start with zeroes at all, mark the variables to amount_of_preceding_zeros to return 0
                 first_zero =  0
                 last_zero  = -1
 
@@ -247,44 +244,50 @@ with open(output, mode='wb') as f:
             if i >= layer_last_idx:
                 write_block = True
 
+                # swy: mark us (the last element in the array) as the last zero, the condition above only detects the 
+                #      last zero in retrospective by looking at the following (non-zero) entry
                 if is_zero and in_a_string_of_zeroes:
                     last_zero = i
                     in_a_string_of_zeroes = False
 
             
-            # swy: write and then start a new block if we find zeros after a non-zero block
+            # swy: write and then start a new block if we find zeroes after a non-zero block
             if (is_zero and not in_a_string_of_zeroes and last_zero):
                 write_block = True
 
             if write_block:
-                # swy: fix ground_elevation being off by one
+                # swy: fix ground_elevation being off by one when there are no preceding zeroes
+                #      we are at the end of the line, writing the block due to being the last idx
+                #      and we want a slice as big as the entire data array (i + 1)
                 last_slice_idx = last_zero == -1 and i + 1 or i
 
                 data_slice = ground[layer_name][last_zero + 1: last_slice_idx]
                 amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1
 
                 if (amount_of_preceding_zeros < 0):
-                    print("bp")
+                    print("[e] the amount of preceding zeroes can't be negative")
 
                 f.write(pack('<I', amount_of_preceding_zeros)) # swy: rle
 
                 if data_slice:
                     f.write(pack('<I', len(data_slice))) # swy: elem_count
 
-                    if layer_name == 'ground_elevation':
+                    if   layer_name == 'ground_elevation':
                         f.write(pack(f'<{len(data_slice)}f', *data_slice))
                     elif layer_name == 'ground_leveling':
                         f.write(pack(f'>{len(data_slice)}I', *data_slice))
                     else:
                         f.write(pack(f'<{len(data_slice)}B', *data_slice))
 
-                # swy: reset the state machine back, a new block may start at the next element
+                # swy: reset the state machine back, a new block may start at this (i) element
                 block_begins_at = i
                 first_zero = None
                 last_zero = None
                 in_a_string_of_zeroes = False
                 write_block = False
 
+                # swy: there is no go-to in Python to rewind this loop and parse a possible first zero in the new block,
+                #      so duplicate the condition above that we wouldn't ever reach and call it a day
                 if is_zero:
                     in_a_string_of_zeroes = True
                     first_zero = i

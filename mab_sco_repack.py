@@ -9,14 +9,14 @@ def write_rgltag(str):
 
 # swy: source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data
 #      from a «scn_advcamp_dale» directory in the same folder as this script
-path  = './scn_isengard_center.sco'
+path  = './scn_caras_galadhon_siege.sco'
 
 # swy: donor SCO with the AI mesh you want to copy over to the file above;
 #      probably the original SCO file, it can't be the same file you want to write to
-donor = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_isengard_center_orig.sco'
+donor = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege_orig.sco'
 
 # swy: target/output SCO file location with the combined/repacked data
-output = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_isengard_center.sco'
+output = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege.sco'
 
 scene_file =  path.replace('\\', '/').split('/')[-1].split('.')[0]
 donor_file = donor.replace('\\', '/').split('/')[-1].split('.')[0]

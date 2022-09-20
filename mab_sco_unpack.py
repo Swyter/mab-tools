@@ -30,7 +30,7 @@ def read_rgltag():
 #
 #         - the rest are optional PGM files which contain grayscale data for each of the painted ground
 #           textures for the limited set of hardcoded materials.
-path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_isengard_center.sco'
+path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege.sco'
 
 scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
 
@@ -102,6 +102,13 @@ with open(path, mode='rb') as f:
 
         ai_mesh['faces'].append({'edge_count': edge_count, 'face': face, 'edge': edge, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
 
+    with open(f"{scene_file}/ai_mesh.obj", mode='w') as fw:
+        for elem in ai_mesh['vertices']:
+            fw.write('v %f %f %f\n' % (elem))
+
+        for elem in ai_mesh['faces']:
+            face_data = [vtx_idx + 1 for vtx_idx in elem['face']]
+            fw.write(f'f {" %u" * len(face_data)}\n' % tuple(face_data))
 
     terrain_magic = unpack('<I', f.read(4))[0]; assert(terrain_magic == 0xFF4AD1A6)
     terrain_section_size = unpack('<I', f.read(4))[0]

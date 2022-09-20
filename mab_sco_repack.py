@@ -240,7 +240,7 @@ with open(output, mode='wb') as f:
                 last_zero = i - 1
                 in_a_string_of_zeroes = False
             elif not is_zero and not first_zero and not last_zero:
-                first_zero = -1
+                first_zero =  0
                 last_zero  = -1
 
             # swy: write the final block if we've reached the end
@@ -257,7 +257,10 @@ with open(output, mode='wb') as f:
                 write_block = True
 
             if write_block:
-                data_slice = ground[layer_name][last_zero + 1: i]
+                # swy: fix ground_elevation being off by one
+                last_slice_idx = last_zero == -1 and i + 1 or i
+
+                data_slice = ground[layer_name][last_zero + 1: last_slice_idx]
                 amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1
 
                 if (amount_of_preceding_zeros < 0):

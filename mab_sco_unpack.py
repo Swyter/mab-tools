@@ -107,10 +107,14 @@ with open(path, mode='rb') as f:
         fw.write(f'# Mount&Blade AI mesh exported by Swyter\'s SCO unpacker from\n# <{scene_file}.sco> on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
         for elem in ai_mesh['vertices']:
             fw.write('v %f %f %f\n' % (elem))
-
-        for elem in ai_mesh['faces']:
-            face_data = [vtx_idx + 1 for vtx_idx in elem['face']]
-            fw.write(f'f{" %u" * len(face_data)}\n' % tuple(face_data))
+        fw.write("\n# edges\n\n")
+        for i, elem in enumerate(ai_mesh['edges']):
+            face_data = [vtx_idx for vtx_idx in elem]
+            fw.write(f'e{" %i" * len(face_data)} \t\t# {i}\n' % tuple(face_data))
+        fw.write("\n# faces\n\n")
+        for i, elem in enumerate(ai_mesh['faces']):
+            face_data = [vtx_idx  for vtx_idx in elem['face']]
+            fw.write(f'f{" %u" * len(face_data)} \t\t# {i} {repr(elem)}\n' % tuple(face_data))
 
     terrain_magic = unpack('<I', f.read(4))[0]; assert(terrain_magic == 0xFF4AD1A6)
     terrain_section_size = unpack('<I', f.read(4))[0]

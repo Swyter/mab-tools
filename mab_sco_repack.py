@@ -225,6 +225,7 @@ with open(output, mode='wb') as f:
             zero = 0 # swy: everything else is grayscale; pure black
 
         block_begins_at = 0
+        write_block = False
 
         for i in range(layer_data_len):
             is_zero = (ground[layer_name][i] == zero)
@@ -238,17 +239,25 @@ with open(output, mode='wb') as f:
             elif not is_zero and in_a_string_of_zeroes:
                 last_zero = i - 1
                 in_a_string_of_zeroes = False
+            elif not is_zero and not first_zero and not last_zero:
+                first_zero = -1
+                last_zero  = -1
 
-            if (i >= layer_last_idx) or (i <= layer_last_idx and (ground[layer_name][i + 1] == zero) and not in_a_string_of_zeroes):
+            # swy: write the final block if we've reached the end
+            if i >= layer_last_idx:
+                write_block = True
 
-                if first_zero and not last_zero and is_zero:
+                if is_zero and in_a_string_of_zeroes:
                     last_zero = i
+                    in_a_string_of_zeroes = False
 
-                if not first_zero or not last_zero:
-                    first_zero = -1
-                    last_zero  = -1
+            
+            # swy: write and then start a new block if we find zeros after a non-zero block
+            if (is_zero and not in_a_string_of_zeroes and last_zero):
+                write_block = True
 
-                data_slice = ground[layer_name][last_zero + 1: i + 1]
+            if write_block:
+                data_slice = ground[layer_name][last_zero + 1: i]
                 amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1
 
                 if (amount_of_preceding_zeros < 0):
@@ -267,10 +276,15 @@ with open(output, mode='wb') as f:
                         f.write(pack(f'<{len(data_slice)}B', *data_slice))
 
                 # swy: reset the state machine back, a new block may start at the next element
-                block_begins_at = i + 1
+                block_begins_at = i
                 first_zero = None
                 last_zero = None
                 in_a_string_of_zeroes = False
+                write_block = False
+
+                if is_zero:
+                    in_a_string_of_zeroes = True
+                    first_zero = i
 
 
 

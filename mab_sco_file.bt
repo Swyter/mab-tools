@@ -120,27 +120,28 @@ struct
     {
         float x;
         float y;
-        float height;
+        float height; /* swy: z is height/up */
     } vertex[vertex_count];
     
     
     uint32 edge_count;
     struct
     {
-        int32 some_count; /* swy: maybe adjacency count for nearby polys */
+        int32 face_count; /* swy: adjacency count for nearby polys we are a part of; either 1 or 2 faces, sometimes an edge is used in a single poly */
         int32 vtx_a;
         int32 vtx_b;
-        int32 face_idx_maybe_a; /* swy: one of these is set to -10000 when some_count is 1 */
-        int32 face_idx_maybe_b; /*      mainly the bottom one here, I think it's a main face back-reference */
+        int32 face_idx_r; /* swy: one of these is set to -10000 when some_count is 1 */
+        int32 face_idx_l; /*      mainly the bottom one here, I think it's a main face back-reference */
     } edge[edge_count];
     
     
     uint32 face_count;
     struct
     {
-        uint32 edge_count <bgcolor=cDkGreen>;
-        uint a[edge_count] <bgcolor=cBlue>;
-        uint b[edge_count] <bgcolor=cDkBlue>;
+        uint vtx_and_edge_count <bgcolor=cDkGreen>;
+
+        uint vertices[vtx_and_edge_count] <bgcolor=cBlue>;
+        uint edges   [vtx_and_edge_count] <bgcolor=cDkBlue>;
 
         uint has_more <bgcolor=cRed>;
 

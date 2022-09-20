@@ -197,8 +197,9 @@ with open(output, mode='wb') as f:
 
     for i, ground_layer in enumerate(ground_layer_look_up):
         layer_name = ground_layer.split('.')[0].lower()
+        layer_data = ground[layer_name]
         layer_index = ground_layer_look_up[ground_layer]
-        layer_data_len = len(ground[layer_name])
+        layer_data_len = len(layer_data)
         layer_last_idx = layer_data_len - 1
         layer_has_data = layer_data_len > 0
 
@@ -231,10 +232,8 @@ with open(output, mode='wb') as f:
         block_begins_at = 0
         write_block = False
 
-        cur_layer_data = ground[layer_name]
-
         for i in range(layer_data_len):
-            is_zero = (cur_layer_data[i] == zero)
+            is_zero = (layer_data[i] == zero)
 
             if block_begins_at == i and is_zero and not in_a_string_of_zeroes: # swy: if our block starts with zeroes, note it down
                 in_a_string_of_zeroes = True
@@ -267,7 +266,7 @@ with open(output, mode='wb') as f:
                 #      and we want a slice as big as the entire data array (i + 1)
                 last_slice_idx = last_zero == -1 and i + 1 or i
 
-                data_slice = cur_layer_data[last_zero + 1: last_slice_idx]
+                data_slice = layer_data[last_zero + 1: last_slice_idx]
                 amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1
 
                 if (amount_of_preceding_zeros < 0):

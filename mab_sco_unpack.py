@@ -103,6 +103,26 @@ with open(path, mode='rb') as f:
 
         ai_mesh['faces'].append({'edge_count': edge_count, 'face': face, 'edge': edge, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
 
+    edgelist = {}
+    for i, elem in enumerate(ai_mesh['faces']):
+        face_data = elem['face']
+        for j, elem in enumerate(face_data):
+            a = face_data[j]; b = face_data[((j+1) % len(face_data))]
+            
+            if f'{a}-{b}' in edgelist:
+                print(f'{a}-{b} already exists')
+                edgelist[f'{a}-{b}'].append(i)
+                continue
+            if f'{b}-{a}' in edgelist:
+                print(f'{b}-{a} already exists (r)')
+                edgelist[f'{b}-{a}'].append(i)
+                continue
+
+            edgelist[f'{a}-{b}'] = [i]
+
+    # swy: orig edge count 615
+    print((len(edgelist))) # len(edgelist) => 938, without dupes: 615
+    exit()
     with open(f"{scene_file}/ai_mesh.obj", mode='w') as fw:
         fw.write(f'# Mount&Blade AI mesh exported by Swyter\'s SCO unpacker from\n# <{scene_file}.sco> on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
         for elem in ai_mesh['vertices']:

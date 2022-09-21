@@ -104,21 +104,28 @@ with open(path, mode='rb') as f:
         ai_mesh['faces'].append({'edge_count': edge_count, 'face': face, 'edge': edge, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
 
     edgelist = {}
+    edgelist_idx = {}
+    facelist = {}
     for i, elem in enumerate(ai_mesh['faces']):
         face_data = elem['face']
+        facelist[i] = []
         for j, elem in enumerate(face_data):
             a = face_data[j]; b = face_data[((j+1) % len(face_data))]
             
             if f'{a}-{b}' in edgelist:
-                print(f'{a}-{b} already exists')
+                print(f'{a}-{b} already exists -- {i}')
                 edgelist[f'{a}-{b}'].append(i)
                 continue
             if f'{b}-{a}' in edgelist:
-                print(f'{b}-{a} already exists (r)')
+                print(f'{b}-{a} already exists (r) -- {edgelist[f"{b}-{a}"]} {i}')
                 edgelist[f'{b}-{a}'].append(i)
+                facelist[i].append(edgelist_idx[f'{b}-{a}'])
                 continue
 
+            print(f'new {a}-{b} -- {i}')
+            edgelist_idx[f'{a}-{b}'] = len(edgelist)
             edgelist[f'{a}-{b}'] = [i]
+            facelist[i].append(edgelist_idx[f'{a}-{b}'])
 
     # swy: orig edge count 615
     print((len(edgelist))) # len(edgelist) => 938, without dupes: 615

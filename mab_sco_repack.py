@@ -9,7 +9,7 @@ def write_rgltag(str):
 
 # swy: source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data
 #      from a «scn_advcamp_dale» directory in the same folder as this script
-path  = './scn_caras_galadhon_siege.sco'
+path  = './scn_caras_galadhon_siege_orig.sco'
 
 # swy: donor SCO with the AI mesh you want to copy over to the file above;
 #      probably the original SCO file, it can't be the same file you want to write to
@@ -66,12 +66,21 @@ with open(output, mode='wb') as f:
             elif line[0] == 'f':
                 faces.append([int(token) - 1 for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
 
-#   # swy: stub this AI mesh section for now; this is empty
-#   f.write(pack('<I', 4*3)) # ai_mesh_section_size
-#   f.write(pack('<I', 0)) # vertex_count
-#   f.write(pack('<I', 0)) # edge_count
-#   f.write(pack('<I', 0)) # face_count
+    # swy: stub this AI mesh section for now; this is empty
+    f.write(pack('<I', 0xE624)) # ai_mesh_section_size
+    f.write(pack('<I', len(vertices))) # vertex_count
 
+    for vtx in vertices:
+        f.write(pack('<3f', *vtx))
+
+    #f.write(pack('<I', len(edges))) # edge_count
+
+    
+    f.write(pack('<I', len(faces))) # face_count
+
+    #for fcs in faces:
+    #    f.write(pack('<3f', *vtx))
+    exit()
 
     # swy: copy the AI mesh and ground stuff over from the other SCO file
     with open(donor, mode='rb') as wf:

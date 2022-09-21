@@ -31,7 +31,7 @@ def read_rgltag():
 #
 #         - the rest are optional PGM files which contain grayscale data for each of the painted ground
 #           textures for the limited set of hardcoded materials.
-path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_edoras_siege.sco'
+path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege_orig.sco'
 
 scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
 
@@ -132,7 +132,7 @@ with open(path, mode='rb') as f:
     with open(f"{scene_file}/ai_mesh.obj", mode='w') as fw:
         fw.write(f'# Mount&Blade AI mesh exported by Swyter\'s SCO unpacker from\n# <{scene_file}.sco> on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
         for elem in ai_mesh['vertices']:
-            fw.write('v %f %f %f\n' % (elem))
+            fw.write(f'v {" ".join([repr(e) for e in elem])}\n') # swy: write the text floats with as much precision/decimals as possible to get exact results when parsing them back: https://stackoverflow.com/a/3481575/674685
         fw.write("\n# edges\n\n")
         for i, elem in enumerate(ai_mesh['edges']):
             face_data = [vtx_idx +1 for vtx_idx in elem]

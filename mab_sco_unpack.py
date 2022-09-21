@@ -113,9 +113,8 @@ with open(path, mode='rb') as f:
             a = face_data[j]; b = face_data[((j+1) % len(face_data))]
             
             if f'{a}-{b}' in edgelist:
-                print(f'{a}-{b} already exists -- {i}')
-                edgelist[f'{a}-{b}'].append(i)
-                continue
+                print(f'{a}-{b} detected non-manifold edge at face index {i} -- between {repr(ai_mesh["vertices"][a])} and {repr(ai_mesh["vertices"][b])}')
+                exit(4)
             if f'{b}-{a}' in edgelist:
                 print(f'{b}-{a} already exists (r) -- {edgelist[f"{b}-{a}"]} {i}')
                 edgelist[f'{b}-{a}'].append(i)
@@ -129,18 +128,18 @@ with open(path, mode='rb') as f:
 
     # swy: orig edge count 615
     print((len(edgelist))) # len(edgelist) => 938, without dupes: 615
-    exit()
+    #exit()
     with open(f"{scene_file}/ai_mesh.obj", mode='w') as fw:
         fw.write(f'# Mount&Blade AI mesh exported by Swyter\'s SCO unpacker from\n# <{scene_file}.sco> on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
         for elem in ai_mesh['vertices']:
             fw.write('v %f %f %f\n' % (elem))
         fw.write("\n# edges\n\n")
         for i, elem in enumerate(ai_mesh['edges']):
-            face_data = [vtx_idx for vtx_idx in elem]
+            face_data = [vtx_idx +1 for vtx_idx in elem]
             fw.write(f'e{" %i" * len(face_data)} \t\t# {i}\n' % tuple(face_data))
         fw.write("\n# faces\n\n")
         for i, elem in enumerate(ai_mesh['faces']):
-            face_data = [vtx_idx  for vtx_idx in elem['face']]
+            face_data = [vtx_idx + 1 for vtx_idx in elem['face']]
             fw.write(f'f{" %u" * len(face_data)} \t\t# {i} {repr(elem)}\n' % tuple(face_data))
 
     terrain_magic = unpack('<I', f.read(4))[0]; assert(terrain_magic == 0xFF4AD1A6)

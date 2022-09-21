@@ -73,13 +73,15 @@ with open(output, mode='wb') as f:
     for vtx in vertices:
         f.write(pack('<3f', *vtx))
 
-    #f.write(pack('<I', len(edges))) # edge_count
+    f.write(pack('<I', 0)) # edge_count
 
-    
     f.write(pack('<I', len(faces))) # face_count
 
-    #for fcs in faces:
-    #    f.write(pack('<3f', *vtx))
+    for fcs in faces:
+        f.write(pack('<I', len(fcs)))
+        f.write(pack(f'<{len(fcs)}I', *fcs))
+        f.write(pack(f'<{len(fcs)}I', *fcs))
+        f.write(pack('<I', 0))
     exit()
 
     # swy: copy the AI mesh and ground stuff over from the other SCO file

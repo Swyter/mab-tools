@@ -69,48 +69,55 @@ with open(output, mode='wb') as f:
     # swy: stub this AI mesh section for now; this is empty
     ai_mesh_section_size_start_pos = f.tell()
     f.write(pack('<I', 0)) # ai_mesh_section_size, we go back and fix/overwrite this one at the end
+
     f.write(pack('<I', len(vertices))) # vertex_count
     for vtx in vertices:
         f.write(pack('<3f', *vtx))
 
-    f.write(pack('<I', 0)) # edge_count
+    f.write(pack('<I', 1407)) # edge_count
+    for edg in range(1407):
+        f.write(pack('<I', 2)) # face_count
+        f.write(pack('<I', 0)) # vtx_a
+        f.write(pack('<I', 0)) # vtx_b
+        f.write(pack('<I', 0)) # face_idx_r
+        f.write(pack('<I', 0)) # face_idx_l
 
     f.write(pack('<I', len(faces))) # face_count
     for fcs in faces:
-        f.write(pack('<I', len(fcs)))
-        f.write(pack(f'<{len(fcs)}I', *fcs))
-        f.write(pack(f'<{len(fcs)}I', *fcs))
-        f.write(pack('<I', 0))
+        f.write(pack('<I', len(fcs))) # vtx_and_edge_count
+        f.write(pack(f'<{len(fcs)}I', *fcs)) # vertices
+        f.write(pack(f'<{len(fcs)}I', *fcs)) # edges
+        f.write(pack('<I', 0)) # has_more
 
-    # swy: fill ai_mesh_section_size afterwards, once we know how bit the section really is
+    # swy: fill ai_mesh_section_size afterwards, once we know how big the section really is
     ai_mesh_section_end_pos = f.tell()
     f.seek(ai_mesh_section_size_start_pos, io.SEEK_SET)
     f.write(pack('<I', ai_mesh_section_end_pos - (ai_mesh_section_size_start_pos + 4)))
     f.seek(ai_mesh_section_end_pos, io.SEEK_SET)
-    exit()
+
 
     # swy: copy the AI mesh and ground stuff over from the other SCO file
-    with open(donor, mode='rb') as wf:
-        magic = unpack('<I', wf.read(4))[0]; assert(magic == 0xFFFFFD33)
-        versi = unpack('<I', wf.read(4))[0]; assert(versi == 4)
-
-        # swy: walk over all the mission object/scene prop entries;
-        #      due to the text/strings each of them takes a variable amount of bytes
-        object_count = unpack('<I', wf.read(4))[0]
-
-        for i in range(object_count):
-            wf.seek(4 + 4 + 4 + (4*3) + (4*3) + (4*3) + (4*3), os.SEEK_CUR);
-            rgltag_len = unpack('<I', wf.read(4))[0]
-            wf.seek(rgltag_len + 4 + 4 + (4*3), os.SEEK_CUR);
-
-        # swy: we've reached the end of the mission object section; the AI mesh chunk starts here.
-        #      copy and paste the rest of the file
-        print(f"[i] AI mesh of donor {donor_file} starts at offset; copying from here onwards:", hex(wf.tell()))
-
-        ai_mesh_start_pos = wf.tell()
-        ai_mesh_section_size = unpack('<I', wf.read(4))[0]
-        wf.seek(ai_mesh_start_pos, io.SEEK_SET)
-        f.write(wf.read(ai_mesh_section_size + 4))
+#    with open(donor, mode='rb') as wf:
+#        magic = unpack('<I', wf.read(4))[0]; assert(magic == 0xFFFFFD33)
+#        versi = unpack('<I', wf.read(4))[0]; assert(versi == 4)
+#
+#        # swy: walk over all the mission object/scene prop entries;
+#        #      due to the text/strings each of them takes a variable amount of bytes
+#        object_count = unpack('<I', wf.read(4))[0]
+#
+#        for i in range(object_count):
+#            wf.seek(4 + 4 + 4 + (4*3) + (4*3) + (4*3) + (4*3), os.SEEK_CUR);
+#            rgltag_len = unpack('<I', wf.read(4))[0]
+#            wf.seek(rgltag_len + 4 + 4 + (4*3), os.SEEK_CUR);
+#
+#        # swy: we've reached the end of the mission object section; the AI mesh chunk starts here.
+#        #      copy and paste the rest of the file
+#        print(f"[i] AI mesh of donor {donor_file} starts at offset; copying from here onwards:", hex(wf.tell()))
+#
+#        ai_mesh_start_pos = wf.tell()
+#        ai_mesh_section_size = unpack('<I', wf.read(4))[0]
+#        wf.seek(ai_mesh_start_pos, io.SEEK_SET)
+#        f.write(wf.read(ai_mesh_section_size + 4))
 
     ground = {}
     ground_layer_look_up = {
@@ -331,7 +338,7 @@ with open(output, mode='wb') as f:
                     in_a_string_of_zeroes = True
                     first_zero = i
 
-    # swy: fill terrain_section_size afterwards, once we know how bit the section really is
+    # swy: fill terrain_section_size afterwards, once we know how big the section really is
     terrain_section_end_pos = f.tell()
     f.seek(terrain_section_size_start_pos, io.SEEK_SET)
     f.write(pack('<I', terrain_section_end_pos - (terrain_section_size_start_pos + 4)))

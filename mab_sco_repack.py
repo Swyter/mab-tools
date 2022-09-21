@@ -67,21 +67,26 @@ with open(output, mode='wb') as f:
                 faces.append([int(token) - 1 for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
 
     # swy: stub this AI mesh section for now; this is empty
-    f.write(pack('<I', 0xE624)) # ai_mesh_section_size
+    ai_mesh_section_size_start_pos = f.tell()
+    f.write(pack('<I', 0)) # ai_mesh_section_size, we go back and fix/overwrite this one at the end
     f.write(pack('<I', len(vertices))) # vertex_count
-
     for vtx in vertices:
         f.write(pack('<3f', *vtx))
 
     f.write(pack('<I', 0)) # edge_count
 
     f.write(pack('<I', len(faces))) # face_count
-
     for fcs in faces:
         f.write(pack('<I', len(fcs)))
         f.write(pack(f'<{len(fcs)}I', *fcs))
         f.write(pack(f'<{len(fcs)}I', *fcs))
         f.write(pack('<I', 0))
+
+    # swy: fill ai_mesh_section_size afterwards, once we know how bit the section really is
+    ai_mesh_section_end_pos = f.tell()
+    f.seek(ai_mesh_section_size_start_pos, io.SEEK_SET)
+    f.write(pack('<I', ai_mesh_section_end_pos - (ai_mesh_section_size_start_pos + 4)))
+    f.seek(ai_mesh_section_end_pos, io.SEEK_SET)
     exit()
 
     # swy: copy the AI mesh and ground stuff over from the other SCO file

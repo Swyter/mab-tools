@@ -47,7 +47,25 @@ with open(output, mode='wb') as f:
         f.write(pack('<I',   object["entry_no"]))
         f.write(pack('<I',   object["menu_entry_no"]))
         f.write(pack('<3f', *object["scale"]))
-    
+
+    vertices = []; faces = []    
+
+    with open(f"{scene_file}/ai_mesh.obj") as f_obj:
+        for line in f_obj:
+            # swy: strip anything to the right of a line comment marker
+            line = line[:line.find('//')]
+            line = line[:line.find('#' )]
+            line = line.split()
+            print(line)
+
+            if not line or len(line) < 4:
+                continue
+
+            if line[0] == 'v':
+                vertices.append([float(token) for token in line[1:]])
+            elif line[0] == 'f':
+                faces.append([int(token) - 1 for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
+
 #   # swy: stub this AI mesh section for now; this is empty
 #   f.write(pack('<I', 4*3)) # ai_mesh_section_size
 #   f.write(pack('<I', 0)) # vertex_count

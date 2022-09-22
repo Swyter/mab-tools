@@ -76,6 +76,7 @@ with open(path, mode='rb') as f:
         print(i, object_type[type], str, entry_no)
         mission_objects.append(object)
     
+    # swy: read the AI mesh data structures
     ai_mesh = {'vertices': [], 'edges': [], 'faces': []}
 
     ai_mesh_section_size = unpack('<I', f.read(4))[0]
@@ -103,6 +104,7 @@ with open(path, mode='rb') as f:
 
         ai_mesh['faces'].append({'edge_count': edge_count, 'face': face, 'edge': edge, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
 
+    # swy: try to recompute the edge data for debugging purposes to see how well it matches the original values
     edgelist = {}
     edgelist_idx = {}
     facelist = {}
@@ -143,6 +145,7 @@ with open(path, mode='rb') as f:
             face_data = [vtx_idx + 1 for vtx_idx in elem['face']]
             fw.write(f'f{" %u" * len(face_data)} \t\t# {i} {repr(elem)}\n' % tuple(face_data))
 
+    # swy: read the terrain/ground layer data structures
     terrain_magic = unpack('<I', f.read(4))[0]; assert(terrain_magic == 0xFF4AD1A6)
     terrain_section_size = unpack('<I', f.read(4))[0]
     num_layers = unpack('<I', f.read(4))[0]

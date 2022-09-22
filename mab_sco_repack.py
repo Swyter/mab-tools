@@ -57,28 +57,25 @@ with open(output, mode='wb') as f:
             pos = line.find(token)
             return pos != -1 and line[:pos] or line
 
-    with open(f"{scene_file}/sphinx_body.obj") as f_obj:
+    with open(f"{scene_file}/ai_mesh.obj") as f_obj:
         for i, line in enumerate(f_obj):
-
-            if i == 8684:
-                print("bp")
-
             # swy: strip anything to the right of a line comment marker
             line = getleftpart(line, '//')
             line = getleftpart(line, '#' )
             line = line.split()
-            print(line)
 
             if not line or len(line) < 4:
                 continue
 
             if line[0] == 'v':
-                vertices.append([float(token) * 100. for token in line[1:]])
+                vertices.append([float(token)  for token in line[1:]])
             elif line[0] == 'f':
-                faces.append([int(getleftpart(token, '/')) - 1 for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
+                faces.append([int(getleftpart(token, '/')) - 1  for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
 
     # swy: crummy way of regenerating an acceptable edge-face data,
     #      this is a bit like some halfedge data structure for A* traversal
+
+    print("[i] recomputing edge data from the face-vertex mapping in the OBJ file")
     faces_in_edge = {} # swy: face idx that this edge is part of
     faces_in_edge_idx = {}
     edges_in_face = {} # swy: edge members of a face
@@ -109,10 +106,10 @@ with open(output, mode='wb') as f:
 
     f.write(pack('<I', len(vertices))) # vertex_count
     for vtx in vertices:
-        y = vtx[1] # swy: make it upright when the model Y-is-up
-        z = vtx[2]
-        vtx[1] = z
-        vtx[2] = y
+        #y = vtx[1] # swy: make it upright when the model Y-is-up
+        #z = vtx[2]
+        #vtx[1] = z
+        #vtx[2] = y
         f.write(pack('<3f', *vtx[:3]))
 
     f.write(pack('<I', len(faces_in_edge))) # edge_count
@@ -122,8 +119,10 @@ with open(output, mode='wb') as f:
         data = faces_in_edge[edg]
         face_count = len(data)
 
+        # swy: if this edge is only part of a single poly pad out the
+        #      remaining field with this dummy value the game uses
         if face_count < 2:
-            data.append(-99999)
+            data.append(-10000)
 
         f.write(pack('<I', face_count)) # face_count
         f.write(pack('<I', a)) # vtx_a
@@ -289,6 +288,8 @@ with open(output, mode='wb') as f:
     f.write(pack('<I', len(ground_layer_look_up))) # swy: num_layers
     f.write(pack('<I', last_scene_width)) # swy: scene_width value
     f.write(pack('<I', last_scene_height)) # swy: scene_height value
+
+    print(f'\n[i] writing a {last_scene_width} x {last_scene_width} terrain block')
 
     for i, ground_layer in enumerate(ground_layer_look_up):
         layer_name = ground_layer.split('.')[0].lower()

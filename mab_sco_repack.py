@@ -16,31 +16,35 @@ output = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_gal
 
 
 # swy: copy the AI mesh and ground stuff over from the other SCO file
-def write_over_from(donor_file, write_mission_objects = False, write_ai_mesh = False, write_terrain = False):
-    with open(donor, mode='rb') as wf:
-        magic = unpack('<I', wf.read(4))[0]; assert(magic == 0xFFFFFD33)
-        versi = unpack('<I', wf.read(4))[0]; assert(versi == 4)
+def write_over_from(output_f, donor, write_mission_objects = False, write_ai_mesh = False, write_terrain = False):
+    if not 'donor_file_data' in donor:
+        print(f"[e] the binary data from the donor is missing; darn..."); exit(69)
+
+    donor_file_data = donor['donor_file_data']
+    with io.BytesIO(donor_file_data) as donor_f:
+        magic = unpack('<I', donor_f.read(4))[0]; assert(magic == 0xFFFFFD33)
+        versi = unpack('<I', donor_f.read(4))[0]; assert(versi == 4)
 
         # swy: walk over all the mission object/scene prop entries;
         #      due to the text/strings each of them takes a variable amount of bytes
-        object_count = unpack('<I', wf.read(4))[0]
+        object_count = unpack('<I', donor_f.read(4))[0]
 
         for i in range(object_count):
-            wf.seek(4 + 4 + 4 + (4*3) + (4*3) + (4*3) + (4*3), os.SEEK_CUR);
-            rgltag_len = unpack('<I', wf.read(4))[0]
-            wf.seek(rgltag_len + 4 + 4 + (4*3), os.SEEK_CUR);
+            donor_f.seek(4 + 4 + 4 + (4*3) + (4*3) + (4*3) + (4*3), os.SEEK_CUR);
+            rgltag_len = unpack('<I', donor_f.read(4))[0]
+            donor_f.seek(rgltag_len + 4 + 4 + (4*3), os.SEEK_CUR);
 
         # swy: we've reached the end of the mission object section; the AI mesh chunk starts here.
         #      copy and paste the rest of the file
-        print(f"[i] AI mesh of donor {donor_file} starts at offset; copying from here onwards:", hex(wf.tell()))
+        print(f"[i] AI mesh of donor starts at offset; copying from here onwards:", hex(donor_f.tell()))
 
-        ai_mesh_start_pos = wf.tell()
-        ai_mesh_section_size = unpack('<I', wf.read(4))[0]
-        wf.seek(ai_mesh_start_pos, io.SEEK_SET)
-        f.write(wf.read(ai_mesh_section_size + 4))
+        ai_mesh_start_pos = donor_f.tell()
+        ai_mesh_section_size = unpack('<I', donor_f.read(4))[0]
+        donor_f.seek(ai_mesh_start_pos, io.SEEK_SET)
+        output_f.write(donor_f.read(ai_mesh_section_size + 4))
 
 def copy_over_instead_of_repacking(option):
-    return option not in ['keep', 'empty']
+    return option not in ['keep', 'empty'] and 'donor_file_data' in option
 
 def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_from = False, terrain_from = False):
     def write_rgltag(str):
@@ -64,7 +68,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
             
             if copy_over_instead_of_repacking(mission_objects_from):
                 print(f"[>] copying over the mission object section from donor «{mission_objects_from}» file")
-                write_over_from(mission_objects_from, write_mission_objects=True)
+                write_over_from(f, mission_objects_from, write_mission_objects=True)
             else:
                 mission_objects = []
 
@@ -99,7 +103,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
 
             if copy_over_instead_of_repacking(ai_mesh_from):
                 print(f"[>] copying over the AI mesh section from donor «{ai_mesh_from}» file")
-                write_over_from(ai_mesh_from, write_ai_mesh=True)
+                write_over_from(f, ai_mesh_from, write_ai_mesh=True)
 
             else:
                 # swy: convert the AI mesh section from a Wavefront OBJ file and
@@ -204,7 +208,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
 
             if copy_over_instead_of_repacking(terrain_from):
                 print(f"[>] copying over the terrain section from donor «{terrain_from}» file")
-                write_over_from(terrain_from, write_terrain=True)
+                write_over_from(f, terrain_from, write_terrain=True)
 
             else:
                 # swy: convert the individual heightmap/RGB paint/material image files into actual ground/terrain

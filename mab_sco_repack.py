@@ -40,7 +40,7 @@ def write_over_from():
         f.write(wf.read(ai_mesh_section_size + 4))
 
 def copy_over_instead_of_repacking(option):
-    return option not in ['keep' or 'empty']
+    return option not in ['keep', 'empty']
 
 def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_from = False, terrain_from = False):
     def write_rgltag(str):
@@ -64,6 +64,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
             
             if copy_over_instead_of_repacking(mission_objects_from):
                 a=1
+                print(f"[>] copying over the mission object section from donor «{mission_objects_from}» file")
             else:
                 mission_objects = []
 
@@ -97,6 +98,8 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
 
             if copy_over_instead_of_repacking(ai_mesh_from):
                 a=1
+                print(f"[>] copying over the AI mesh section from donor «{ai_mesh_from}» file")
+
             else:
                 # swy: convert the AI mesh section from a Wavefront OBJ file and
                 #      regenerate the extra face <-> edge <-> vertex linked data
@@ -199,6 +202,8 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
 
             if copy_over_instead_of_repacking(terrain_from):
                 a=1
+                print(f"[>] copying over the terrain section from donor «{terrain_from}» file")
+
             else:
                 # swy: convert the individual heightmap/RGB paint/material image files into actual ground/terrain
                 #      layer blocks. these are optionally RLE-encoded using a matching algorithm
@@ -463,7 +468,7 @@ Quick examples:
     parser.add_argument('-te', '--terrain',        dest='sect_terrain',         default='repack', metavar='<option>', required=False,
                         help='by default the <option> is «repack», it will convert back the unpacked data in the folder you provide. You can use «keep» to retain the original data in the target SCO if it exists and avoid modifying that part, which is also faster than repacking and lossless, you can use «empty» or «blank» to completely remove any data previously that section, or, finally; you can provide a path to a different donor .sco file to copy that section over directly into the target .sco, losslessly replacing a section/block without having to unpack it first or merge it manually.')
 
-    args = parser.parse_args('. -o scn_blank_sc.sco -mo empty -ai empty -te empty '.split())
+    args = parser.parse_args('. -o scn_blank_sc.sco -mo .sco -ai emptye -te emptyu '.split())
 
     sco_repack(
         args.input, args.output, mission_objects_from=args.sect_mission_objects,

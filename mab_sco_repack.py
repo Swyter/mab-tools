@@ -57,7 +57,7 @@ with open(output, mode='wb') as f:
             pos = line.find(token)
             return pos != -1 and line[:pos] or line
 
-    with open(f"{scene_file}/HD22_Aby_Mayor.obj") as f_obj:
+    with open(f"{scene_file}/sphinx_body.obj") as f_obj:
         for i, line in enumerate(f_obj):
 
             if i == 8684:
@@ -77,29 +77,30 @@ with open(output, mode='wb') as f:
             elif line[0] == 'f':
                 faces.append([int(getleftpart(token, '/')) - 1 for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
 
-
-    edgelist = {} # swy: face idx that this edge is part of
-    edgelist_idx = {}
-    facelist = {} # swy: edge members of a face
+    # swy: crummy way of regenerating an acceptable edge-face data,
+    #      this is a bit like some halfedge data structure for A* traversal
+    faces_in_edge = {} # swy: face idx that this edge is part of
+    faces_in_edge_idx = {}
+    edges_in_face = {} # swy: edge members of a face
     for i, elem in enumerate(faces):
         face_data = elem
-        facelist[i] = []
+        edges_in_face[i] = []
         for j, elem in enumerate(face_data):
             a = face_data[j]; b = face_data[((j+1) % len(face_data))]
             
-            if f'{a}-{b}' in edgelist:
-                print(f'{a}-{b} detected non-manifold edge at face index {i} -- between {repr(vertices[a])} and {repr(vertices[b])}')
+            if f'{a}-{b}' in faces_in_edge:
+                print(f'[e] {a}-{b} detected non-manifold edge at face index {i} -- between {repr(vertices[a])} and {repr(vertices[b])}\n    This means that some of your vertices/edges are part of more than two faces, please fix this in the original 3D mesh. This may cause issues, ignoring.')
                 #exit(4)
-            if f'{b}-{a}' in edgelist:
-                print(f'{b}-{a} already exists (r) -- {edgelist[f"{b}-{a}"]} {i}')
-                edgelist[f'{b}-{a}'].append(i)
-                facelist[i].append(edgelist_idx[f'{b}-{a}'])
+            if f'{b}-{a}' in faces_in_edge:
+                print(f'{b}-{a} already exists (r) -- {faces_in_edge[f"{b}-{a}"]} {i}')
+                faces_in_edge[f'{b}-{a}'].append(i)
+                edges_in_face[i].append(faces_in_edge_idx[f'{b}-{a}'])
                 continue
 
             print(f'new {a}-{b} -- {i}')
-            edgelist_idx[f'{a}-{b}'] = len(edgelist)
-            edgelist[f'{a}-{b}'] = [i]
-            facelist[i].append(edgelist_idx[f'{a}-{b}'])
+            faces_in_edge_idx[f'{a}-{b}'] = len(faces_in_edge)
+            faces_in_edge[f'{a}-{b}'] = [i]
+            edges_in_face[i].append(faces_in_edge_idx[f'{a}-{b}'])
 
 
 
@@ -114,11 +115,11 @@ with open(output, mode='wb') as f:
         vtx[2] = y
         f.write(pack('<3f', *vtx[:3]))
 
-    f.write(pack('<I', len(edgelist))) # edge_count
-    for edg in edgelist:
+    f.write(pack('<I', len(faces_in_edge))) # edge_count
+    for edg in faces_in_edge:
         a, b = (int(token)  for token in edg.split('-'))
 
-        data = edgelist[edg]
+        data = faces_in_edge[edg]
         face_count = len(data)
 
         if face_count < 2:
@@ -135,7 +136,7 @@ with open(output, mode='wb') as f:
     for i, fcs in enumerate(faces):
         f.write(pack('<I', len(fcs))) # vtx_and_edge_count
         f.write(pack(f'<{len(fcs)}I', *fcs)) # vertices
-        f.write(pack(f'<{len(fcs)}I', *facelist[i])) # edges
+        f.write(pack(f'<{len(fcs)}I', *edges_in_face[i])) # edges
         f.write(pack('<I', 0)) # has_more
 
     # swy: fill ai_mesh_section_size afterwards, once we know how big the section really is

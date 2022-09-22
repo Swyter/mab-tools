@@ -61,11 +61,13 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
             f.write(pack('<I', 4)) # swy: SCO file version
             
             mission_objects = []
-            try:
-                with open(f"{input_folder}/mission_objects.json") as f_json:
-                    mission_objects = json.load(f_json)
-            except OSError as e:
-                print(f"[!] skipping mission objects/scene props: {e}", file=sys.stderr)
+
+            if not mission_objects_from == 'empty':
+                try:
+                    with open(f"{input_folder}/mission_objects.json") as f_json:
+                        mission_objects = json.load(f_json)
+                except OSError as e:
+                    print(f"[!] skipping mission objects/scene props: {e}", file=sys.stderr)
 
             object_count = len(mission_objects)
             f.write(pack('<I', object_count))
@@ -96,23 +98,24 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
             def getleftpart(line, token):
                     pos = line.find(token)
                     return pos != -1 and line[:pos] or line
-            try:
-                with open(f"{input_folder}/ai_mesh.obj") as f_obj:
-                    for i, line in enumerate(f_obj):
-                        # swy: strip anything to the right of a line comment marker
-                        line = getleftpart(line, '//')
-                        line = getleftpart(line, '#' )
-                        line = line.split()
+            if not ai_mesh_from == 'empty':
+                try:
+                    with open(f"{input_folder}/ai_mesh.obj") as f_obj:
+                        for i, line in enumerate(f_obj):
+                            # swy: strip anything to the right of a line comment marker
+                            line = getleftpart(line, '//')
+                            line = getleftpart(line, '#' )
+                            line = line.split()
 
-                        if not line or len(line) < 4:
-                            continue
+                            if not line or len(line) < 4:
+                                continue
 
-                        if line[0] == 'v':
-                            vertices.append([float(token)  for token in line[1:]])
-                        elif line[0] == 'f':
-                            faces.append([int(getleftpart(token, '/')) - 1  for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
-            except OSError as e:
-                print(f"[!] skipping AI mesh: {e}", file=sys.stderr)
+                            if line[0] == 'v':
+                                vertices.append([float(token)  for token in line[1:]])
+                            elif line[0] == 'f':
+                                faces.append([int(getleftpart(token, '/')) - 1  for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
+                except OSError as e:
+                    print(f"[!] skipping AI mesh: {e}", file=sys.stderr)
 
             # swy: crummy way of regenerating an acceptable edge-face data,
             #      this is a bit like some halfedge data structure for A* traversal
@@ -202,103 +205,104 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                 layer_name = ground_layer.split('.')[0].lower()
                 ext        = ground_layer.split('.')[1].lower()
                 ground[layer_name] = []; contents = []
+                
+                if not terrain_from == 'empty':
+                    try:
+                        with open(f"{input_folder}/layer_{ground_layer}", 'rb') as f_image:
+                            ascii_header = [] # swy: grab the three ASCII lines that make out the header of these NetPBM formats; strip their carriage returns and split each line into words/tokens
 
-                try:
-                    with open(f"{input_folder}/layer_{ground_layer}", 'rb') as f_image:
-                        ascii_header = [] # swy: grab the three ASCII lines that make out the header of these NetPBM formats; strip their carriage returns and split each line into words/tokens
+                            while True:
+                                try:
+                                    line = f_image.readline().decode('utf-8').replace('\n', '').replace('\r', '').replace('\t', ' ').strip()
+                                    header_end_byte_offset = f_image.tell()
+                                except UnicodeDecodeError:
+                                    line = '' # swy: skip weird stuff or characters with wrong encoding
+                                    break
 
-                        while True:
-                            try:
-                                line = f_image.readline().decode('utf-8').replace('\n', '').replace('\r', '').replace('\t', ' ').strip()
-                                header_end_byte_offset = f_image.tell()
-                            except UnicodeDecodeError:
-                                line = '' # swy: skip weird stuff or characters with wrong encoding
-                                break
+                                # swy: ignore dummy second (comment) lines like the funky '# Created by GIMP version 2.10.32 PNM plug-in'
+                                if not line or line[0] == '#' or line.startswith('--') or line[0] not in '0123456789+-.,P':
+                                    continue
 
-                            # swy: ignore dummy second (comment) lines like the funky '# Created by GIMP version 2.10.32 PNM plug-in'
-                            if not line or line[0] == '#' or line.startswith('--') or line[0] not in '0123456789+-.,P':
+                                ascii_header += [line.split(' ')]
+                                ascii_header_flattened = [value.strip() for sub_list in ascii_header for value in sub_list if value != ''] # swy: photoshop exports width and height in different lines, and maxval in the fourth line, don't depend on the line position, only the 'token' order matters
+
+                                # swy: the format only has four tokens, that can be part of different lines or just separated by whitespace; this format is way too lax
+                                if len(ascii_header_flattened) > 4:
+                                    break
+
+                            if ascii_header_flattened[0][0] != 'P':
+                                print(f'[e] invalid {ground_layer} header format; skipping')
                                 continue
 
-                            ascii_header += [line.split(' ')]
-                            ascii_header_flattened = [value.strip() for sub_list in ascii_header for value in sub_list if value != ''] # swy: photoshop exports width and height in different lines, and maxval in the fourth line, don't depend on the line position, only the 'token' order matters
+                            magic  =       ascii_header_flattened[0]  # line 1, magic value
+                            width  =   int(ascii_header_flattened[1]) # line 2, width and height
+                            height =   int(ascii_header_flattened[2])
+                            maxval = float(ascii_header_flattened[3]) # line 3, extra thing
 
-                            # swy: the format only has four tokens, that can be part of different lines or just separated by whitespace; this format is way too lax
-                            if len(ascii_header_flattened) > 4:
-                                break
+                            # swy: grab how far away we are from the start after reading the ASCII part, use it to compute how many bytes the rest of the data takes
+                            f_image.seek(0, io.SEEK_END); bytes_remain = f_image.tell() - header_end_byte_offset; f_image.seek(header_end_byte_offset)
 
-                        if ascii_header_flattened[0][0] != 'P':
-                            print(f'[e] invalid {ground_layer} header format; skipping')
-                            continue
+                            if not last_scene_width:
+                                last_scene_width = width
+                            else:
+                                if last_scene_width != width:
+                                    print('[e] the width of all layer images must match'); exit(2)
+                                    
+                            if not last_scene_height:
+                                last_scene_height = height
+                            else:
+                                if last_scene_height != height:
+                                    print('[e] the height of all layer images must match'); exit(2)
 
-                        magic  =       ascii_header_flattened[0]  # line 1, magic value
-                        width  =   int(ascii_header_flattened[1]) # line 2, width and height
-                        height =   int(ascii_header_flattened[2])
-                        maxval = float(ascii_header_flattened[3]) # line 3, extra thing
+                            # swy: actually read and interpret the binary data after the header, depending on the format/sub-variant
+                            print(f'[i] found layer_{ground_layer}; type {magic}, {width} x {height}')
 
-                        # swy: grab how far away we are from the start after reading the ASCII part, use it to compute how many bytes the rest of the data takes
-                        f_image.seek(0, io.SEEK_END); bytes_remain = f_image.tell() - header_end_byte_offset; f_image.seek(header_end_byte_offset)
+                            if magic == 'P5' and ext == 'pgm':
+                                assert(maxval == 255)
+                                cells_to_read = width * height
+                                bytes_to_read = cells_to_read * 1; assert(cells_to_read == bytes_remain)
+                                contents_orig = []; contents_orig = unpack(f'<{cells_to_read}B', f_image.read(bytes_to_read))
 
-                        if not last_scene_width:
-                            last_scene_width = width
-                        else:
-                            if last_scene_width != width:
-                                print('[e] the width of all layer images must match'); exit(2)
-                                
-                        if not last_scene_height:
-                            last_scene_height = height
-                        else:
-                            if last_scene_height != height:
-                                print('[e] the height of all layer images must match'); exit(2)
+                                # swy: flip or mirror each row from right-to-left to left-to-right
+                                for i in range(last_scene_height):
+                                    contents += contents_orig[i*last_scene_width : (i*last_scene_width) + last_scene_width][::-1]
 
-                        # swy: actually read and interpret the binary data after the header, depending on the format/sub-variant
-                        print(f'[i] found layer_{ground_layer}; type {magic}, {width} x {height}')
+                            elif magic == 'P6' and ext == 'ppm':
+                                assert(maxval == 255)
+                                cells_to_read = width * height
+                                bytes_to_read = cells_to_read * 3; assert(bytes_to_read == bytes_remain)
+                                contents_orig = []; contents_orig_rgb_bytes = unpack(f'<{cells_to_read*3}B', f_image.read(bytes_to_read))
 
-                        if magic == 'P5' and ext == 'pgm':
-                            assert(maxval == 255)
-                            cells_to_read = width * height
-                            bytes_to_read = cells_to_read * 1; assert(cells_to_read == bytes_remain)
-                            contents_orig = []; contents_orig = unpack(f'<{cells_to_read}B', f_image.read(bytes_to_read))
+                                for i in range(cells_to_read):
+                                    r = (contents_orig_rgb_bytes[(i * 3) + 0] & 0xff)
+                                    g = (contents_orig_rgb_bytes[(i * 3) + 1] & 0xff)
+                                    b = (contents_orig_rgb_bytes[(i * 3) + 2] & 0xff)
 
-                            # swy: flip or mirror each row from right-to-left to left-to-right
-                            for i in range(last_scene_height):
-                                contents += contents_orig[i*last_scene_width : (i*last_scene_width) + last_scene_width][::-1]
+                                    packed_rgb = (r << (8*1)) | (g << (8*2)) | (b << (8*3))
+                                    contents_orig.append(packed_rgb)
 
-                        elif magic == 'P6' and ext == 'ppm':
-                            assert(maxval == 255)
-                            cells_to_read = width * height
-                            bytes_to_read = cells_to_read * 3; assert(bytes_to_read == bytes_remain)
-                            contents_orig = []; contents_orig_rgb_bytes = unpack(f'<{cells_to_read*3}B', f_image.read(bytes_to_read))
+                                # swy: flip or mirror each row from right-to-left to left-to-right
+                                for i in range(last_scene_height):
+                                    contents += contents_orig[i*last_scene_width : (i*last_scene_width) + last_scene_width][::-1]
 
-                            for i in range(cells_to_read):
-                                r = (contents_orig_rgb_bytes[(i * 3) + 0] & 0xff)
-                                g = (contents_orig_rgb_bytes[(i * 3) + 1] & 0xff)
-                                b = (contents_orig_rgb_bytes[(i * 3) + 2] & 0xff)
+                            elif magic == 'Pf' and ext == 'pfm':
+                                assert(maxval in [-1.0, 1.0])
+                                cells_to_read = width * height
+                                bytes_to_read = cells_to_read * 4; assert(bytes_to_read == bytes_remain)
+                                contents_orig = []; contents_orig = unpack(f'{maxval < 0.0 and "<" or ">"}{cells_to_read}f', f_image.read(bytes_to_read)) # swy: handle both big (1.0, '>f') and little-endian (-1.0, '<f') floats; just in case
 
-                                packed_rgb = (r << (8*1)) | (g << (8*2)) | (b << (8*3))
-                                contents_orig.append(packed_rgb)
-
-                            # swy: flip or mirror each row from right-to-left to left-to-right
-                            for i in range(last_scene_height):
-                                contents += contents_orig[i*last_scene_width : (i*last_scene_width) + last_scene_width][::-1]
-
-                        elif magic == 'Pf' and ext == 'pfm':
-                            assert(maxval in [-1.0, 1.0])
-                            cells_to_read = width * height
-                            bytes_to_read = cells_to_read * 4; assert(bytes_to_read == bytes_remain)
-                            contents_orig = []; contents_orig = unpack(f'{maxval < 0.0 and "<" or ">"}{cells_to_read}f', f_image.read(bytes_to_read)) # swy: handle both big (1.0, '>f') and little-endian (-1.0, '<f') floats; just in case
-
-                            # swy: reverse the row ordering because the PFM format is from bottom to top, unlike every other NetPBM one, of course :)
-                            for i in reversed(range(last_scene_height)):
-                                contents += contents_orig[i*last_scene_width : (i*last_scene_width) + last_scene_width][::-1] # swy: grab one "line" worth of data from the farthest point, and add it first; sort them backwards
+                                # swy: reverse the row ordering because the PFM format is from bottom to top, unlike every other NetPBM one, of course :)
+                                for i in reversed(range(last_scene_height)):
+                                    contents += contents_orig[i*last_scene_width : (i*last_scene_width) + last_scene_width][::-1] # swy: grab one "line" worth of data from the farthest point, and add it first; sort them backwards
 
 
-                        else:
-                            print(f'[e] Unknown NetPBM format, {magic}: use P5, P6 or Pf.'); exit(1)
+                            else:
+                                print(f'[e] Unknown NetPBM format, {magic}: use P5, P6 or Pf.'); exit(1)
 
-                        ground[layer_name] = contents
+                            ground[layer_name] = contents
 
-                except FileNotFoundError:
-                    print(f'[!]    no layer_{ground_layer} here, skipping...')
+                    except FileNotFoundError:
+                        print(f'[!]    no layer_{ground_layer} here, skipping...')
 
             # swy: ensure we at least set the scene dimensions to zero if we're kind of writing an empty section
             last_scene_width  = last_scene_width  and last_scene_width  or 0

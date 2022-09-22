@@ -420,20 +420,20 @@ def sco_repack(input_folder, output_sco, donor_sco='', donate_mission_objects = 
     except OSError as e:
         print(f"[e] couldn't open the target SCO file: {e}", file=sys.stderr)
 
-
+import pathlib
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Repacks Mount&Blade SceneObj files. Created by Swyter in 2022.')
-    parser.add_argument('unpacked_sco_folder', nargs=1, help='an integer for the accumulator')
+    parser = argparse.ArgumentParser(description='Repacks and mixes Mount&Blade SceneObj files. Created by Swyter in 2022.')
+    parser.add_argument('unpacked_sco_folder', type=pathlib.Path, help='an integer for the accumulator')
 
-    parser.add_argument('--output=<path-to-sco>', nargs=1, required=False, help='filename or path to where to write the resulting .SCO;\nif not specified it will be saved in the current folder with the same name as the unpacked_sco_folder.')
+    parser.add_argument('-o', '--output=<path-to-sco>', type=pathlib.Path, required=False, help='filename or path to where to write the resulting .SCO;\nif not specified it will be saved in the current folder with the same name as the unpacked_sco_folder.')
                         
-    parser.add_argument('--objects', nargs=1,
+    parser.add_argument('-mo', '--missionobjects', nargs=1, choices=['keep', 'empty', 'path'],
                         help='«keep»; to retain the existing data, «empty», or a path to the donor .sco file')
-    parser.add_argument('--aimesh',  nargs=1,
+    parser.add_argument('-ai', '--aimesh',  nargs=1,
                         help='«keep»; to retain the existing data, «empty», or a path to the donor .sco file')
-    parser.add_argument('--terrain', nargs=1,
+    parser.add_argument('-te', '--terrain', nargs=1,
                         help='«keep»; to retain the existing data, «empty», or a path to the donor .sco file')
     parser.print_help()
-    args = parser.parse_args("asdfasfd ")
+    args = parser.parse_args([path, '-o', 'thing.sco', '-mat', 'keep'])
     print(args.accumulate(args.integers))
     sco_repack(path, output)

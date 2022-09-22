@@ -1,3 +1,4 @@
+import pathlib
 from struct import *
 import json, os, io
 import sys
@@ -70,11 +71,14 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
     scene_file = input_folder + '.sco'
     donor_file = donor.replace('\\', '/').split('/')[-1].split('.')[0]
 
-    print(f"[i] repacking the data from the «{input_folder}» folder into «{output_sco}»")
+    if not output_sco:
+        output_sco = f'{pathlib.Path(input_folder)}.sco'
 
     if not os.path.isdir(input_folder):
         print(f"[e] the unpacked «{input_folder}» SCO folder doesn't seem to exist")
         exit(1)
+
+    print(f"[i] repacking the data from the «{input_folder}» folder into «{output_sco}»")
 
     try:
         with open(output_sco, mode='wb') as f:
@@ -351,7 +355,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                 f.write(pack('<I', last_scene_width)) # swy: scene_width value
                 f.write(pack('<I', last_scene_height)) # swy: scene_height value
 
-                print(f'\n[i] writing a {last_scene_width} x {last_scene_width} terrain block')
+                print(f'\n[i] writing a {last_scene_width} x {last_scene_height} terrain block')
 
                 for i, ground_layer in enumerate(ground_layer_look_up):
                     layer_name = ground_layer.split('.')[0].lower()
@@ -489,7 +493,7 @@ Quick examples:
     parser.add_argument('-te', '--terrain',        dest='sect_terrain',         default='repack', metavar='<option>', required=False,
                         help='by default the <option> is «repack», it will convert back the unpacked data in the folder you provide. You can use «keep» to retain the original data in the target SCO if it exists and avoid modifying that part, which is also faster than repacking and lossless, you can use «empty» or «blank» to completely remove any data previously that section, or, finally; you can provide a path to a different donor .sco file to copy that section over directly into the target .sco, losslessly replacing a section/block without having to unpack it first or merge it manually.')
 
-    args = parser.parse_args() #'scn_lebennin_coast_3 -o scn_blank_sc.sco -ai keep '.split())
+    args = parser.parse_args() #'scn_lebennin_coast_3'.split())
 
 
     if args.sect_mission_objects == args.sect_ai_mesh == args.sect_terrain == 'keep':

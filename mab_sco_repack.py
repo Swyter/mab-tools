@@ -1,6 +1,6 @@
-from email import header
 from struct import *
 import json, os, io
+import sys
 
 def write_rgltag(str):
     str_enc = str.encode('utf-8'); str_enc_len = len(str_enc)
@@ -21,16 +21,27 @@ output = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_gal
 scene_file =  path.replace('\\', '/').split('/')[-1].split('.')[0]
 donor_file = donor.replace('\\', '/').split('/')[-1].split('.')[0]
 
+print(f"[i] repacking the data from the «{scene_file}» folder into «{output}»")
+
+if not os.path.isdir(scene_file):
+    print(f"[e] the unpacked «{scene_file}» SCO folder doesn't seem to exist")
+    exit(1)
+
 with open(output, mode='wb') as f:
     f.write(pack('<I', 0xFFFFFD33)) # swy: magic value
     f.write(pack('<I', 4)) # swy: SCO file version
 
-    with open(f"{scene_file}/mission_objects.json") as f_json:
-       mission_objects = json.load(f_json)
+    mission_objects = []
+    try:
+        with open(f"{scene_file}/mission_objects.json") as f_json:
+           mission_objects = json.load(f_json)
+    except OSError as e:
+        print(f"[!] skipping mission objects/scene props: {e}", file=sys.stderr)
 
     object_count = len(mission_objects)
-
     f.write(pack('<I', object_count))
+
+    print(f"[i] writing {object_count} mission objects from the JSON file\n")
 
     object_type = {'prop': 0, 'entry': 1, 'item': 2, 'unused': 3, 'plant': 4, 'passage': 5}
 
@@ -56,21 +67,23 @@ with open(output, mode='wb') as f:
     def getleftpart(line, token):
             pos = line.find(token)
             return pos != -1 and line[:pos] or line
+    try:
+        with open(f"{scene_file}/ai_mesh.obj") as f_obj:
+            for i, line in enumerate(f_obj):
+                # swy: strip anything to the right of a line comment marker
+                line = getleftpart(line, '//')
+                line = getleftpart(line, '#' )
+                line = line.split()
 
-    with open(f"{scene_file}/ai_mesh.obj") as f_obj:
-        for i, line in enumerate(f_obj):
-            # swy: strip anything to the right of a line comment marker
-            line = getleftpart(line, '//')
-            line = getleftpart(line, '#' )
-            line = line.split()
+                if not line or len(line) < 4:
+                    continue
 
-            if not line or len(line) < 4:
-                continue
-
-            if line[0] == 'v':
-                vertices.append([float(token)  for token in line[1:]])
-            elif line[0] == 'f':
-                faces.append([int(getleftpart(token, '/')) - 1  for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
+                if line[0] == 'v':
+                    vertices.append([float(token)  for token in line[1:]])
+                elif line[0] == 'f':
+                    faces.append([int(getleftpart(token, '/')) - 1  for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
+    except OSError as e:
+        print(f"[!] skipping AI mesh: {e}", file=sys.stderr)
 
     # swy: crummy way of regenerating an acceptable edge-face data,
     #      this is a bit like some halfedge data structure for A* traversal

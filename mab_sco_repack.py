@@ -132,10 +132,10 @@ with open(output, mode='wb') as f:
 
 
     f.write(pack('<I', len(faces))) # face_count
-    for fcs in faces:
+    for i, fcs in enumerate(faces):
         f.write(pack('<I', len(fcs))) # vtx_and_edge_count
         f.write(pack(f'<{len(fcs)}I', *fcs)) # vertices
-        f.write(pack(f'<{len(fcs)}I', *fcs)) # edges
+        f.write(pack(f'<{len(fcs)}I', *facelist[i])) # edges
         f.write(pack('<I', 0)) # has_more
 
     # swy: fill ai_mesh_section_size afterwards, once we know how big the section really is

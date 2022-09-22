@@ -24,10 +24,8 @@ import json, os
 #
 #         - the rest are optional PGM files which contain grayscale data for each of the painted ground
 #           textures for the limited set of hardcoded materials.
-path = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege_orig.sco'
 
-
-def sco_unpack(input_sco, output_folder):
+def sco_unpack(input_sco_path, output_folder):
     def read_rgltag():
         size = unpack('<I', f.read(4))[0]
         if not size:
@@ -36,11 +34,11 @@ def sco_unpack(input_sco, output_folder):
         str = unpack(f'{size}s', f.read(size))[0].decode('utf-8')
         return str
 
-    scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
+    scene_file = input_sco_path.replace('\\', '/').split('/')[-1].split('.')[0]
 
     os.makedirs(output_folder, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
 
-    with open(path, mode='rb') as f:
+    with open(input_sco_path, mode='rb') as f:
         magic = unpack('<I', f.read(4))[0]; assert(magic == 0xFFFFFD33)
         versi = unpack('<I', f.read(4))[0]; assert(versi == 4)
 
@@ -270,5 +268,5 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--output', metavar='<unpacked-sco-folder>', dest='output', required=False,
                         help='path to the resulting folder where the loose (.json, .pgm, .ppm, .pfm, .obj) files will be stored. it does not need to exist, and will get created automatically as needed.')
 
-    args = parser.parse_args('scn_advcamp_dale.sco -o __unpacker_test '.split())
+    args = parser.parse_args('-h C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege_orig.sco -o __unpacker_test '.split())
     sco_unpack(args.input, args.output)

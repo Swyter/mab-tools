@@ -82,7 +82,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
             f.write(pack('<I', 4)) # swy: SCO file version
             
             if copy_over_instead_of_repacking(mission_objects_from):
-                print(f"\n[>] copying over the mission object section from donor «{mission_objects_from['donor_filename']}» file")
+                print(f"[>] copying over the mission object section from donor «{mission_objects_from['donor_filename']}» file")
                 write_over_from(f, mission_objects_from, write_mission_objects=True)
             else:
                 mission_objects = []
@@ -117,7 +117,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
 
 
             if copy_over_instead_of_repacking(ai_mesh_from):
-                print(f"\n[>] copying over the AI mesh section from donor «{ai_mesh_from['donor_filename']}» file")
+                print(f"[>] copying over the AI mesh section from donor «{ai_mesh_from['donor_filename']}» file")
                 write_over_from(f, ai_mesh_from, write_ai_mesh=True)
 
             else:
@@ -222,7 +222,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
 
 
             if copy_over_instead_of_repacking(terrain_from):
-                print(f"\n[>] copying over the terrain section from donor «{terrain_from['donor_filename']}» file")
+                print(f"[>] copying over the terrain section from donor «{terrain_from['donor_filename']}» file")
                 write_over_from(f, terrain_from, write_terrain=True)
 
             else:
@@ -489,12 +489,23 @@ Quick examples:
     parser.add_argument('-te', '--terrain',        dest='sect_terrain',         default='repack', metavar='<option>', required=False,
                         help='by default the <option> is «repack», it will convert back the unpacked data in the folder you provide. You can use «keep» to retain the original data in the target SCO if it exists and avoid modifying that part, which is also faster than repacking and lossless, you can use «empty» or «blank» to completely remove any data previously that section, or, finally; you can provide a path to a different donor .sco file to copy that section over directly into the target .sco, losslessly replacing a section/block without having to unpack it first or merge it manually.')
 
-    args = parser.parse_args('. -o scn_blank_sc.sco -mo scn_advcamp_dale.sco -ai scn_advcamp_dale.sco -te scn_advcamp_dale.sco '.split())
+    args = parser.parse_args() #'scn_lebennin_coast_3 -o scn_blank_sc.sco -ai keep '.split())
 
+
+    if args.sect_mission_objects == args.sect_ai_mesh == args.sect_terrain == 'keep':
+        print(f"[i] we were asked to keep all the three sections of «{args.output}» as-is. so we don't need to touch the file. ¯\_(ツ)_/¯")
+        exit(0)
+
+    # swy: if we are using donor files, especially with the 'keep' option where we are essentially overwriting the file itself,
+    #      we need to read the entire contents just moments before. we can't read the previous data in the middle.
     def process(option):
         if option in ['empty', 'blank']:
             return 'empty'
 
+        if option == 'repack':
+            return option
+
+        # swy: use the output file as donor file, this is just quicker to type
         if option == 'keep':
             option = args.output
 

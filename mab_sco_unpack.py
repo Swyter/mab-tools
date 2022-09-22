@@ -38,7 +38,7 @@ def sco_unpack(input_sco, output_folder):
 
     scene_file = path.replace('\\', '/').split('/')[-1].split('.')[0]
 
-    os.makedirs(scene_file, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
+    os.makedirs(output_folder, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
 
     with open(path, mode='rb') as f:
         magic = unpack('<I', f.read(4))[0]; assert(magic == 0xFFFFFD33)
@@ -134,7 +134,7 @@ def sco_unpack(input_sco, output_folder):
         # swy: orig edge count 615
         print((len(edgelist))) # len(edgelist) => 938, without dupes: 615
         #exit()
-        with open(f"{scene_file}/ai_mesh.obj", mode='w') as fw:
+        with open(f"{output_folder}/ai_mesh.obj", mode='w') as fw:
             fw.write(f'# Mount&Blade AI mesh exported by Swyter\'s SCO unpacker from\n# <{scene_file}.sco> on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
             for elem in ai_mesh['vertices']:
                 floats_as_text = " ".join([repr(fnum)  for fnum in elem])
@@ -202,7 +202,7 @@ def sco_unpack(input_sco, output_folder):
 
                 # swy: floating point grayscale with the raw terrain height at each point. Note: Photoshop 2017 wrongly loads these files vertically flipped
                 if layer_str == 'ground_elevation':
-                    with open(f"{scene_file}/layer_{layer_str}.pfm", mode='wb') as fw:
+                    with open(f"{output_folder}/layer_{layer_str}.pfm", mode='wb') as fw:
                         # swy: format spec at http://netpbm.sourceforge.net/doc/pfm.html; scanlines from left to right, from BOTTOM to top
                         #      small three-line ASCII header with binary floats afterwards. e.g.: 
                         #      Pf
@@ -221,7 +221,7 @@ def sco_unpack(input_sco, output_folder):
 
                 # swy: Red/Green/Blue vertex coloring/terrain tinting
                 elif layer_str == 'ground_leveling':
-                    with open(f"{scene_file}/layer_{layer_str}.ppm", mode='wb') as fw:
+                    with open(f"{output_folder}/layer_{layer_str}.ppm", mode='wb') as fw:
                         # swy: format spec at http://netpbm.sourceforge.net/doc/ppm.html; scanlines from left to right, from TOP to bottom
                         #      small three-line ASCII header with binary floats afterwards. e.g.: 
                         #      P6
@@ -240,7 +240,7 @@ def sco_unpack(input_sco, output_folder):
 
                 # swy: unsigned byte (0-254) grayscale with the amount of paint for this material/layer
                 elif not layer_str == 'ground_leveling':
-                    with open(f"{scene_file}/layer_{layer_str}.pgm", mode='wb') as fw:
+                    with open(f"{output_folder}/layer_{layer_str}.pgm", mode='wb') as fw:
                         # swy: format spec at http://netpbm.sourceforge.net/doc/pgm.html; scanlines from left to right, from TOP to bottom
                         #      small three-line ASCII header with binary floats afterwards. e.g.: 
                         #      P5
@@ -259,7 +259,7 @@ def sco_unpack(input_sco, output_folder):
     js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
     js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look
 
-    with open(f"{scene_file}/mission_objects.json", mode='w') as fw:
+    with open(f"{output_folder}/mission_objects.json", mode='w') as fw:
         fw.write(js)
 
 if __name__ == "__main__":
@@ -268,7 +268,7 @@ if __name__ == "__main__":
     parser.add_argument('input', metavar='<path-to-sco>', help='the source .sco file to extract; for a «scn_advcamp_dale.sco» it would write the unpacked data to a «scn_advcamp_dale» directory in the same folder as this script, if not set manually.')
 
     parser.add_argument('-o', '--output', metavar='<unpacked-sco-folder>', dest='output', required=False,
-                        help='path to the resulting folder where the loose (.json, .pgm, .ppm, .pfm, .obj) will be stored. it does not need to exist, will get created automatically as needed.')
+                        help='path to the resulting folder where the loose (.json, .pgm, .ppm, .pfm, .obj) files will be stored. it does not need to exist, and will get created automatically as needed.')
 
-    args = parser.parse_args() #'scn_lebennin_coast_3 -o scn_blank_sc.sco -ai keep '.split())
+    args = parser.parse_args('scn_advcamp_dale.sco -o __unpacker_test '.split())
     sco_unpack(args.input, args.output)

@@ -25,6 +25,8 @@ def write_over_from(output_f, donor, write_mission_objects = False, write_ai_mes
         magic = unpack('<I', donor_f.read(4))[0]; assert(magic == 0xFFFFFD33)
         versi = unpack('<I', donor_f.read(4))[0]; assert(versi == 4)
 
+        mission_obj_start_pos = donor_f.tell()
+
         # swy: walk over all the mission object/scene prop entries;
         #      due to the text/strings each of them takes a variable amount of bytes
         object_count = unpack('<I', donor_f.read(4))[0]
@@ -37,11 +39,24 @@ def write_over_from(output_f, donor, write_mission_objects = False, write_ai_mes
         # swy: we've reached the end of the mission object section; the AI mesh chunk starts here.
         #      copy and paste the rest of the file
         print(f"[i] AI mesh of donor starts at offset; copying from here onwards:", hex(donor_f.tell()))
-
+        
         ai_mesh_start_pos = donor_f.tell()
         ai_mesh_section_size = unpack('<I', donor_f.read(4))[0]
-        donor_f.seek(ai_mesh_start_pos, io.SEEK_SET)
-        output_f.write(donor_f.read(ai_mesh_section_size + 4))
+
+        mission_obj_section_size = ai_mesh_start_pos - mission_obj_start_pos
+        terrain_start_pos        = ai_mesh_start_pos + ai_mesh_section_size
+
+        if (write_mission_objects):
+            donor_f.seek(mission_obj_start_pos, io.SEEK_SET)
+            output_f.write(donor_f.read(mission_obj_section_size))
+
+        if (write_ai_mesh):
+            donor_f.seek(ai_mesh_start_pos, io.SEEK_SET)
+            output_f.write(donor_f.read(ai_mesh_section_size))
+
+        if (write_terrain):
+            donor_f.seek(terrain_start_pos, io.SEEK_SET)
+            output_f.write(donor_f.read())
 
 def copy_over_instead_of_repacking(option):
     return option not in ['keep', 'empty'] and 'donor_file_data' in option
@@ -67,7 +82,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
             f.write(pack('<I', 4)) # swy: SCO file version
             
             if copy_over_instead_of_repacking(mission_objects_from):
-                print(f"[>] copying over the mission object section from donor «{mission_objects_from}» file")
+                print(f"\n[>] copying over the mission object section from donor «{mission_objects_from['donor_filename']}» file")
                 write_over_from(f, mission_objects_from, write_mission_objects=True)
             else:
                 mission_objects = []
@@ -102,7 +117,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
 
 
             if copy_over_instead_of_repacking(ai_mesh_from):
-                print(f"[>] copying over the AI mesh section from donor «{ai_mesh_from}» file")
+                print(f"\n[>] copying over the AI mesh section from donor «{ai_mesh_from['donor_filename']}» file")
                 write_over_from(f, ai_mesh_from, write_ai_mesh=True)
 
             else:
@@ -207,7 +222,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
 
 
             if copy_over_instead_of_repacking(terrain_from):
-                print(f"[>] copying over the terrain section from donor «{terrain_from}» file")
+                print(f"\n[>] copying over the terrain section from donor «{terrain_from['donor_filename']}» file")
                 write_over_from(f, terrain_from, write_terrain=True)
 
             else:
@@ -474,7 +489,7 @@ Quick examples:
     parser.add_argument('-te', '--terrain',        dest='sect_terrain',         default='repack', metavar='<option>', required=False,
                         help='by default the <option> is «repack», it will convert back the unpacked data in the folder you provide. You can use «keep» to retain the original data in the target SCO if it exists and avoid modifying that part, which is also faster than repacking and lossless, you can use «empty» or «blank» to completely remove any data previously that section, or, finally; you can provide a path to a different donor .sco file to copy that section over directly into the target .sco, losslessly replacing a section/block without having to unpack it first or merge it manually.')
 
-    args = parser.parse_args('. -o scn_blank_sc.sco -mo blank -ai keep -te scn_advcamp_dale.sco '.split())
+    args = parser.parse_args('. -o scn_blank_sc.sco -mo scn_advcamp_dale.sco -ai scn_advcamp_dale.sco -te scn_advcamp_dale.sco '.split())
 
     def process(option):
         if option in ['empty', 'blank']:
@@ -487,7 +502,7 @@ Quick examples:
             with open(option, mode='rb') as donor_f:
                 file_data = donor_f.read()
                 print(f"[i] reading the donor file: {option} ({donor_f.tell() // 1024} KiB)")
-                return {'donor_file_data': file_data}
+                return {'donor_file_data': file_data, 'donor_filename': option}
         except OSError as e:
             print(f"[e] couldn't open the donor file: {e}", file=sys.stderr)
             exit(1)

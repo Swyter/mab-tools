@@ -73,7 +73,7 @@ with open(output, mode='wb') as f:
                 continue
 
             if line[0] == 'v':
-                vertices.append([float(token) for token in line[1:]])
+                vertices.append([float(token) * 100. for token in line[1:]])
             elif line[0] == 'f':
                 faces.append([int(getleftpart(token, '/')) - 1 for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
 
@@ -82,6 +82,10 @@ with open(output, mode='wb') as f:
 
     f.write(pack('<I', len(vertices))) # vertex_count
     for vtx in vertices:
+        y = vtx[1]
+        z = vtx[2]
+        vtx[1] = z
+        vtx[2] = y
         f.write(pack('<3f', *vtx[:3]))
 
     f.write(pack('<I', 1407)) # edge_count
@@ -91,6 +95,7 @@ with open(output, mode='wb') as f:
         f.write(pack('<I', 0)) # vtx_b
         f.write(pack('<I', 0)) # face_idx_r
         f.write(pack('<I', 0)) # face_idx_l
+
 
     f.write(pack('<I', len(faces))) # face_count
     for fcs in faces:

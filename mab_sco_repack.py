@@ -1,6 +1,7 @@
 from struct import *
 import json, os, io
 import sys
+import argparse
 
 # swy: source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data
 #      from a «scn_advcamp_dale» directory in the same folder as this script
@@ -12,6 +13,32 @@ donor = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_gala
 
 # swy: target/output SCO file location with the combined/repacked data
 output = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege.sco'
+
+
+# swy: copy the AI mesh and ground stuff over from the other SCO file
+def write_over_from():
+    with open(donor, mode='rb') as wf:
+        magic = unpack('<I', wf.read(4))[0]; assert(magic == 0xFFFFFD33)
+        versi = unpack('<I', wf.read(4))[0]; assert(versi == 4)
+
+        # swy: walk over all the mission object/scene prop entries;
+        #      due to the text/strings each of them takes a variable amount of bytes
+        object_count = unpack('<I', wf.read(4))[0]
+
+        for i in range(object_count):
+            wf.seek(4 + 4 + 4 + (4*3) + (4*3) + (4*3) + (4*3), os.SEEK_CUR);
+            rgltag_len = unpack('<I', wf.read(4))[0]
+            wf.seek(rgltag_len + 4 + 4 + (4*3), os.SEEK_CUR);
+
+        # swy: we've reached the end of the mission object section; the AI mesh chunk starts here.
+        #      copy and paste the rest of the file
+        print(f"[i] AI mesh of donor {donor_file} starts at offset; copying from here onwards:", hex(wf.tell()))
+
+        ai_mesh_start_pos = wf.tell()
+        ai_mesh_section_size = unpack('<I', wf.read(4))[0]
+        wf.seek(ai_mesh_start_pos, io.SEEK_SET)
+        f.write(wf.read(ai_mesh_section_size + 4))
+
 
 def sco_repack(input_folder, output_sco, donor_sco='', donate_mission_objects = False, donate_ai_mesh = False, donate_terrain = False):
     def write_rgltag(str):
@@ -159,30 +186,6 @@ def sco_repack(input_folder, output_sco, donor_sco='', donate_mission_objects = 
             f.write(pack('<I', ai_mesh_section_end_pos - (ai_mesh_section_size_start_pos + 4)))
             f.seek(ai_mesh_section_end_pos, io.SEEK_SET)
             print(f"[i] done writing the AI mesh data\n")
-
-            # swy: copy the AI mesh and ground stuff over from the other SCO file
-            #    with open(donor, mode='rb') as wf:
-            #        magic = unpack('<I', wf.read(4))[0]; assert(magic == 0xFFFFFD33)
-            #        versi = unpack('<I', wf.read(4))[0]; assert(versi == 4)
-            #
-            #        # swy: walk over all the mission object/scene prop entries;
-            #        #      due to the text/strings each of them takes a variable amount of bytes
-            #        object_count = unpack('<I', wf.read(4))[0]
-            #
-            #        for i in range(object_count):
-            #            wf.seek(4 + 4 + 4 + (4*3) + (4*3) + (4*3) + (4*3), os.SEEK_CUR);
-            #            rgltag_len = unpack('<I', wf.read(4))[0]
-            #            wf.seek(rgltag_len + 4 + 4 + (4*3), os.SEEK_CUR);
-            #
-            #        # swy: we've reached the end of the mission object section; the AI mesh chunk starts here.
-            #        #      copy and paste the rest of the file
-            #        print(f"[i] AI mesh of donor {donor_file} starts at offset; copying from here onwards:", hex(wf.tell()))
-            #
-            #        ai_mesh_start_pos = wf.tell()
-            #        ai_mesh_section_size = unpack('<I', wf.read(4))[0]
-            #        wf.seek(ai_mesh_start_pos, io.SEEK_SET)
-            #        f.write(wf.read(ai_mesh_section_size + 4))
-
 
             # swy: convert the individual heightmap/RGB paint/material image files into actual ground/terrain
             #      layer blocks. these are optionally RLE-encoded using a matching algorithm
@@ -419,4 +422,23 @@ def sco_repack(input_folder, output_sco, donor_sco='', donate_mission_objects = 
 
 
 if __name__ == "__main__":
-  sco_repack(path, output)
+    parser = argparse.ArgumentParser(description='Repacks Mount&Blade SceneObj files. Created by Swyter in 2022.')
+    parser.add_argument('integers', metavar='source_folder', type=int, nargs='+',
+                        help='an integer for the accumulator')
+
+    parser.add_argument('integers', metavar='output', type=int, nargs='+',
+                        help='an integer for the accumulator')
+                        
+    parser.add_argument('--objects', dest='accumulate', action='store_const',
+                        const=sum, default=max,
+                        help='«keep»; to retain the existing data, «empty», or a path to the donor .sco file')
+    parser.add_argument('--aimesh', dest='accumulate', action='store_const',
+                        const=sum, default=max,
+                        help='«keep»; to retain the existing data, «empty», or a path to the donor .sco file')
+    parser.add_argument('--terrain', dest='accumulate', action='store_const',
+                        const=sum, default=max,
+                        help='«keep»; to retain the existing data, «empty», or a path to the donor .sco file')
+    parser.print_help()
+    args = parser.parse_args()
+    print(args.accumulate(args.integers))
+    sco_repack(path, output)

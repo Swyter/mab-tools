@@ -48,13 +48,24 @@ with open(output, mode='wb') as f:
         f.write(pack('<I',   object["menu_entry_no"]))
         f.write(pack('<3f', *object["scale"]))
 
+
+    # swy: convert the AI mesh section from a Wavefront OBJ file and
+    #      regenerate the extra face <-> edge <-> vertex linked data
     vertices = []; faces = []    
 
-    with open(f"{scene_file}/ai_mesh.obj") as f_obj:
-        for line in f_obj:
+    def getleftpart(line, token):
+            pos = line.find(token)
+            return pos != -1 and line[:pos] or line
+
+    with open(f"{scene_file}/HD22_Aby_Mayor.obj") as f_obj:
+        for i, line in enumerate(f_obj):
+
+            if i == 8684:
+                print("bp")
+
             # swy: strip anything to the right of a line comment marker
-            line = line[:line.find('//')]
-            line = line[:line.find('#' )]
+            line = getleftpart(line, '//')
+            line = getleftpart(line, '#' )
             line = line.split()
             print(line)
 
@@ -64,15 +75,14 @@ with open(output, mode='wb') as f:
             if line[0] == 'v':
                 vertices.append([float(token) for token in line[1:]])
             elif line[0] == 'f':
-                faces.append([int(token) - 1 for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
+                faces.append([int(getleftpart(token, '/')) - 1 for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
 
-    # swy: stub this AI mesh section for now; this is empty
     ai_mesh_section_size_start_pos = f.tell()
     f.write(pack('<I', 0)) # ai_mesh_section_size, we go back and fix/overwrite this one at the end
 
     f.write(pack('<I', len(vertices))) # vertex_count
     for vtx in vertices:
-        f.write(pack('<3f', *vtx))
+        f.write(pack('<3f', *vtx[:3]))
 
     f.write(pack('<I', 1407)) # edge_count
     for edg in range(1407):
@@ -119,6 +129,10 @@ with open(output, mode='wb') as f:
 #        wf.seek(ai_mesh_start_pos, io.SEEK_SET)
 #        f.write(wf.read(ai_mesh_section_size + 4))
 
+
+    # swy: convert the individual heightmap/RGB paint/material image files into actual ground/terrain
+    #      layer blocks. these are optionally RLE-encoded using a matching algorithm
+    #      to get the same file back for the same unmodified exported data.
     ground = {}
     ground_layer_look_up = {
         'gray_stone.pgm': 0, 'brown_stone.pgm': 1, 'turf.pgm': 2, 'steppe.pgm': 3, 'snow.pgm': 4, 'earth.pgm': 5, 'desert.pgm': 6, 'forest.pgm': 7,
@@ -247,8 +261,8 @@ with open(output, mode='wb') as f:
         print(f'[-] compressing and writing layer {layer_name}...')
 
         f.write(pack('<i', layer_index))    # swy: index (signed)
-        write_rgltag(layer_name)            # swy: layer_str
-        f.write(pack('<I', layer_has_data)) # swy: enabled
+        write_rgltag(layer_name)            # swy: layer_str; this seems unused by the game, only pays attention to the layer ID to get its meaning
+        f.write(pack('<I', layer_has_data)) # swy: enabled; or not if the layer is empty
 
         if not layer_has_data:
             continue

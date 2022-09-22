@@ -4,27 +4,6 @@ import re
 from struct import *
 import json, os
 
-# swy: source SCO file; for a «scn_advcamp_dale.sco» it will unpack the internal data
-#      into a «scn_advcamp_dale» directory in the same folder as this script
-#      the folder will contain a mission_objects.json and various layer_* image files
-#      storing each ground/terrain in their appropriate format.
-#
-#         - layer_ground_leveling.ppm actually stores the RGB color paint, the name Armagan used is just stupid. ¯\_(ツ)_/¯
-#         - layer_ground_elevation.pfm stores the heightmap data as unnormalized (i.e. -3.0 is three meters
-#           underwater) 32-bit floating point numbers. This can be converted to 32-bit .EXR or .TIF using ImageMagick, or opened with GIMP.
-#             Keep in mind that Photoshop opens these PFM files vertically-flipped by mistake.
-#
-#             If you can't see the height properly (there are only blotchy black and white spots) try adjusting/lowering the exposure to preview it,
-#             keep in mind that changing that will mess with the data and the heights it contains.
-#             You can see the raw height with the eyedropper and by switching the mode in the Info panel to «Actual Color» and its range to «32-bit».
-#
-#             There's a quick way of previewing the actual range of the image without destroying the underlying data in Photoshop, by clicking
-#             the triangle in the bottom border of the document window, and selecting «32-bit Exposure», that will show a handy slider:
-#             https://helpx.adobe.com/photoshop/using/image-information.html
-#
-#         - the rest are optional PGM files which contain grayscale data for each of the painted ground
-#           textures for the limited set of hardcoded materials.
-
 def sco_unpack(input_sco_path, output_folder):
     def read_rgltag():
         size = unpack('<I', f.read(4))[0]
@@ -35,6 +14,9 @@ def sco_unpack(input_sco_path, output_folder):
         return str
 
     scene_file = input_sco_path.replace('\\', '/').split('/')[-1].split('.')[0]
+
+    if not output_folder:
+        output_folder = scene_file
 
     os.makedirs(output_folder, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
 
@@ -262,7 +244,34 @@ def sco_unpack(input_sco_path, output_folder):
 
 if __name__ == "__main__":
     # swy: add some helpful commands and their documentation
-    parser = argparse.ArgumentParser(description='Unpacks Mount&Blade SceneObj files into a folder of loose files. Created by Swyter in 2022.')
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+                                     description='Unpacks Mount&Blade SceneObj files into a folder of loose files. Created by Swyter in 2022.',
+                                     epilog='''\
+| Quick-ish help and how to open extracted terrain images /
+\________________________________________________________/
+
+  for a «scn_advcamp_dale.sco» it will unpack the internal data
+  into a «scn_advcamp_dale» directory in the same folder as this script
+  the folder will contain a mission_objects.json and various layer_* image files
+  storing each ground/terrain in their appropriate format.
+
+   - layer_ground_leveling.ppm actually stores the RGB color paint, the name Armagan used is just stupid. ¯\_(ツ)_/¯
+   - layer_ground_elevation.pfm stores the heightmap data as unnormalized (i.e. -3.0 is three meters
+     underwater) 32-bit floating point numbers. This can be converted to 32-bit .EXR or .TIF using ImageMagick, or opened with GIMP.
+       Keep in mind that Photoshop opens these PFM files vertically-flipped by mistake.
+
+       If you can't see the height properly (there are only blotchy black and white spots) try adjusting/lowering the exposure to preview it,
+       keep in mind that changing that will mess with the data and the heights it contains.
+       You can see the raw height with the eyedropper and by switching the mode in the Info panel to «Actual Color» and its range to «32-bit».
+
+       There's a quick way of previewing the actual range of the image without destroying the underlying data in Photoshop, by clicking
+       the triangle in the bottom border of the document window, and selecting «32-bit Exposure», that will show a handy slider:
+       https://helpx.adobe.com/photoshop/using/image-information.html
+
+   - the rest are optional PGM files which contain grayscale data for each of the painted ground
+     textures for the limited set of hardcoded materials.
+
+                                     ''')
     parser.add_argument('input', metavar='<path-to-sco>', help='the source .sco file to extract; for a «scn_advcamp_dale.sco» it would write the unpacked data to a «scn_advcamp_dale» directory in the same folder as this script, if not set manually.')
 
     parser.add_argument('-o', '--output', metavar='<unpacked-sco-folder>', dest='output', required=False,

@@ -75,7 +75,7 @@ with open(output, mode='wb') as f:
     # swy: crummy way of regenerating an acceptable edge-face data,
     #      this is a bit like some halfedge data structure for A* traversal
 
-    print("[i] recomputing edge data from the face-vertex mapping in the OBJ file")
+    print("[i] recomputing edge data from the face-vertex mapping in the Wavefront OBJ file")
     faces_in_edge = {} # swy: face idx that this edge is part of
     faces_in_edge_idx = {}
     edges_in_face = {} # swy: edge members of a face
@@ -89,17 +89,17 @@ with open(output, mode='wb') as f:
                 print(f'[e] {a}-{b} detected non-manifold edge at face index {i} -- between {repr(vertices[a])} and {repr(vertices[b])}\n    This means that some of your vertices/edges are part of more than two faces, please fix this in the original 3D mesh. This may cause issues, ignoring.')
                 #exit(4)
             if f'{b}-{a}' in faces_in_edge:
-                print(f'{b}-{a} already exists (r) -- {faces_in_edge[f"{b}-{a}"]} {i}')
+                #print(f'{b}-{a} already exists (r) -- {faces_in_edge[f"{b}-{a}"]} {i}')
                 faces_in_edge[f'{b}-{a}'].append(i)
                 edges_in_face[i].append(faces_in_edge_idx[f'{b}-{a}'])
                 continue
 
-            print(f'new {a}-{b} -- {i}')
+            #print(f'new {a}-{b} -- {i}')
             faces_in_edge_idx[f'{a}-{b}'] = len(faces_in_edge)
             faces_in_edge[f'{a}-{b}'] = [i]
             edges_in_face[i].append(faces_in_edge_idx[f'{a}-{b}'])
 
-
+    print(f"[i] done; got {len(vertices)} vertices, {len(faces_in_edge)} valid edges and {len(faces)} faces in this AI mesh")
 
     ai_mesh_section_size_start_pos = f.tell()
     f.write(pack('<I', 0)) # ai_mesh_section_size, we go back and fix/overwrite this one at the end
@@ -143,6 +143,7 @@ with open(output, mode='wb') as f:
     f.seek(ai_mesh_section_size_start_pos, io.SEEK_SET)
     f.write(pack('<I', ai_mesh_section_end_pos - (ai_mesh_section_size_start_pos + 4)))
     f.seek(ai_mesh_section_end_pos, io.SEEK_SET)
+    print(f"[i] done writing the AI mesh data\n")
 
 
     # swy: copy the AI mesh and ground stuff over from the other SCO file

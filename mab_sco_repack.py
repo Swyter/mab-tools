@@ -2,22 +2,22 @@ from struct import *
 import json, os, io
 import sys
 
-def main():
+# swy: source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data
+#      from a «scn_advcamp_dale» directory in the same folder as this script
+path  = './scn_caras_galadhon_siege_orig.sco'
+
+# swy: donor SCO with the AI mesh you want to copy over to the file above;
+#      probably the original SCO file, it can't be the same file you want to write to
+donor = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege_orig.sco'
+
+# swy: target/output SCO file location with the combined/repacked data
+output = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege.sco'
+
+def sco_repack(input_folder, output_sco, donor_sco='', donate_mission_objects = False, donate_ai_mesh = False, donate_terrain = False):
     def write_rgltag(str):
         str_enc = str.encode('utf-8'); str_enc_len = len(str_enc)
         f.write(pack('<I', str_enc_len))
         f.write(pack(f'{str_enc_len}s', str_enc))
-
-    # swy: source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data
-    #      from a «scn_advcamp_dale» directory in the same folder as this script
-    path  = './scn_caras_galadhon_siege_orig.sco'
-
-    # swy: donor SCO with the AI mesh you want to copy over to the file above;
-    #      probably the original SCO file, it can't be the same file you want to write to
-    donor = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege_orig.sco'
-
-    # swy: target/output SCO file location with the combined/repacked data
-    output = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege.sco'
 
     scene_file =  path.replace('\\', '/').split('/')[-1].split('.')[0]
     donor_file = donor.replace('\\', '/').split('/')[-1].split('.')[0]
@@ -419,4 +419,4 @@ def main():
 
 
 if __name__ == "__main__":
-  main()
+  sco_repack(path, output)

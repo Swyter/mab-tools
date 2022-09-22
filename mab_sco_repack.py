@@ -422,16 +422,18 @@ def sco_repack(input_folder, output_sco, donor_sco='', donate_mission_objects = 
 
 import pathlib
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description='Repacks and intermixes Mount&Blade SceneObj files. Created by Swyter in 2022.', epilog='''This is very powerful and it allows you to repack a file partially, sourcing each of the three blocks an SCO file is made of (mission objects, AI mesh and terrain/ground layers) from different SCO files.
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+                                     description='Repacks and intermixes Mount&Blade SceneObj files. Created by Swyter in 2022.',
+                                     epilog='''This is very powerful and allows you to repack a file partially, sourcing each of the three blocks/parts of an SCO file (mission objects/AI mesh/terrain-ground layers) from different SCO files.
 
 Quick examples:
-   mab_sco_repack.py ./scn_advcamp_dale                                                # this will generate some «scn_advcamp_dale.sco», it can be used for drag-and-dropping the folder directly over this tool.
-   mab_sco_repack.py ./scn_advcamp_dale -o '../SceneObj/scn_advcamp_dale_repacked.sco' # save our repacked scene in a specific place or set a custom filename.
-   mab_sco_repack.py ./scn_advcamp_dale -o scn_out.sco --aimesh keep                   # this overwrites scn_out.sco with the repacked data for props and terrain but leaves the existing AI mesh section alone and untouched.
-   mab_sco_repack.py ./scn_advcamp_dale -o scn_out.sco -te scn_a.sco -ai scn_b.sco     # this combines the unpacked props with a copy of scn_a.sco's terrain and scn_b.sco's AI mesh.
-   mab_sco_repack.py . -o scn_existing.sco -mo  keep -ai keep  -te keep                # this does nothing, as long as scn_existing.sco exists, we're telling to retain all the three original sections intact. the <unpacked-sco-folder> doesn't even matter, it doesn't get used
-   mab_sco_repack.py . -o scn_existing.sco -mo empty -ai keep  -te keep                # this clears all the existing props in the output scene, while retaining the rest of the original output scene's data, <unpacked-sco-folder> doesn't get used, we're only working with scn_existing.sco without repacking anything from the input folder
-   mab_sco_repack.py . -o scn_blank_sc.sco -mo empty -ai empty -te empty               # create a completely empty SCO file
+   mab_sco_repack ./scn_advcamp_dale                                                # this will generate some «scn_advcamp_dale.sco», it can be used for drag-and-dropping the folder directly over this tool.
+   mab_sco_repack ./scn_advcamp_dale -o '../SceneObj/scn_advcamp_dale_repacked.sco' # save our repacked scene in a specific place or set a custom filename.
+   mab_sco_repack ./scn_advcamp_dale -o scn_out.sco --aimesh keep                   # this overwrites scn_out.sco with the repacked data for props and terrain but leaves the existing AI mesh section alone and untouched.
+   mab_sco_repack ./scn_advcamp_dale -o scn_out.sco -te scn_a.sco -ai scn_b.sco     # this combines the unpacked props with a copy of scn_a.sco's terrain and scn_b.sco's AI mesh.
+   mab_sco_repack . -o scn_existing.sco -mo keep  -ai keep  -te keep                # this does nothing, as long as scn_existing.sco exists, all three sections are intact, the input goes unused.
+   mab_sco_repack . -o scn_existing.sco -mo empty -ai keep  -te keep                # clears all the existing props in the output scene, but keeps the rest as-is; we're no repacking anything.
+   mab_sco_repack . -o scn_blank_sc.sco -mo empty -ai empty -te empty               # create a completely empty SCO file from scratch, the first argument doesn't matter.
 ''')
     parser.add_argument('input', metavar='<unpacked-sco-folder>', help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')
 

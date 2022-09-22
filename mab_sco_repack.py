@@ -77,24 +77,58 @@ with open(output, mode='wb') as f:
             elif line[0] == 'f':
                 faces.append([int(getleftpart(token, '/')) - 1 for token in line[1:]]) # swy: convert from Wavefront OBJs start-at-1 to M&B's start-at-0 vertex indices
 
+
+    edgelist = {} # swy: face idx that this edge is part of
+    edgelist_idx = {}
+    facelist = {} # swy: edge members of a face
+    for i, elem in enumerate(faces):
+        face_data = elem
+        facelist[i] = []
+        for j, elem in enumerate(face_data):
+            a = face_data[j]; b = face_data[((j+1) % len(face_data))]
+            
+            if f'{a}-{b}' in edgelist:
+                print(f'{a}-{b} detected non-manifold edge at face index {i} -- between {repr(vertices[a])} and {repr(vertices[b])}')
+                #exit(4)
+            if f'{b}-{a}' in edgelist:
+                print(f'{b}-{a} already exists (r) -- {edgelist[f"{b}-{a}"]} {i}')
+                edgelist[f'{b}-{a}'].append(i)
+                facelist[i].append(edgelist_idx[f'{b}-{a}'])
+                continue
+
+            print(f'new {a}-{b} -- {i}')
+            edgelist_idx[f'{a}-{b}'] = len(edgelist)
+            edgelist[f'{a}-{b}'] = [i]
+            facelist[i].append(edgelist_idx[f'{a}-{b}'])
+
+
+
     ai_mesh_section_size_start_pos = f.tell()
     f.write(pack('<I', 0)) # ai_mesh_section_size, we go back and fix/overwrite this one at the end
 
     f.write(pack('<I', len(vertices))) # vertex_count
     for vtx in vertices:
-        y = vtx[1]
+        y = vtx[1] # swy: make it upright when the model Y-is-up
         z = vtx[2]
         vtx[1] = z
         vtx[2] = y
         f.write(pack('<3f', *vtx[:3]))
 
-    f.write(pack('<I', 1407)) # edge_count
-    for edg in range(1407):
-        f.write(pack('<I', 2)) # face_count
-        f.write(pack('<I', 0)) # vtx_a
-        f.write(pack('<I', 0)) # vtx_b
-        f.write(pack('<I', 0)) # face_idx_r
-        f.write(pack('<I', 0)) # face_idx_l
+    f.write(pack('<I', len(edgelist))) # edge_count
+    for edg in edgelist:
+        a, b = (int(token)  for token in edg.split('-'))
+
+        data = edgelist[edg]
+        face_count = len(data)
+
+        if face_count < 2:
+            data.append(-99999)
+
+        f.write(pack('<I', face_count)) # face_count
+        f.write(pack('<I', a)) # vtx_a
+        f.write(pack('<I', b)) # vtx_b
+        f.write(pack('<I', data[0])) # face_idx_r
+        f.write(pack('<i', data[1])) # face_idx_l
 
 
     f.write(pack('<I', len(faces))) # face_count

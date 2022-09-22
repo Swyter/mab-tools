@@ -16,7 +16,7 @@ output = 'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_gal
 
 
 # swy: copy the AI mesh and ground stuff over from the other SCO file
-def write_over_from():
+def write_over_from(donor_file, write_mission_objects = False, write_ai_mesh = False, write_terrain = False):
     with open(donor, mode='rb') as wf:
         magic = unpack('<I', wf.read(4))[0]; assert(magic == 0xFFFFFD33)
         versi = unpack('<I', wf.read(4))[0]; assert(versi == 4)
@@ -63,8 +63,8 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
             f.write(pack('<I', 4)) # swy: SCO file version
             
             if copy_over_instead_of_repacking(mission_objects_from):
-                a=1
                 print(f"[>] copying over the mission object section from donor «{mission_objects_from}» file")
+                write_over_from(mission_objects_from, write_mission_objects=True)
             else:
                 mission_objects = []
 
@@ -96,9 +96,10 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                     f.write(pack('<I',   object["menu_entry_no"]))
                     f.write(pack('<3f', *object["scale"]))
 
+
             if copy_over_instead_of_repacking(ai_mesh_from):
-                a=1
                 print(f"[>] copying over the AI mesh section from donor «{ai_mesh_from}» file")
+                write_over_from(ai_mesh_from, write_ai_mesh=True)
 
             else:
                 # swy: convert the AI mesh section from a Wavefront OBJ file and
@@ -200,9 +201,10 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                 f.seek(ai_mesh_section_end_pos, io.SEEK_SET)
                 print(f"[i] done writing the AI mesh data\n")
 
+
             if copy_over_instead_of_repacking(terrain_from):
-                a=1
                 print(f"[>] copying over the terrain section from donor «{terrain_from}» file")
+                write_over_from(terrain_from, write_terrain=True)
 
             else:
                 # swy: convert the individual heightmap/RGB paint/material image files into actual ground/terrain
@@ -468,7 +470,27 @@ Quick examples:
     parser.add_argument('-te', '--terrain',        dest='sect_terrain',         default='repack', metavar='<option>', required=False,
                         help='by default the <option> is «repack», it will convert back the unpacked data in the folder you provide. You can use «keep» to retain the original data in the target SCO if it exists and avoid modifying that part, which is also faster than repacking and lossless, you can use «empty» or «blank» to completely remove any data previously that section, or, finally; you can provide a path to a different donor .sco file to copy that section over directly into the target .sco, losslessly replacing a section/block without having to unpack it first or merge it manually.')
 
-    args = parser.parse_args('. -o scn_blank_sc.sco -mo .sco -ai emptye -te emptyu '.split())
+    args = parser.parse_args('. -o scn_blank_sc.sco -mo blank -ai keep -te scn_advcamp_dale.sco '.split())
+
+    def process(option):
+        if option in ['empty', 'blank']:
+            return 'empty'
+
+        if option == 'keep':
+            option = args.output
+
+        try:
+            with open(option, mode='rb') as donor_f:
+                file_data = donor_f.read()
+                print(f"[i] reading the donor file: {option} ({donor_f.tell() // 1024} KiB)")
+                return {'donor_file_data': file_data}
+        except OSError as e:
+            print(f"[e] couldn't open the donor file: {e}", file=sys.stderr)
+            exit(1)
+
+    args.sect_mission_objects = process(args.sect_mission_objects)
+    args.sect_ai_mesh         = process(args.sect_ai_mesh)
+    args.sect_terrain         = process(args.sect_terrain)
 
     sco_repack(
         args.input, args.output, mission_objects_from=args.sect_mission_objects,

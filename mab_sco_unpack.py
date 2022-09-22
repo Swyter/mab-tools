@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import pathlib
 import re
 from struct import *
 import json, os
@@ -13,10 +14,15 @@ def sco_unpack(input_sco_path, output_folder):
         str = unpack(f'{size}s', f.read(size))[0].decode('utf-8')
         return str
 
+    if not input_sco_path:
+        print('[e] you need to specify some scn_*.sco file to unpack'); exit(1)
+
     scene_file = input_sco_path.replace('\\', '/').split('/')[-1].split('.')[0]
 
     if not output_folder:
-        output_folder = scene_file
+        output_folder = f'{pathlib.Path(input_sco_path).parent}/{scene_file}/'
+
+    print(f'[i] unpacking «{input_sco_path}» into «{output_folder}»')
 
     os.makedirs(output_folder, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
 
@@ -88,31 +94,31 @@ def sco_unpack(input_sco_path, output_folder):
             ai_mesh['faces'].append({'edge_count': edge_count, 'face': face, 'edge': edge, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
 
         # swy: try to recompute the edge data for debugging purposes to see how well it matches the original values
-        edgelist = {}
-        edgelist_idx = {}
-        facelist = {}
-        for i, elem in enumerate(ai_mesh['faces']):
-            face_data = elem['face']
-            facelist[i] = []
-            for j, elem in enumerate(face_data):
-                a = face_data[j]; b = face_data[((j+1) % len(face_data))]
-                
-                if f'{a}-{b}' in edgelist:
-                    print(f'{a}-{b} detected non-manifold edge at face index {i} -- between {repr(ai_mesh["vertices"][a])} and {repr(ai_mesh["vertices"][b])}')
-                    exit(4)
-                if f'{b}-{a}' in edgelist:
-                    print(f'{b}-{a} already exists (r) -- {edgelist[f"{b}-{a}"]} {i}')
-                    edgelist[f'{b}-{a}'].append(i)
-                    facelist[i].append(edgelist_idx[f'{b}-{a}'])
-                    continue
-
-                print(f'new {a}-{b} -- {i}')
-                edgelist_idx[f'{a}-{b}'] = len(edgelist)
-                edgelist[f'{a}-{b}'] = [i]
-                facelist[i].append(edgelist_idx[f'{a}-{b}'])
-
-        # swy: orig edge count 615
-        print((len(edgelist))) # len(edgelist) => 938, without dupes: 615
+    #    edgelist = {}
+    #    edgelist_idx = {}
+    #    facelist = {}
+    #    for i, elem in enumerate(ai_mesh['faces']):
+    #        face_data = elem['face']
+    #        facelist[i] = []
+    #        for j, elem in enumerate(face_data):
+    #            a = face_data[j]; b = face_data[((j+1) % len(face_data))]
+    #            
+    #            if f'{a}-{b}' in edgelist:
+    #                print(f'{a}-{b} detected non-manifold edge at face index {i} -- between {repr(ai_mesh["vertices"][a])} and {repr(ai_mesh["vertices"][b])}')
+    #                exit(4)
+    #            if f'{b}-{a}' in edgelist:
+    #                print(f'{b}-{a} already exists (r) -- {edgelist[f"{b}-{a}"]} {i}')
+    #                edgelist[f'{b}-{a}'].append(i)
+    #                facelist[i].append(edgelist_idx[f'{b}-{a}'])
+    #                continue
+    #
+    #            print(f'new {a}-{b} -- {i}')
+    #            edgelist_idx[f'{a}-{b}'] = len(edgelist)
+    #            edgelist[f'{a}-{b}'] = [i]
+    #            facelist[i].append(edgelist_idx[f'{a}-{b}'])
+    #
+    #    # swy: orig edge count 615
+    #    print((len(edgelist))) # len(edgelist) => 938, without dupes: 615
         #exit()
         with open(f"{output_folder}/ai_mesh.obj", mode='w') as fw:
             fw.write(f'# Mount&Blade AI mesh exported by Swyter\'s SCO unpacker from\n# <{scene_file}.sco> on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
@@ -140,7 +146,7 @@ def sco_unpack(input_sco_path, output_folder):
         ground = {}
 
         for i in range(num_layers):
-            index = unpack('<I', f.read(4))[0]
+            index = unpack('<i', f.read(4))[0]
             layer_str = read_rgltag()
             enabled = unpack('<I', f.read(4))[0]
 
@@ -242,6 +248,8 @@ def sco_unpack(input_sco_path, output_folder):
     with open(f"{output_folder}/mission_objects.json", mode='w') as fw:
         fw.write(js)
 
+    print(f'[i] done!')
+
 if __name__ == "__main__":
     # swy: add some helpful commands and their documentation
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
@@ -270,12 +278,11 @@ if __name__ == "__main__":
 
    - the rest are optional PGM files which contain grayscale data for each of the painted ground
      textures for the limited set of hardcoded materials.
-
-                                     ''')
+''')
     parser.add_argument('input', metavar='<path-to-sco>', help='the source .sco file to extract; for a «scn_advcamp_dale.sco» it would write the unpacked data to a «scn_advcamp_dale» directory in the same folder as this script, if not set manually.')
 
     parser.add_argument('-o', '--output', metavar='<unpacked-sco-folder>', dest='output', required=False,
                         help='path to the resulting folder where the loose (.json, .pgm, .ppm, .pfm, .obj) files will be stored. it does not need to exist, and will get created automatically as needed.')
 
-    args = parser.parse_args('-h C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege_orig.sco -o __unpacker_test '.split())
+    args = parser.parse_args()#'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege_orig.sco '.split())
     sco_unpack(args.input, args.output)

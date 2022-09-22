@@ -422,18 +422,17 @@ def sco_repack(input_folder, output_sco, donor_sco='', donate_mission_objects = 
 
 import pathlib
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Repacks and mixes Mount&Blade SceneObj files. Created by Swyter in 2022.')
-    parser.add_argument('unpacked_sco_folder', type=pathlib.Path, help='an integer for the accumulator')
+    parser = argparse.ArgumentParser(description='Repacks and intermixes Mount&Blade SceneObj files. Created by Swyter in 2022.', epilog='This is very powerful and it allows you to repack a file partially, sourcing each of the three blocks an SCO file is made of (mission objects, AI mesh and terrain/ground layers) from different SCO files.\n\nasdfasdf')
+    parser.add_argument('input', metavar='<unpacked-sco-folder>', help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')
 
-    parser.add_argument('-o', '--output=<path-to-sco>', type=pathlib.Path, required=False, help='filename or path to where to write the resulting .SCO;\nif not specified it will be saved in the current folder with the same name as the unpacked_sco_folder.')
-                        
-    parser.add_argument('-mo', '--missionobjects', nargs=1, choices=['keep', 'empty', 'path'],
-                        help='«keep»; to retain the existing data, «empty», or a path to the donor .sco file')
-    parser.add_argument('-ai', '--aimesh',  nargs=1,
-                        help='«keep»; to retain the existing data, «empty», or a path to the donor .sco file')
-    parser.add_argument('-te', '--terrain', nargs=1,
-                        help='«keep»; to retain the existing data, «empty», or a path to the donor .sco file')
+    parser.add_argument('-o', '--output', metavar='<path-to-sco>', dest='output', type=pathlib.Path, required=False,
+                        help='filename or path where to write the resulting .SCO; if not specified it will be saved in the current folder with the same name as the input folder plus the «.sco» extension, overwriting any files.')
+
+    parser.add_argument('-mo', '--missionobjects', dest='sect_missobj', default='repack', metavar='<option>', required=False)
+    parser.add_argument('-ai', '--aimesh',         dest='sect_ai_mesh', default='repack', metavar='<option>', required=False)
+    parser.add_argument('-te', '--terrain',        dest='sect_terrain', default='repack', metavar='<option>', required=False,
+                        help='by default the <option> is «repack», it will convert back the unpacked data in the folder you provide. You can use «keep» to retain the original data in the target SCO if it exists and avoid modifying that part, which is also faster than repacking and lossless, you can use «empty» or «blank» to completely remove any data previously that section, or finally, you can provide a path to a different donor .sco file to copy that section over directly into the target SCO, replacing a block without having to unpack it first or merge it manually.')
     parser.print_help()
-    args = parser.parse_args([path, '-o', 'thing.sco', '-mat', 'keep'])
-    print(args.accumulate(args.integers))
+    args = parser.parse_args([path, '-o', 'thing.sco', '--ter', 'keep'])
+
     sco_repack(path, output)

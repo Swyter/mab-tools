@@ -4,6 +4,7 @@ import pathlib
 import re
 from struct import *
 import json, os
+import sys
 
 def sco_unpack(input_sco_path, output_folder):
     def read_rgltag():
@@ -26,229 +27,245 @@ def sco_unpack(input_sco_path, output_folder):
 
     os.makedirs(output_folder, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
 
-    with open(input_sco_path, mode='rb') as f:
-        magic = unpack('<I', f.read(4))[0]; assert(magic == 0xFFFFFD33)
-        versi = unpack('<I', f.read(4))[0]; assert(versi == 4)
+    try:
+        with open(input_sco_path, mode='rb') as f:
+            magic = unpack('<I', f.read(4))[0]; assert(magic == 0xFFFFFD33)
+            versi = unpack('<I', f.read(4))[0]; assert(versi == 4)
 
-        object_count = unpack('<I', f.read(4))[0]
+            object_count = unpack('<I', f.read(4))[0]
 
-        mission_objects = []
+            mission_objects = []
 
-        object_type = ['prop', 'entry', 'item', 'unused', 'plant', 'passage']
+            object_type = ['prop', 'entry', 'item', 'unused', 'plant', 'passage']
 
-        for i in range(object_count):
-            type    = unpack('<I',  f.read(4    ))[0]
-            id      = unpack('<I',  f.read(4    ))[0]
-            garbage = unpack('<I',  f.read(4    ))[0]
-            mtx_a   = unpack('<3f', f.read(4 * 3))
-            mtx_b   = unpack('<3f', f.read(4 * 3))
-            mtx_c   = unpack('<3f', f.read(4 * 3))
-            pos     = unpack('<3f', f.read(4 * 3))
-            str     = read_rgltag()
+            for i in range(object_count):
+                type    = unpack('<I',  f.read(4    ))[0]
+                id      = unpack('<I',  f.read(4    ))[0]
+                garbage = unpack('<I',  f.read(4    ))[0]
+                mtx_a   = unpack('<3f', f.read(4 * 3))
+                mtx_b   = unpack('<3f', f.read(4 * 3))
+                mtx_c   = unpack('<3f', f.read(4 * 3))
+                pos     = unpack('<3f', f.read(4 * 3))
+                str     = read_rgltag()
 
-            entry_no     = unpack('<I',  f.read(4    ))[0]
-            menu_item_no = unpack('<I',  f.read(4    ))[0]
-            scale        = unpack('<3f', f.read(4 * 3))
+                entry_no     = unpack('<I',  f.read(4    ))[0]
+                menu_item_no = unpack('<I',  f.read(4    ))[0]
+                scale        = unpack('<3f', f.read(4 * 3))
 
-            object = {
-                'type': object_type[type],
-                'id': id,
-                'garbage': '%0#x' % garbage,
-                'rotation_matrix': [mtx_a, mtx_b, mtx_c],
-                'pos': pos,
-                'str': str,
-                'entry_no': entry_no,
-                'menu_entry_no': menu_item_no,
-                'scale': scale,
-            }
+                object = {
+                    'type': object_type[type],
+                    'id': id,
+                    'garbage': '%0#x' % garbage,
+                    'rotation_matrix': [mtx_a, mtx_b, mtx_c],
+                    'pos': pos,
+                    'str': str,
+                    'entry_no': entry_no,
+                    'menu_entry_no': menu_item_no,
+                    'scale': scale,
+                }
 
-            print(i, object_type[type], str, entry_no)
-            mission_objects.append(object)
-        
-        # swy: read the AI mesh data structures
-        ai_mesh = {'vertices': [], 'edges': [], 'faces': []}
+                print(i, object_type[type], str, entry_no)
+                mission_objects.append(object)
+            
+            # swy: read the AI mesh data structures
+            ai_mesh = {'vertices': [], 'edges': [], 'faces': []}
 
-        ai_mesh_section_size = unpack('<I', f.read(4))[0]
-        vertex_count = unpack('<I', f.read(4))[0]
+            ai_mesh_section_size = unpack('<I', f.read(4))[0]
+            vertex_count = unpack('<I', f.read(4))[0]
 
-        for i in range(vertex_count):
-            vertex = unpack('<3f', f.read(4 * 3))
-            ai_mesh['vertices'].append(vertex)
+            for i in range(vertex_count):
+                vertex = unpack('<3f', f.read(4 * 3))
+                ai_mesh['vertices'].append(vertex)
 
-        edge_count = unpack('<I', f.read(4))[0]
-
-        for i in range(edge_count):
-            edge = unpack('<5i', f.read(4 * 5))
-            ai_mesh['edges'].append(edge)
-
-        face_count = unpack('<I', f.read(4))[0]
-
-        for i in range(face_count):
             edge_count = unpack('<I', f.read(4))[0]
-            face = unpack(f'<{edge_count}I', f.read(4 * edge_count))
-            edge = unpack(f'<{edge_count}I', f.read(4 * edge_count))
-            has_more = unpack('<I', f.read(4))[0]
 
-            ai_mesh_id = has_more and unpack('<I', f.read(4))[0] or 0
+            for i in range(edge_count):
+                edge = unpack('<5i', f.read(4 * 5))
+                ai_mesh['edges'].append(edge)
 
-            ai_mesh['faces'].append({'edge_count': edge_count, 'face': face, 'edge': edge, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
+            face_count = unpack('<I', f.read(4))[0]
 
-        # swy: try to recompute the edge data for debugging purposes to see how well it matches the original values
-    #    edgelist = {}
-    #    edgelist_idx = {}
-    #    facelist = {}
-    #    for i, elem in enumerate(ai_mesh['faces']):
-    #        face_data = elem['face']
-    #        facelist[i] = []
-    #        for j, elem in enumerate(face_data):
-    #            a = face_data[j]; b = face_data[((j+1) % len(face_data))]
-    #            
-    #            if f'{a}-{b}' in edgelist:
-    #                print(f'{a}-{b} detected non-manifold edge at face index {i} -- between {repr(ai_mesh["vertices"][a])} and {repr(ai_mesh["vertices"][b])}')
-    #                exit(4)
-    #            if f'{b}-{a}' in edgelist:
-    #                print(f'{b}-{a} already exists (r) -- {edgelist[f"{b}-{a}"]} {i}')
-    #                edgelist[f'{b}-{a}'].append(i)
-    #                facelist[i].append(edgelist_idx[f'{b}-{a}'])
-    #                continue
-    #
-    #            print(f'new {a}-{b} -- {i}')
-    #            edgelist_idx[f'{a}-{b}'] = len(edgelist)
-    #            edgelist[f'{a}-{b}'] = [i]
-    #            facelist[i].append(edgelist_idx[f'{a}-{b}'])
-    #
-    #    # swy: orig edge count 615
-    #    print((len(edgelist))) # len(edgelist) => 938, without dupes: 615
-        #exit()
-        with open(f"{output_folder}/ai_mesh.obj", mode='w') as fw:
-            fw.write(f'# Mount&Blade AI mesh exported by Swyter\'s SCO unpacker from\n# <{scene_file}.sco> on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
-            for elem in ai_mesh['vertices']:
-                floats_as_text = " ".join([repr(fnum)  for fnum in elem])
-                fw.write(f'v {floats_as_text}\n') # swy: write the text floats with as much precision/decimals as possible to get exact results when parsing them back: https://stackoverflow.com/a/3481575/674685
-            fw.write("\n# edges\n\n")
-            for i, elem in enumerate(ai_mesh['edges']):
-                face_data = [vtx_idx +1 for vtx_idx in elem]
-                fw.write(f'e{" %i" * len(face_data)} \t\t# {i}\n' % tuple(face_data))
-            fw.write("\n# faces\n\n")
-            for i, elem in enumerate(ai_mesh['faces']):
-                face_data = [vtx_idx + 1 for vtx_idx in elem['face']]
-                fw.write(f'f{" %u" * len(face_data)} \t\t# {i} {repr(elem)}\n' % tuple(face_data))
+            for i in range(face_count):
+                edge_count = unpack('<I', f.read(4))[0]
+                face = unpack(f'<{edge_count}I', f.read(4 * edge_count))
+                edge = unpack(f'<{edge_count}I', f.read(4 * edge_count))
+                has_more = unpack('<I', f.read(4))[0]
 
-        # swy: read the terrain/ground layer data structures
-        terrain_magic = unpack('<I', f.read(4))[0]; assert(terrain_magic == 0xFF4AD1A6)
-        terrain_section_size = unpack('<I', f.read(4))[0]
-        num_layers = unpack('<I', f.read(4))[0]
-        scene_width = unpack('<I', f.read(4))[0]
-        scene_height = unpack('<I', f.read(4))[0]
+                ai_mesh_id = has_more and unpack('<I', f.read(4))[0] or 0
 
-        block_count = scene_width * scene_height
+                ai_mesh['faces'].append({'edge_count': edge_count, 'face': face, 'edge': edge, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
 
-        ground = {}
+            # swy: try to recompute the edge data for debugging purposes to see how well it matches the original values
+        #    edgelist = {}
+        #    edgelist_idx = {}
+        #    facelist = {}
+        #    for i, elem in enumerate(ai_mesh['faces']):
+        #        face_data = elem['face']
+        #        facelist[i] = []
+        #        for j, elem in enumerate(face_data):
+        #            a = face_data[j]; b = face_data[((j+1) % len(face_data))]
+        #            
+        #            if f'{a}-{b}' in edgelist:
+        #                print(f'{a}-{b} detected non-manifold edge at face index {i} -- between {repr(ai_mesh["vertices"][a])} and {repr(ai_mesh["vertices"][b])}')
+        #                exit(4)
+        #            if f'{b}-{a}' in edgelist:
+        #                print(f'{b}-{a} already exists (r) -- {edgelist[f"{b}-{a}"]} {i}')
+        #                edgelist[f'{b}-{a}'].append(i)
+        #                facelist[i].append(edgelist_idx[f'{b}-{a}'])
+        #                continue
+        #
+        #            print(f'new {a}-{b} -- {i}')
+        #            edgelist_idx[f'{a}-{b}'] = len(edgelist)
+        #            edgelist[f'{a}-{b}'] = [i]
+        #            facelist[i].append(edgelist_idx[f'{a}-{b}'])
+        #
+        #    # swy: orig edge count 615
+        #    print((len(edgelist))) # len(edgelist) => 938, without dupes: 615
+            #exit()
+            with open(f"{output_folder}/ai_mesh.obj", mode='w') as fw:
+                fw.write(f'# Mount&Blade AI mesh exported by Swyter\'s SCO unpacker from\n# <{scene_file}.sco> on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
+                for elem in ai_mesh['vertices']:
+                    floats_as_text = " ".join([repr(fnum)  for fnum in elem])
+                    fw.write(f'v {floats_as_text}\n') # swy: write the text floats with as much precision/decimals as possible to get exact results when parsing them back: https://stackoverflow.com/a/3481575/674685
+                fw.write("\n# edges\n\n")
+                for i, elem in enumerate(ai_mesh['edges']):
+                    face_data = [vtx_idx +1 for vtx_idx in elem]
+                    fw.write(f'e{" %i" * len(face_data)} \t\t# {i}\n' % tuple(face_data))
+                fw.write("\n# faces\n\n")
+                for i, elem in enumerate(ai_mesh['faces']):
+                    face_data = [vtx_idx + 1 for vtx_idx in elem['face']]
+                    fw.write(f'f{" %u" * len(face_data)} \t\t# {i} {repr(elem)}\n' % tuple(face_data))
 
-        for i in range(num_layers):
-            index = unpack('<i', f.read(4))[0]
-            layer_str = read_rgltag()
-            enabled = unpack('<I', f.read(4))[0]
+            # swy: read the terrain/ground layer data structures
+            terrain_magic = unpack('<I', f.read(4))[0]; assert(terrain_magic == 0xFF4AD1A6)
+            terrain_section_size = unpack('<I', f.read(4))[0]
+            num_layers = unpack('<I', f.read(4))[0]
+            scene_width = unpack('<I', f.read(4))[0]
+            scene_height = unpack('<I', f.read(4))[0]
+
+            block_count = scene_width * scene_height
+
+            ground = {}
+
+            for i in range(num_layers):
+                index = unpack('<i', f.read(4))[0]
+                layer_str = read_rgltag()
+                enabled = unpack('<I', f.read(4))[0]
 
 
-            ground[layer_str] = []
+                ground[layer_str] = []
 
-            print(">> ", index, layer_str, enabled)
+                print(">> ", index, layer_str, enabled)
 
-            if enabled:
-                remaining_blocks = block_count
+                if enabled:
+                    remaining_blocks = block_count
 
-                while remaining_blocks > 0:
-                    rle = unpack('<I', f.read(4))[0]
+                    while remaining_blocks > 0:
+                        rle = unpack('<I', f.read(4))[0]
 
-                    if rle:
-                        if layer_str == 'ground_leveling':
-                            ground[layer_str].append(([0xFFFFFF] * rle)) # swy: make empty RGB vertex paint cells white
+                        if rle:
+                            if layer_str == 'ground_leveling':
+                                ground[layer_str].append(([0xFFFFFF] * rle)) # swy: make empty RGB vertex paint cells white
+                            else:
+                                ground[layer_str].append(([       0] * rle)) # swy: otherwise make them pure black
+
+                        remaining_blocks -= rle
+
+                        if remaining_blocks <= 0:
+                            break
+
+                        elem_count = unpack('<I', f.read(4))[0]
+
+                        remaining_blocks -= elem_count
+
+                        if layer_str == 'ground_elevation':
+                            elem = unpack(f'<{elem_count}f', f.read(4 * elem_count)) # swy: 4-byte float
+                        elif layer_str == 'ground_leveling':
+                            elem = unpack(f'<{elem_count}I', f.read(4 * elem_count)) # swy: 4-byte unsigned integer (uint) that holds vertex coloring
                         else:
-                            ground[layer_str].append(([       0] * rle)) # swy: otherwise make them pure black
+                            elem = unpack(f'<{elem_count}B', f.read(1 * elem_count)) # swy: 1 unsigned byte
 
-                    remaining_blocks -= rle
 
-                    if remaining_blocks <= 0:
-                        break
+                        ground[layer_str].append(elem)
 
-                    elem_count = unpack('<I', f.read(4))[0]
-
-                    remaining_blocks -= elem_count
-
+                    # swy: floating point grayscale with the raw terrain height at each point. Note: Photoshop 2017 wrongly loads these files vertically flipped
                     if layer_str == 'ground_elevation':
-                        elem = unpack(f'<{elem_count}f', f.read(4 * elem_count)) # swy: 4-byte float
+                        try:
+                            with open(f"{output_folder}/layer_{layer_str}.pfm", mode='wb') as fw:
+                                # swy: format spec at http://netpbm.sourceforge.net/doc/pfm.html; scanlines from left to right, from BOTTOM to top
+                                #      small three-line ASCII header with binary floats afterwards. e.g.: 
+                                #      Pf
+                                #      71 71
+                                #      -1.000
+                                fw.write(f'Pf\n{scene_width} {scene_height}\n-1.000\n'.encode('utf-8')) # swy: PF has RGB color, Pf is grayscale. align the first binary bytes to 16 bytes with the extra padded .000 in the ASCII part, make the number negative to let the program know that we're using little-endian floats
+
+                                flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
+                                reversed_list = []
+
+                                # swy: reverse the row ordering because the PFM format is from bottom to top, unlike every other NetPBM one, of course :)
+                                for i in reversed(range(scene_height)):
+                                    reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width][::-1] # swy: grab one "line" worth of data from the farthest point, and add it first; sort them backwards
+
+                                fw.write(pack(f'<{scene_width * scene_height}f', *reversed_list))
+                        except OSError as e:
+                            print(f"[e] couldn't open the pfm file: {e}", file=sys.stderr)
+
+                    # swy: Red/Green/Blue vertex coloring/terrain tinting
                     elif layer_str == 'ground_leveling':
-                        elem = unpack(f'<{elem_count}I', f.read(4 * elem_count)) # swy: 4-byte unsigned integer (uint) that holds vertex coloring
-                    else:
-                        elem = unpack(f'<{elem_count}B', f.read(1 * elem_count)) # swy: 1 unsigned byte
+                        try:
+                            with open(f"{output_folder}/layer_{layer_str}.ppm", mode='wb') as fw:
+                                # swy: format spec at http://netpbm.sourceforge.net/doc/ppm.html; scanlines from left to right, from TOP to bottom
+                                #      small three-line ASCII header with binary floats afterwards. e.g.: 
+                                #      P6
+                                #      71 71
+                                #      255
+                                fw.write(f'P6\n{scene_width} {scene_height}\n255\n'.encode('utf-8'))
 
+                                flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
+                                reversed_list = []
+                                # swy: flip or mirror each row from right-to-left to left-to-right
+                                for i in range(scene_height):
+                                    reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width][::-1]
 
-                    ground[layer_str].append(elem)
+                                for elem in reversed_list:
+                                    fw.write(pack(f'<3B', (elem >> 8*2) & 0xFF, (elem >> 8*1) & 0xFF, (elem >> 8*0) & 0xFF))
+                        except OSError as e:
+                            print(f"[e] couldn't open the ppm file: {e}", file=sys.stderr)
 
-                # swy: floating point grayscale with the raw terrain height at each point. Note: Photoshop 2017 wrongly loads these files vertically flipped
-                if layer_str == 'ground_elevation':
-                    with open(f"{output_folder}/layer_{layer_str}.pfm", mode='wb') as fw:
-                        # swy: format spec at http://netpbm.sourceforge.net/doc/pfm.html; scanlines from left to right, from BOTTOM to top
-                        #      small three-line ASCII header with binary floats afterwards. e.g.: 
-                        #      Pf
-                        #      71 71
-                        #      -1.000
-                        fw.write(f'Pf\n{scene_width} {scene_height}\n-1.000\n'.encode('utf-8')) # swy: PF has RGB color, Pf is grayscale. align the first binary bytes to 16 bytes with the extra padded .000 in the ASCII part, make the number negative to let the program know that we're using little-endian floats
+                    # swy: unsigned byte (0-254) grayscale with the amount of paint for this material/layer
+                    elif not layer_str == 'ground_leveling':
+                        try:
+                            with open(f"{output_folder}/layer_{layer_str}.pgm", mode='wb') as fw:
+                                # swy: format spec at http://netpbm.sourceforge.net/doc/pgm.html; scanlines from left to right, from TOP to bottom
+                                #      small three-line ASCII header with binary floats afterwards. e.g.: 
+                                #      P5
+                                #      71 71
+                                #      255
+                                fw.write(f'P5\n{scene_width} {scene_height}\n255\n'.encode('utf-8'))
 
-                        flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
-                        reversed_list = []
+                                flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
+                                reversed_list = []
+                                # swy: flip or mirror each row from right-to-left to left-to-right
+                                for i in range(scene_height):
+                                    reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width][::-1]
 
-                        # swy: reverse the row ordering because the PFM format is from bottom to top, unlike every other NetPBM one, of course :)
-                        for i in reversed(range(scene_height)):
-                            reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width][::-1] # swy: grab one "line" worth of data from the farthest point, and add it first; sort them backwards
+                                fw.write(pack(f'<{scene_width * scene_height}B', *reversed_list))
+                        except OSError as e:
+                            print(f"[e] couldn't open the pgm file: {e}", file=sys.stderr)
 
-                        fw.write(pack(f'<{scene_width * scene_height}f', *reversed_list))
+        js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
+        js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look
 
-                # swy: Red/Green/Blue vertex coloring/terrain tinting
-                elif layer_str == 'ground_leveling':
-                    with open(f"{output_folder}/layer_{layer_str}.ppm", mode='wb') as fw:
-                        # swy: format spec at http://netpbm.sourceforge.net/doc/ppm.html; scanlines from left to right, from TOP to bottom
-                        #      small three-line ASCII header with binary floats afterwards. e.g.: 
-                        #      P6
-                        #      71 71
-                        #      255
-                        fw.write(f'P6\n{scene_width} {scene_height}\n255\n'.encode('utf-8'))
+        try:
+            with open(f"{output_folder}/mission_objects.json", mode='w') as fw:
+                fw.write(js)
+        except OSError as e:
+            print(f"[e] couldn't open the JSON file: {e}", file=sys.stderr)
 
-                        flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
-                        reversed_list = []
-                        # swy: flip or mirror each row from right-to-left to left-to-right
-                        for i in range(scene_height):
-                            reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width][::-1]
+        print(f'[i] done!')
 
-                        for elem in reversed_list:
-                            fw.write(pack(f'<3B', (elem >> 8*2) & 0xFF, (elem >> 8*1) & 0xFF, (elem >> 8*0) & 0xFF))
-
-                # swy: unsigned byte (0-254) grayscale with the amount of paint for this material/layer
-                elif not layer_str == 'ground_leveling':
-                    with open(f"{output_folder}/layer_{layer_str}.pgm", mode='wb') as fw:
-                        # swy: format spec at http://netpbm.sourceforge.net/doc/pgm.html; scanlines from left to right, from TOP to bottom
-                        #      small three-line ASCII header with binary floats afterwards. e.g.: 
-                        #      P5
-                        #      71 71
-                        #      255
-                        fw.write(f'P5\n{scene_width} {scene_height}\n255\n'.encode('utf-8'))
-
-                        flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
-                        reversed_list = []
-                        # swy: flip or mirror each row from right-to-left to left-to-right
-                        for i in range(scene_height):
-                            reversed_list += flattened_list[i*scene_width : (i*scene_width) + scene_width][::-1]
-
-                        fw.write(pack(f'<{scene_width * scene_height}B', *reversed_list))
-
-    js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
-    js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look
-
-    with open(f"{output_folder}/mission_objects.json", mode='w') as fw:
-        fw.write(js)
-
-    print(f'[i] done!')
+    except OSError as e:
+        print(f"[e] couldn't open the input SCO file: {e}", file=sys.stderr)
 
 if __name__ == "__main__":
     # swy: add some helpful commands and their documentation

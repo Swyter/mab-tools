@@ -39,10 +39,10 @@ def write_over_from(output_f, donor, write_mission_objects = False, write_ai_mes
 
         # swy: we've reached the end of the mission object section; the AI mesh chunk starts here.
         #      copy and paste the rest of the file
-        print(f"[i] AI mesh of donor starts at offset; copying from here onwards:", hex(donor_f.tell()))
+        print(f"[i] AI mesh of donor starts at offset {hex(donor_f.tell())}; copying from here onwards")
         
         ai_mesh_start_pos = donor_f.tell()
-        ai_mesh_section_size = unpack('<I', donor_f.read(4))[0]
+        ai_mesh_section_size = unpack('<I', donor_f.read(4))[0] + 4 # swy: the section size does not include the size field itself
 
         mission_obj_section_size = ai_mesh_start_pos - mission_obj_start_pos
         terrain_start_pos        = ai_mesh_start_pos + ai_mesh_section_size
@@ -53,7 +53,7 @@ def write_over_from(output_f, donor, write_mission_objects = False, write_ai_mes
 
         if (write_ai_mesh):
             donor_f.seek(ai_mesh_start_pos, io.SEEK_SET)
-            output_f.write(donor_f.read(ai_mesh_section_size + 4))
+            output_f.write(donor_f.read(ai_mesh_section_size))
 
         if (write_terrain):
             donor_f.seek(terrain_start_pos, io.SEEK_SET)

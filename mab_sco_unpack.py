@@ -5,7 +5,7 @@ import re
 from struct import *
 import json, os
 import sys
-
+import io
 def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip_ai_mesh = False, skip_terrain = False):
     def read_rgltag():
         size = unpack('<I', f.read(4))[0]
@@ -136,7 +136,9 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
         #    print((len(edgelist))) # len(edgelist) => 938, without dupes: 615
         #    exit()
 
-            if skip_ai_mesh:
+            if not vertex_count and not edge_count and not face_count:
+                print(f'[-] AI mesh section empty; nothing to unpack')
+            elif skip_ai_mesh:
                 print(f'[i] skipping AI mesh section')
             else:
                 print(f'[>] unpacking AI mesh with {vertex_count} vertices, {edge_count} edges and {face_count} faces into a Wavefront OBJ file')
@@ -155,7 +157,16 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                         face_data = [vtx_idx + 1 for vtx_idx in elem['face']]
                         fw.write(f'f{" %u" * len(face_data)} \t\t# {i} {repr(elem)}\n' % tuple(face_data))
 
-            if skip_terrain:
+            # swy: some SCO files end at this point, with the terrain/ground section being
+            #      completely optional for interiors, which use a custom entity mesh
+            cur_offset = f.tell()
+            end_offset = f.seek(0, io.SEEK_END)
+
+            f.seek(cur_offset, io.SEEK_SET)
+            
+            if cur_offset == end_offset:
+                print(f'[-] terrain section not present, this may be an interior scene')
+            elif skip_terrain:
                 print(f'[i] skipping terrain section')
             else:
                 # swy: read the terrain/ground layer data structures
@@ -320,8 +331,10 @@ if __name__ == "__main__":
     parser.add_argument('--dont-unpack-aimesh',         dest='skip_ai_mesh',         required=False, action='store_true')
     parser.add_argument('--dont-unpack-terrain',        dest='skip_terrain',         required=False, action='store_true')
 
-    args = parser.parse_args() #'--dont-unpack-terrain C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege_orig.sco '.split())
-    sco_unpack(args.input, args.output, skip_mission_objects=args.skip_mission_objects,
-                                                skip_ai_mesh=args.skip_ai_mesh,
-                                                skip_terrain=args.skip_terrain
+    args = parser.parse_args() #' C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_mordor_prison.sco '.split())
+
+    sco_unpack(
+        args.input, args.output, skip_mission_objects=args.skip_mission_objects,
+                                         skip_ai_mesh=args.skip_ai_mesh,
+                                         skip_terrain=args.skip_terrain
     )

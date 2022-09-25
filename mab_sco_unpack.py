@@ -99,14 +99,14 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
             face_count = unpack('<I', f.read(4))[0]
 
             for i in range(face_count):
-                edge_count = unpack('<I', f.read(4))[0]
-                face = unpack(f'<{edge_count}I', f.read(4 * edge_count))
-                edge = unpack(f'<{edge_count}I', f.read(4 * edge_count))
+                vtx_and_edge_count = unpack('<I', f.read(4))[0]
+                idx_vertices = unpack(f'<{vtx_and_edge_count}I', f.read(4 * vtx_and_edge_count))
+                idx_edges    = unpack(f'<{vtx_and_edge_count}I', f.read(4 * vtx_and_edge_count))
                 has_more = unpack('<I', f.read(4))[0]
 
                 ai_mesh_id = has_more and unpack('<I', f.read(4))[0] or 0
 
-                ai_mesh['faces'].append({'edge_count': edge_count, 'face': face, 'edge': edge, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
+                ai_mesh['faces'].append({'vtx_and_edge_count': vtx_and_edge_count, 'idx_vertices': idx_vertices, 'idx_edges': idx_edges, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
 
             # swy: try to recompute the edge data for debugging purposes to see how well it matches the original values
         #    edgelist = {}
@@ -154,7 +154,7 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                         fw.write(f'e{" %i" * len(face_data)} \t\t# {i}\n' % tuple(face_data))
                     fw.write("\n# faces\n\n")
                     for i, elem in enumerate(ai_mesh['faces']):
-                        face_data = [vtx_idx + 1 for vtx_idx in elem['face']]
+                        face_data = [vtx_idx + 1 for vtx_idx in elem['idx_vertices']]
                         fw.write(f'f{" %u" * len(face_data)} \t\t# {i} {repr(elem)}\n' % tuple(face_data))
 
             # swy: some SCO files end at this point, with the terrain/ground section being

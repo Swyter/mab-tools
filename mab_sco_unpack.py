@@ -167,7 +167,7 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
 
                 block_count = scene_width * scene_height
 
-                print(f'[>] unpacking {scene_width} x {scene_height} terrain with {num_layers} layers into PGM/PPM/PFM images')
+                print(f'[>] unpacking {scene_width} x {scene_height} terrain with {num_layers} layers into loose PGM/PPM/PFM images')
 
                 ground = {}
 
@@ -179,7 +179,7 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
 
                     ground[layer_str] = []
 
-                    print(">> ", index, layer_str, enabled)
+                    print("     ", index, layer_str, enabled)
 
                     if enabled:
                         remaining_blocks = block_count
@@ -320,5 +320,8 @@ if __name__ == "__main__":
     parser.add_argument('--dont-unpack-aimesh',         dest='skip_ai_mesh',         required=False, action='store_true')
     parser.add_argument('--dont-unpack-terrain',        dest='skip_terrain',         required=False, action='store_true')
 
-    args = parser.parse_args('--dont-unpack-missionobjects --dont-unpack-terrain --dont-unpack-aimesh C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege_orig.sco '.split())
-    sco_unpack(args.input, args.output, skip_mission_objects=args.skip_mission_objects, skip_ai_mesh=args.skip_ai_mesh, skip_terrain=args.skip_terrain)
+    args = parser.parse_args() #'--dont-unpack-terrain C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_caras_galadhon_siege_orig.sco '.split())
+    sco_unpack(args.input, args.output, skip_mission_objects=args.skip_mission_objects,
+                                                skip_ai_mesh=args.skip_ai_mesh,
+                                                skip_terrain=args.skip_terrain
+    )

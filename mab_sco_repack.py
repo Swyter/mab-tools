@@ -431,9 +431,6 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                             data_slice = layer_data[last_zero + 1: last_slice_idx]
                             amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1
 
-                            if amount_of_preceding_zeros == 36 and layer_name == 'path':
-                                a=1
-
                             if (amount_of_preceding_zeros < 0):
                                 print("[e] the amount of preceding zeroes can't be negative")
 
@@ -496,7 +493,7 @@ Quick examples:
     parser.add_argument('-te', '--terrain',        dest='sect_terrain',         default='repack', metavar='<option>', required=False,
                         help='by default the <option> is «repack», it will convert back the unpacked data in the folder you provide. You can use «keep» to retain the original data in the target SCO if it exists and avoid modifying that part, which is also faster than repacking and lossless, you can use «empty» or «blank» to completely remove any data previously that section, or, finally; you can provide a path to a different donor .sco file to copy that section over directly into the target .sco, losslessly replacing a section/block without having to unpack it first or merge it manually.')
 
-    args = parser.parse_args('C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_lebennin_coast_3 -mo C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_lebennin_coast_3_orig.sco'.split())
+    args = parser.parse_args() #'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_lebennin_coast_3 -mo C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_lebennin_coast_3_orig.sco'.split())
 
 
     if args.sect_mission_objects == args.sect_ai_mesh == args.sect_terrain == 'keep':

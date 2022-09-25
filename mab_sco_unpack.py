@@ -100,9 +100,9 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
 
             for i in range(face_count):
                 vtx_and_edge_count = unpack('<I', f.read(4))[0]
-                idx_vertices = unpack(f'<{vtx_and_edge_count}I', f.read(4 * vtx_and_edge_count))
-                idx_edges    = unpack(f'<{vtx_and_edge_count}I', f.read(4 * vtx_and_edge_count))
-                has_more = unpack('<I', f.read(4))[0]
+                idx_vertices       = unpack(f'<{vtx_and_edge_count}I', f.read(4 * vtx_and_edge_count))
+                idx_edges          = unpack(f'<{vtx_and_edge_count}I', f.read(4 * vtx_and_edge_count))
+                has_more           = unpack('<I', f.read(4))[0]
 
                 ai_mesh_id = has_more and unpack('<I', f.read(4))[0] or 0
 

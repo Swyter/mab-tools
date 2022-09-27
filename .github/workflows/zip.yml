@@ -12,12 +12,18 @@ jobs:
       
     - name: Install dependencies
       run: | 
+        sudo add-apt-repository universe -yy
+        sudo dpkg --add-architecture i386 -yy
+        sudo add-apt-repository ppa:wine/wine-builds -yy
+        sudo apt-get update -yy
+        sudo apt-get install --install-recommends wine-staging winehq-staging xvfb tree winetricks flip curl unzip lsof -yy --force-yes
+        
         sudo apt install p7zip
 
     - name: Pack things up
       id: pack
       run: |
-        prev_run_sha="`curl -s --location --fail 'https://api.github.com/repos/eurotools/blender-addon/actions/workflows/2949131/runs' | jq -r .workflow_runs[1].head_sha`"
+        prev_run_sha="`curl -s --location --fail 'https://api.github.com/repos/swyter/mab-tools/actions/workflows/2949131/runs' | jq -r .workflow_runs[1].head_sha`"
         echo "prev=$prev_run_sha cur=`git rev-parse --short HEAD`"
         
         # swy: replace the versioned date in the script descriptor; (2020, 10, 10) -> (2021, 05, 22)
@@ -29,7 +35,23 @@ jobs:
 
         # swy: only pack it when the folder has changed since the last time we ran a GitHub Actions job
         if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- io_scene_sphnx || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then
-          7z a "sphinx-blender-tools-$(date +%Y.%m.%d-%H.%M -u).zip" io_scene_sphnx
+          7z a "swy-sco-tools-$(date +%Y.%m.%d-%H.%M -u).zip" dist/mab_sco_*.exe
+          
+          Xvfb :1 -screen 0 800x600x16 &
+          export DISPLAY=:1
+          export WINEDLLOVERRIDES="mscoree,mshtml="
+          export WINEDEBUG=-all
+          
+          wineboot -u
+          
+          curl -LO https://www.python.org/ftp/python/3.10.7/python-3.10.7.exe
+          wine python-3.10.7.exe /quiet Include_launcher=1 InstallLauncherAllUsers=1
+          
+          curl -LO https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win32.zip
+          unzip -o upx-*-win32.zip . && mv upx-*-win32/upx.exe . && rm -rf upx-*
+          
+          wine pyinstaller mab_sco_unpack.py -i NONE --onefile --upx-dir . --strip
+          wine pyinstaller mab_sco_repack.py -i NONE --onefile --upx-dir . --strip
         fi
 
     - name: Upload Release Asset
@@ -37,7 +59,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.TK }}
       run: |
-        owner="eurotools"; repo="blender-addon"; release_id="32423809"
+        owner="swyter"; repo="mab-tools; release_id="32423809"
         
         FILENAME="$(basename "$(find . -name '*tools*.zip' | sort -r -u | head -n 1)")"
         GH_ASSET="https://uploads.github.com/repos/$owner/$repo/releases/$release_id/assets?name=$FILENAME"

@@ -27,7 +27,7 @@ jobs:
         sudo add-apt-repository ppa:cybermax-dexter/sdl2-backport
         
         sudo apt-get update -yy
-        sudo apt-get install --install-recommends winehq-staging xvfb tree flip curl unzip lsof -yy --force-yes
+        sudo apt-get install --install-recommends wine-staging winehq-staging xvfb tree flip curl unzip lsof -yy --force-yes
         
         sudo apt install p7zip
 

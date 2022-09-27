@@ -14,21 +14,7 @@ jobs:
       
     - name: Install dependencies
       run: | 
-        # swy: https://wiki.winehq.org/Ubuntu
-        sudo dpkg --add-architecture i386
-
-        sudo mkdir -pm755 /etc/apt/keyrings
-        sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-
-        source /etc/lsb-release && echo current distro is $DISTRIB_CODENAME # swy: https://unix.stackexchange.com/a/115650/295814
-        sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/$DISTRIB_CODENAME/winehq-$DISTRIB_CODENAME.sources
-
-        # fix of the broken dependency: https://askubuntu.com/a/1217898
-        sudo add-apt-repository ppa:cybermax-dexter/sdl2-backport
-        
-        sudo apt update
-        sudo apt install --install-recommends winehq-staging
-        sudo apt install --install-recommends xvfb tree flip curl unzip lsof -yy --force-yes
+        sudo apt install --install-recommends wine xvfb tree flip curl unzip lsof -yy --force-yes
         sudo apt install p7zip
 
     - name: Pack things up

@@ -5,6 +5,8 @@ jobs:
   build-lnx:
     name: Linux
     runs-on: ubuntu-latest
+    permissions:
+      contents: write 
     steps:
     - uses: actions/checkout@v2
       with:
@@ -70,8 +72,6 @@ jobs:
 
     - name: Upload Release Asset
       id: upload-release-asset
-      permissions:
-        contents: write 
       run: |
         owner="swyter"; repo="mab-tools; release_id="78295290"
         

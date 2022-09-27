@@ -42,13 +42,17 @@ jobs:
           export WINEDLLOVERRIDES="mscoree,mshtml="
           export WINEDEBUG=-all
           
-          wineboot -u
+          WINEARCH=win32 wineboot -u
+          winetricks win10 vcrun2015
+          winetricks --unattended vcrun2017
           
           curl -LO https://www.python.org/ftp/python/3.10.7/python-3.10.7.exe
-          wine python-3.10.7.exe /quiet Include_launcher=1 InstallLauncherAllUsers=1
+          wine python-3.10.7.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0 Include_launcher=0 Include_tcltk=0
           
           curl -LO https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win32.zip
           unzip -o upx-*-win32.zip . && mv upx-*-win32/upx.exe . && rm -rf upx-*
+          
+          wine pip install pyinstaller
           
           wine pyinstaller mab_sco_unpack.py -i NONE --onefile --upx-dir . --strip
           wine pyinstaller mab_sco_repack.py -i NONE --onefile --upx-dir . --strip

@@ -40,22 +40,29 @@ jobs:
           Xvfb :1 -screen 0 800x600x16 &
           export DISPLAY=:1
           export WINEDLLOVERRIDES="mscoree,mshtml="
-          export WINEDEBUG=-all
+          export WINEDEBUG=fixme-all
           
           WINEARCH=win32 wineboot -u
-          winetricks win10 vcrun2015
-          winetricks --unattended vcrun2017
+
+          # swy: newer versions don't really seem to install properly under Wine; we could also use the embedded version and install pip on top by removing the python310._pth file from the extracted .zip first
+          curl -LO https://www.python.org/ftp/python/3.8.9/python-3.8.9.exe
+          wine python-3.8.9.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0 Include_launcher=0 Include_tcltk=0
           
-          curl -LO https://www.python.org/ftp/python/3.10.7/python-3.10.7.exe
-          wine python-3.10.7.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0 Include_launcher=0 Include_tcltk=0
-          
+          # swy: make upx work
           curl -LO https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win32.zip
-          unzip -o upx-*-win32.zip . && mv upx-*-win32/upx.exe . && rm -rf upx-*
+          unzip -o upx-*-win32.zip && mv upx-*-win32/upx.exe . && rm -rf upx-*
+          
+          # swy: make strip work, sourced from: https://dl.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-win32/sjlj/i686-8.1.0-release-win32-sjlj-rt_v6-rev0.7z
+          curl -LO https://cdn.discordapp.com/attachments/470890531061366787/1024408065455423518/strip.exe
+          sudo cp strip.exe  ~/.wine/drive_c/windows/system32/strip.exe
           
           wine pip install pyinstaller
           
+          # swy: fix a weird Wine exception on win32api.EnumResourceTypes when the PE file doesn't have any resource, we can ignore it
+          sed -i 's/raise exception/pass/' ~/.wine/drive_c/Program\ Files/Python38-32/Lib/site-packages/PyInstaller/utils/win32/winresource.py
+          
           wine pyinstaller mab_sco_unpack.py -i NONE --onefile --upx-dir . --strip
-          wine pyinstaller mab_sco_repack.py -i NONE --onefile --upx-dir . --strip
+          wine pyinstaller mab_sco_repack.py -i NONE --onefile --upx-dir . --strip  
         fi
 
     - name: Upload Release Asset

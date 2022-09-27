@@ -14,7 +14,12 @@ jobs:
       
     - name: Install dependencies
       run: | 
+        sudo add-apt-repository universe
+        sudo add-apt-repository multiverse
+        sudo apt update
+
         sudo dpkg --add-architecture i386
+        
         sudo apt-get update
         sudo apt install wine64 wine32  -yy --force-yes
 

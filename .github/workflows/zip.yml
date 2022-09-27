@@ -14,6 +14,8 @@ jobs:
       
     - name: Install dependencies
       run: | 
+        cat /etc/apt/sources.list
+        
         sudo add-apt-repository universe
         sudo add-apt-repository multiverse
         sudo apt update
@@ -21,6 +23,10 @@ jobs:
         sudo dpkg --add-architecture i386
         
         sudo apt-get update
+        sudo apt-get upgrade
+        
+        cat /etc/apt/sources.list
+        
         sudo apt install wine64 wine32  -yy --force-yes
 
         sudo apt install --install-recommends xvfb tree flip curl unzip lsof -yy --force-yes

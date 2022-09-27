@@ -14,15 +14,21 @@ jobs:
       
     - name: Install dependencies
       run: | 
+        # swy: absolutely braindead breakage: https://github.com/actions/runner-images/issues/4589#issuecomment-1194891446
+        sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+        sudo apt-get update -qq
+        sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
+        sudo apt-get purge -yqq libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
+
         sudo apt-get update
-        sudo apt-get upgrade
+        sudo apt-get upgrade    
 
         sudo dpkg --add-architecture i386
         
         sudo apt-get update
         sudo apt-get upgrade
         
-        sudo apt install wine64 wine32  -yy --force-yes
+        sudo apt install wine32  -yy --force-yes
 
         sudo apt install --install-recommends xvfb tree flip curl unzip lsof -yy --force-yes
         sudo apt install p7zip

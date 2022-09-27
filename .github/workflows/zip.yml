@@ -18,14 +18,13 @@ jobs:
         sudo add-apt-repository universe -yy
         sudo dpkg --add-architecture i386
 
-        sudo mkdir -pm755 /etc/apt/keyrings
-        sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+        wget -nc https://dl.winehq.org/wine-builds/winehq.key && sudo apt-key add winehq.key
         
         source /etc/lsb-release && echo current distro is $DISTRIB_CODENAME # swy: https://unix.stackexchange.com/a/115650/295814
-        sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/$DISTRIB_CODENAME/winehq-$DISTRIB_CODENAME.sources
+        sudo add-apt-repository "deb https://dl.winehq.org/wine-builds/ubuntu/ $DISTRIB_CODENAME main"
         
         sudo apt-get update -yy
-        sudo apt-get install --install-recommends wine-staging xvfb tree flip curl unzip lsof -yy --force-yes
+        sudo apt-get install --install-recommends winehq-staging xvfb tree flip curl unzip lsof -yy --force-yes
         
         sudo apt install p7zip
 

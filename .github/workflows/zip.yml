@@ -20,7 +20,7 @@ jobs:
     - name: Pack things up
       id: pack
       run: |
-        prev_run_sha="`curl -s --location --fail 'https://api.github.com/repos/swyter/mab-tools/actions/workflows/2949131/runs' | jq -r .workflow_runs[1].head_sha`"
+        prev_run_sha="`curl -s --location --fail 'https://api.github.com/repos/swyter/mab-tools/actions/runs' | jq -r .workflow_runs[1].head_sha`"
         echo "prev=$prev_run_sha cur=`git rev-parse --short HEAD`"
         
         # swy: replace the versioned date in the script descriptor; (2020, 10, 10) -> (2021, 05, 22)
@@ -28,7 +28,7 @@ jobs:
         #      we need to do this because python throws an error due to the invalid octal prefix:
         #      https://unix.stackexchange.com/a/79372/295814
         #      https://stackoverflow.com/a/1315213/674685 ' -> '\''
-        sed -i --regexp-extended 's/('\''version'\'':) .+(,.+)/\1 '"$(date "+(%-Y, %-m, %-d)" -u)"'\2/'  io_scene_sphnx/__init__.py
+        # sed -i --regexp-extended 's/('\''version'\'':) .+(,.+)/\1 '"$(date "+(%-Y, %-m, %-d)" -u)"'\2/'  io_scene_sphnx/__init__.py
 
         # swy: only pack it when the folder has changed since the last time we ran a GitHub Actions job
         if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- mab_sco_*.py || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then

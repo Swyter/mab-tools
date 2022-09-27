@@ -14,7 +14,10 @@ jobs:
       
     - name: Install dependencies
       run: | 
-        sudo apt install --install-recommends wine xvfb tree flip curl unzip lsof -yy --force-yes
+        sudo dpkg --add-architecture i386
+        sudo apt-get update
+        sudo apt-get install --install-recommends wine32
+        sudo apt install --install-recommends xvfb tree flip curl unzip lsof -yy --force-yes
         sudo apt install p7zip
 
     - name: Pack things up

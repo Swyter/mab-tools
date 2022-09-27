@@ -1,0 +1,50 @@
+name: Zip it up
+on:
+  push:
+jobs:
+  build-lnx:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+      
+    - name: Install dependencies
+      run: | 
+        sudo apt install p7zip
+
+    - name: Pack things up
+      id: pack
+      run: |
+        prev_run_sha="`curl -s --location --fail 'https://api.github.com/repos/eurotools/blender-addon/actions/workflows/2949131/runs' | jq -r .workflow_runs[1].head_sha`"
+        echo "prev=$prev_run_sha cur=`git rev-parse --short HEAD`"
+        
+        # swy: replace the versioned date in the script descriptor; (2020, 10, 10) -> (2021, 05, 22)
+        #      the hyphen in the date formatter makes it not pad numbers to zero (2021, 05, 22) -> (2021, 5, 22)
+        #      we need to do this because python throws an error due to the invalid octal prefix:
+        #      https://unix.stackexchange.com/a/79372/295814
+        #      https://stackoverflow.com/a/1315213/674685 ' -> '\''
+        sed -i --regexp-extended 's/('\''version'\'':) .+(,.+)/\1 '"$(date "+(%-Y, %-m, %-d)" -u)"'\2/'  io_scene_sphnx/__init__.py
+
+        # swy: only pack it when the folder has changed since the last time we ran a GitHub Actions job
+        if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- io_scene_sphnx || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then
+          7z a "sphinx-blender-tools-$(date +%Y.%m.%d-%H.%M -u).zip" io_scene_sphnx
+        fi
+
+    - name: Upload Release Asset
+      id: upload-release-asset
+      env:
+        GITHUB_TOKEN: ${{ secrets.TK }}
+      run: |
+        owner="eurotools"; repo="blender-addon"; release_id="32423809"
+        
+        FILENAME="$(basename "$(find . -name '*tools*.zip' | sort -r -u | head -n 1)")"
+        GH_ASSET="https://uploads.github.com/repos/$owner/$repo/releases/$release_id/assets?name=$FILENAME"
+        echo "$GH_ASSET"; echo "$FILENAME"
+        
+        if [[ -f "$FILENAME" ]]; then
+          curl --fail --location --data-binary @"$FILENAME" -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/octet-stream" "$GH_ASSET"
+        else
+          echo "[no changes in the add-on folder this time around; skipped]"
+        fi

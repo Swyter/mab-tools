@@ -54,7 +54,7 @@ jobs:
           
           # swy: make strip work, sourced from: https://dl.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-win32/sjlj/i686-8.1.0-release-win32-sjlj-rt_v6-rev0.7z
           curl -LO https://cdn.discordapp.com/attachments/470890531061366787/1024408065455423518/strip.exe
-          sudo cp strip.exe  ~/.wine/drive_c/windows/system32/strip.exe
+          sudo cp strip.exe ~/.wine/drive_c/windows/system32/strip.exe
           
           wine pip install pyinstaller
           
@@ -64,7 +64,8 @@ jobs:
           wine pyinstaller mab_sco_unpack.py -i NONE --onefile --upx-dir . --strip
           wine pyinstaller mab_sco_repack.py -i NONE --onefile --upx-dir . --strip
           
-          7z a "swy-sco-tools-$(date +%Y.%m.%d-%H.%M -u).zip" dist/mab_sco_*.exe
+          # swy: PyInstaller drops the final .exe in a ./dist subfolder, go inside, zip them and go back
+          pushd dist && 7z a "../swy-sco-tools-$(date +%Y.%m.%d-%H.%M -u).zip" mab_sco_*.exe && popd
         fi
 
     - name: Upload Release Asset

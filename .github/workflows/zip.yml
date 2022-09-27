@@ -31,7 +31,7 @@ jobs:
         # sed -i --regexp-extended 's/('\''version'\'':) .+(,.+)/\1 '"$(date "+(%-Y, %-m, %-d)" -u)"'\2/'  io_scene_sphnx/__init__.py
 
         # swy: only pack it when the folder has changed since the last time we ran a GitHub Actions job
-        if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- mab_sco_*.py || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then
+        #if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- mab_sco_*.py || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then
           # swy: add a dummy screen for Wine to proceed headless, dial down the Wine log spam
           #      we need Wine to run the Windows version of PyInstaller to turn the .py into a self-contained .exe
           Xvfb :1 -screen 0 800x600x16 &
@@ -63,12 +63,12 @@ jobs:
           
           # swy: PyInstaller drops the final .exe in a ./dist subfolder, go inside, zip them and go back
           pushd dist && 7z a "../swy-sco-tools-$(date +%Y.%m.%d-%H.%M -u).zip" mab_sco_*.exe && popd
-        fi
+        #fi
 
     - name: Upload Release Asset
       id: upload-release-asset
       run: |
-        owner="swyter"; repo="mab-tools; release_id="78295290"
+        owner="swyter"; repo="mab-tools"; release_id="78295290"
         
         FILENAME="$(basename "$(find . -name '*tools*.zip' | sort -r -u | head -n 1)")"
         GH_ASSET="https://uploads.github.com/repos/$owner/$repo/releases/$release_id/assets?name=$FILENAME"

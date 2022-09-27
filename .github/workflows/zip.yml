@@ -34,9 +34,9 @@ jobs:
         sed -i --regexp-extended 's/('\''version'\'':) .+(,.+)/\1 '"$(date "+(%-Y, %-m, %-d)" -u)"'\2/'  io_scene_sphnx/__init__.py
 
         # swy: only pack it when the folder has changed since the last time we ran a GitHub Actions job
-        if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- io_scene_sphnx || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then
-          7z a "swy-sco-tools-$(date +%Y.%m.%d-%H.%M -u).zip" dist/mab_sco_*.exe
-          
+        if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- mab_sco_*.py || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then
+          # swy: add a dummy screen for Wine to proceed headless, dial down the Wine log spam
+          #      we need Wine to run the Windows version of PyInstaller to turn the .py into a self-contained .exe
           Xvfb :1 -screen 0 800x600x16 &
           export DISPLAY=:1
           export WINEDLLOVERRIDES="mscoree,mshtml="
@@ -44,7 +44,7 @@ jobs:
           
           WINEARCH=win32 wineboot -u
 
-          # swy: newer versions don't really seem to install properly under Wine; we could also use the embedded version and install pip on top by removing the python310._pth file from the extracted .zip first
+          # swy: newer versions of Python don't really seem to install properly under Wine; we could also use the embedded version and install pip on top by removing the python310._pth file from the extracted .zip first
           curl -LO https://www.python.org/ftp/python/3.8.9/python-3.8.9.exe
           wine python-3.8.9.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0 Include_launcher=0 Include_tcltk=0
           
@@ -62,22 +62,24 @@ jobs:
           sed -i 's/raise exception/pass/' ~/.wine/drive_c/Program\ Files/Python38-32/Lib/site-packages/PyInstaller/utils/win32/winresource.py
           
           wine pyinstaller mab_sco_unpack.py -i NONE --onefile --upx-dir . --strip
-          wine pyinstaller mab_sco_repack.py -i NONE --onefile --upx-dir . --strip  
+          wine pyinstaller mab_sco_repack.py -i NONE --onefile --upx-dir . --strip
+          
+          7z a "swy-sco-tools-$(date +%Y.%m.%d-%H.%M -u).zip" dist/mab_sco_*.exe
         fi
 
     - name: Upload Release Asset
       id: upload-release-asset
-      env:
-        GITHUB_TOKEN: ${{ secrets.TK }}
+      permissions:
+        contents: write 
       run: |
-        owner="swyter"; repo="mab-tools; release_id="32423809"
+        owner="swyter"; repo="mab-tools; release_id="78295290"
         
         FILENAME="$(basename "$(find . -name '*tools*.zip' | sort -r -u | head -n 1)")"
         GH_ASSET="https://uploads.github.com/repos/$owner/$repo/releases/$release_id/assets?name=$FILENAME"
         echo "$GH_ASSET"; echo "$FILENAME"
         
         if [[ -f "$FILENAME" ]]; then
-          curl --fail --location --data-binary @"$FILENAME" -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/octet-stream" "$GH_ASSET"
+          curl --fail --location --data-binary @"$FILENAME" -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' -H "Content-Type: application/octet-stream" "$GH_ASSET"
         else
           echo "[no changes in the add-on folder this time around; skipped]"
         fi

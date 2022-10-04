@@ -53,20 +53,34 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
     cur_line = 2
     cur_idx = 0
     for i in range(scene_prop_txt_count):
-        print(i)
         scene_prop_txt_entries[scene_props_txt_lines[cur_line][0]] = i
-        cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5])
-
-    exit(0)
+        cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5]) # swy: advance the current line (1), plus the two trailing lines (2), plus the variable amount of lines, one per extra trigger.
 
     for i, object in enumerate(mission_objects):
+        if not object['type'] == 'prop':
+            continue
+        
+        if object['str'] not in scene_prop_txt_entries:
+            print(f"[!] the scene prop «{object['str']}» is not present in the mod's scene_props.txt file; skipping")
+            continue
+
+        prop_tag = object['str']
+        old_id = object['id']
+        cur_id = scene_prop_txt_entries[object['str']]
+
+        if old_id == cur_id:
+            continue
+        
+        object['id'] = cur_id
+        print(f"[>] setting id of scene prop «{prop_tag}» to {cur_id}, it was {old_id}")
+
         print(object)
 
     js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
     js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look
 
 
-    exit
+    exit()
 
     try:
         with open(f"{input_folder}/mission_objects.json", mode='w') as fw:

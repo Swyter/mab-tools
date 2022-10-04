@@ -6,16 +6,11 @@ import sys
 import argparse
 
 def sco_unpacked_reindex(input_folder, scene_props_txt):
-
-    scene_file = input_folder + '.sco'
-
     if not os.path.isdir(input_folder):
         print(f"[e] the unpacked «{input_folder}» SCO folder doesn't seem to exist")
         exit(1)
 
     print(f"[i] reindexing the scene prop data from the «{input_folder}» folder via «{scene_props_txt}»")
-
-    mission_objects = ""
 
     try:
         with open(f"{input_folder}/mission_objects.json") as f_json:
@@ -42,14 +37,14 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
         exit(2)
 
     if ' '.join(scene_props_txt_lines[0]) != 'scene_propsfile version 1':
-        print(f"[!] bad header")
+        print("[!] bad scene_props.txt header; wrong file?")
         exit(3)
 
     # swy: actually parse the splitted text lines to get the sorted list of available props in this mod that hold their index, using a hash table
     scene_prop_txt_count = int(scene_props_txt_lines[1][0])
     scene_prop_txt_entries = {}
 
-    print(f'[-] loading {scene_prop_txt_count} total scene props from the mod TXT file')
+    print(f'[-] loading {scene_prop_txt_count} total scene props from the mod .txt file')
 
     cur_line = 2 # swy: line 0 is the header magic, line 1 is the prop count, line 2 is where the first prop entry is
     for i in range(scene_prop_txt_count):
@@ -97,7 +92,13 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
             prop_already_mentioned.append(prop_tag)
 
 
-    print(f"\n[/] finished; {prop_count_fine} props were fine, {prop_count_changed} props were reindexed and {prop_count_missing} props were missing ({prop_count_fine + prop_count_changed + prop_count_missing} in total)")
+    prop_count_total = prop_count_fine + prop_count_changed + prop_count_missing
+    mission_objects_that_are_not_props = len(mission_objects) - prop_count_total
+    print(f"\n[/] finished; {prop_count_fine} props were fine, {prop_count_changed} props were reindexed and {prop_count_missing} props were missing\n    ({prop_count_total} in total, plus {mission_objects_that_are_not_props} asorted mission objects that are not props)")
+
+    if prop_count_changed <= 0:
+        print("[i] no need to overwrite the unchanged JSON file, we're done here")
+        exit(0)
 
     # swy: save again as an updated JSON file, in-place
     js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
@@ -110,24 +111,30 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
             fw.write(js)
     except OSError as e:
         print(f"[e] couldn't open the JSON file: {e}", file=sys.stderr)
-    except OSError as e:
-        print(f"[e] couldn't open the target SCO file: {e}", file=sys.stderr)
 
 if __name__ == "__main__":
     # swy: add some helpful commands and their documentation
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                      description='''Fixes the scene prop indices in Mount&Blade SceneObj files to match the order of a mod's scene_props.txt. Created by Swyter in 2022.''',
-                                     epilog='''Why? Even if each mission object entry includes a name for each prop instance, the game only ever uses the numeric index to match it against a mod's scene_props.txt file.''' +
-                                            '''So, in case the modder changes the order in which scene props are listed in the module system, either by re-sorting them or deleting an obsolete entry,''' +
-                                            '''any previously-edited SCO will be off, spawning the wrong prop. So if spr_fireplace_b was placed in an SCO when it was number 33 in the scene prop list''' +
-                                            '''the SCO will save both the spr_fireplace_b tag and the index 32 (indices start at zero). After moving the list around by removing a prop that goes before in your module system, spr_fireplace_b may now be prop number 20 instead, so index 19.''' +
-                                            '''But the game still tries to use index 32 in that scene and maybe puts a spr_pillow_c there instead (which is the random prop that ended up in that line).''' + 
-                                            '''Thanks to this program we can match the spr_fireplace_b tag in the SCO with a newer scene_props.txt, find that in the updated scene_props.txt our spr_fireplace_b now is 19, and replace the number. We do that for every prop in the scene, if the prop no longer exists we throw a warning for the modder to fix. Easy peasy.''')
+                                     epilog='''\
+    Q: What is this for?
+    A: Even if each mission object entry includes a name for each prop instance, the game only ever uses the numeric index to match it against a mod's scene_props.txt file.
+
+    So, in case the modder changes the order in which scene props are listed in the module system, either by re-sorting them or deleting an obsolete entry,
+    any previously-edited SCO will be off, spawning the wrong prop. So if spr_fireplace_b was placed in an SCO when it was number 33 in the scene prop list
+    the SCO will save both the spr_fireplace_b tag and the index 32 (indices start at zero). After moving the list around by removing a prop that goes before
+    in your module system, spr_fireplace_b may now be prop number 20 instead, so index 19.
+
+    But the game still tries to use index 32 in that scene and maybe puts a spr_pillow_c there instead (which is the random prop that ended up in that line).
+    Thanks to this program we can match the spr_fireplace_b tag in the SCO with a newer scene_props.txt, find that in the updated scene_props.txt our
+    spr_fireplace_b now is 19, and replace the number. We do that for every prop in the scene, if the prop no longer exists we
+    throw a warning for the modder to fix. Easy peasy.
+''')
 
     parser.add_argument('input', metavar='<unpacked-sco-folder>', help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')
-    parser.add_argument('-sc', '--scenepropstxt', dest='scene_props_txt', default='', metavar='<path to the updated .txt file>', required=False)
+    parser.add_argument('-sc', '--scenepropstxt', dest='scene_props_txt', default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='by default it will guess that we are under <mod folder>/SceneObj/scn_... and use the parent folder, which should be where the mod .txt files are')
 
-    args = parser.parse_args("C:\\Users\\Usuario\\Documents\\github\\mab-tools\\scn_mont_st_michel --scenepropstxt C:\\Users\\Usuario\\Documents\\github\\tldmod\\scene_props.txt".split())
+    args = parser.parse_args("-h C:\\Users\\Usuario\\Documents\\github\\mab-tools\\scn_caras_galadhon_siege --scenepropstxt C:\\Users\\Usuario\\Documents\\github\\tldmod\\scene_props.txt".split())
 
     # swy: by default we will assume we are in the SceneObj folder and that the parent folder is where the mod's scene_props.txt is
     if not args.scene_props_txt:

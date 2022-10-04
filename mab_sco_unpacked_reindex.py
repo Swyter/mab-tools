@@ -6,17 +6,12 @@ import sys
 import argparse
 
 def sco_unpacked_reindex(input_folder, scene_props_txt):
-    def write_rgltag(str):
-        str_enc = str.encode('utf-8'); str_enc_len = len(str_enc)
-        f.write(pack('<I', str_enc_len))
-        f.write(pack(f'{str_enc_len}s', str_enc))
 
     scene_file = input_folder + '.sco'
 
     if not os.path.isdir(input_folder):
         print(f"[e] the unpacked «{input_folder}» SCO folder doesn't seem to exist")
         exit(1)
-
 
     mission_objects = ""
 
@@ -48,7 +43,6 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
 
 
     scene_prop_txt_count = int(scene_props_txt_lines[1][0])
-
     scene_prop_txt_entries = {}
     cur_line = 2
     cur_idx = 0
@@ -56,25 +50,36 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
         scene_prop_txt_entries[scene_props_txt_lines[cur_line][0]] = i
         cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5]) # swy: advance the current line (1), plus the two trailing lines (2), plus the variable amount of lines, one per extra trigger.
 
+
+
+    prop_already_mentioned = []
+
     for i, object in enumerate(mission_objects):
-        if not object['type'] == 'prop':
+        prop_type = object['type']
+        prop_tag  = object['str']
+
+        if prop_type != 'prop':
             continue
         
-        if object['str'] not in scene_prop_txt_entries:
-            print(f"[!] the scene prop «{object['str']}» is not present in the mod's scene_props.txt file; skipping")
+        if prop_tag not in scene_prop_txt_entries:
+            if prop_tag not in prop_already_mentioned:
+                print(f"[!] prop not present in the mod's scene_props.txt file; skipping: {prop_tag}")
+                prop_already_mentioned.append(prop_tag)
             continue
 
-        prop_tag = object['str']
-        old_id = object['id']
-        cur_id = scene_prop_txt_entries[object['str']]
+        old_id    = object['id']
+        cur_id    = scene_prop_txt_entries[object['str']]
 
         if old_id == cur_id:
             continue
         
         object['id'] = cur_id
-        print(f"[>] setting id of scene prop «{prop_tag}» to {cur_id}, it was {old_id}")
 
-        print(object)
+        if prop_tag not in prop_already_mentioned:
+            print(f"[>] setting id of scene prop «{prop_tag}» to {cur_id}, it was {old_id}")
+            prop_already_mentioned.append(prop_tag)
+
+        #print(object)
 
     js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
     js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look

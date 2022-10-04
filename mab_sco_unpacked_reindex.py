@@ -19,21 +19,25 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
         with open(f"{input_folder}/mission_objects.json") as f_json:
             mission_objects = json.load(f_json)
     except OSError as e:
-        print(f"[!] skipping mission objects/scene props: {e}", file=sys.stderr)
+        print(f"[!] the mission_objects.json file does not exist: {e}", file=sys.stderr)
+        exit(1)
 
     print(f"[i] reindexing the scene prop data from the «{input_folder}» folder via «{scene_props_txt}»")
 
-
+    # swy: split the mod's scene_props.txt file into a 2D tokenized array, each line is a row, which has as many columns as whitespace-separated words
+    #      that way we can skip ahead quickly when actually reading and understanding the contents in a second step, we only need to do the bare minimum
     scene_props_txt_lines = []
 
     try:
         with open(f"{scene_props_txt}") as f_obj:
             for i, line in enumerate(f_obj):
                 line = line.split()
+                line = [token.strip()  for token in line] # swy: make sure get rid of any extra leading/trailing spaces once separated
                 scene_props_txt_lines.append(line)
 
     except OSError as e:
-        print(f"[!] skipping AI mesh: {e}", file=sys.stderr)
+        print(f"[e] the scene_props.txt file does not exist: {e}", file=sys.stderr)
+        exit(2)
 
 
     #print(f'[>] unpacking {object_count} mission objects into a JSON file')
@@ -42,16 +46,16 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
         print(f"[!] bad header")
 
 
+    # swy: actually parse the splitted text lines to get the sorted list of available props in this mod that hold their index, using a hash table
     scene_prop_txt_count = int(scene_props_txt_lines[1][0])
     scene_prop_txt_entries = {}
-    cur_line = 2
-    cur_idx = 0
+    cur_line = 2 # swy: line 0 is the header magic, line 1 is the prop count, line 2 is where the first prop entry is
     for i in range(scene_prop_txt_count):
         scene_prop_txt_entries[scene_props_txt_lines[cur_line][0]] = i
-        cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5]) # swy: advance the current line (1), plus the two trailing lines (2), plus the variable amount of lines, one per extra trigger.
+        cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5]) # swy: advance the current line (1), plus the two trailing lines (2), plus the variable amount of lines; one per extra prop trigger.
 
-
-
+    # swy: go prop by prop in the loaded JSON scene and find if the prop is part of the mod or not,
+    #       and if it is, update the old index to the newer one
     prop_already_mentioned = []
 
     for i, object in enumerate(mission_objects):
@@ -67,23 +71,25 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
                 prop_already_mentioned.append(prop_tag)
             continue
 
+        # swy: scene_prop_txt_entries contains the entries that we just parsed
         old_id    = object['id']
         cur_id    = scene_prop_txt_entries[object['str']]
 
+        # swy: if the indices match, all is fine; skip the entry
         if old_id == cur_id:
             continue
         
+        # swy: doesn't match; update it and talk about it if it's the first instance of this prop
+        #      in the scene; we don't want to spam the user for each copy
         object['id'] = cur_id
 
         if prop_tag not in prop_already_mentioned:
             print(f"[>] setting id of scene prop «{prop_tag}» to {cur_id}, it was {old_id}")
             prop_already_mentioned.append(prop_tag)
 
-        #print(object)
-
+    # swy: save again as an updated JSON file, in-place
     js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
     js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look
-
 
     exit()
 

@@ -4,7 +4,7 @@ import json, os
 import sys
 import argparse
 
-def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = False):
+def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = False, opt_remapping_file = '', opt_flora = ''):
     if not os.path.isdir(input_folder):
         print(f"[e] the unpacked «{input_folder}» SCO folder doesn't seem to exist")
         exit(1)
@@ -42,6 +42,7 @@ def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = Fal
     # swy: actually parse the splitted text lines to get the sorted list of available props in this mod that hold their index, using a hash table
     scene_prop_txt_count = int(scene_props_txt_lines[1][0])
     scene_prop_txt_entries = {}
+    scene_prop_txt_remaps  = {}
 
     print(f'[-] loading {scene_prop_txt_count} total scene props from the mod .txt file')
 
@@ -49,6 +50,31 @@ def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = Fal
     for i in range(scene_prop_txt_count):
         scene_prop_txt_entries[scene_props_txt_lines[cur_line][0]] = i # swy: add a new prop entry; its index is its value. doing it as a hashtable makes it easier below
         cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5]) # swy: advance the current line (1), plus the two compulsory trailing lines after each prop (2), plus the variable amount of lines; one per extra prop trigger.
+
+
+    # swy: add a way to let the tool know that a prop changed names; via a plain text file with lines like «spr_old_name_in_sco = spr_new_name_in_mod»
+    #      the tool will treat them like they are that new prop, for all intents and purposes. probably saves a lot of work in certain cases
+    if opt_remapping_file:
+        try:
+            with open(f"{opt_remapping_file}") as f_remap:
+                for i, line in enumerate(f_remap):
+                    line = line.split('=')
+                    line = [token.strip()  for token in line]
+
+                    if len(line) < 2:
+                        continue
+
+                    old_name = line[0]
+                    new_name = line[1]
+
+                    if scene_prop_txt_entries[new_name]:
+                        scene_prop_txt_entries[old_name] = scene_prop_txt_entries[new_name]
+                        scene_prop_txt_remaps[old_name] = new_name
+                        print(f"[+] added {old_name} as an older/mapped/renamed version of {new_name}")
+
+        except OSError as e:
+            print(f"[e] the optional remapping file {opt_remapping_file} does not seem to exist, skipping: {e}", file=sys.stderr)
+
 
     print(f'[-] successfully loaded all the mod\'s props; starting...\n')
 
@@ -65,6 +91,12 @@ def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = Fal
 
         if prop_type != 'prop':
             continue
+
+        # swy: rename our prop's tag if it is part of the remapping table: old_name => new_name
+        if prop_tag in scene_prop_txt_remaps:
+            object['str'] = scene_prop_txt_remaps[object['str']]
+            print(f"[.] renaming prop from {prop_tag} to {object['str']}")
+            prop_tag = object['str']
         
         if prop_tag not in scene_prop_txt_entries:
             prop_count_missing += 1
@@ -168,6 +200,8 @@ A: You can probably quickly chain or combine the small tools into small scripts
     parser.add_argument('input', metavar='<unpacked-sco-folder>', help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')
     parser.add_argument('-sc', '--scenepropstxt', dest='scene_props_txt', default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='by default it will guess that we are under <mod folder>/SceneObj/scn_... and use the parent folder, which should be where the mod .txt files are')
     parser.add_argument('-rm', '--removemissing', dest='opt_remove_missing', action='store_true', required=False, help='automatically delete any props in the scene not part of the provided scene_props.txt, instead of skipping them')
+    parser.add_argument('-re', '--remappingfile', dest='opt_remapping_file', action='store_true', required=False, help='automatically delete any props in the scene not part of the provided scene_props.txt, instead of skipping them')
+    parser.add_argument('-fl', '--reindexflora',  dest='opt_flora',          action='store_true', required=False, help='also reindexes mission objects of type «plant» via a provided flora_kinds.txt')
 
     args = parser.parse_args()
 
@@ -175,4 +209,4 @@ A: You can probably quickly chain or combine the small tools into small scripts
     if not args.scene_props_txt:
         args.scene_props_txt = '../scene_props.txt'
 
-    sco_unpacked_reindex(args.input, args.scene_props_txt, opt_remove_missing=args.opt_remove_missing)
+    sco_unpacked_reindex(args.input, args.scene_props_txt, opt_remove_missing=args.opt_remove_missing, opt_remapping_file=args.opt_remapping_file, opt_flora=args.opt_flora)

@@ -140,8 +140,8 @@ A: Are your props suddenly all messed up? Even if each mission object entry incl
    modder to fix. Easy peasy.
 
 Q: Doing it manually sounds cumbersome. Any way to automate all this for many files?
-A: You can probably quickly chain or combine the small tools into small
-   scripts to do this for you, something along these lines, in Bash:
+A: You can probably quickly chain or combine the small tools into small scripts
+   to do this for you, something along these lines, in Bash (i.e. Linux/macOS):
     for file in ./scn_*.sco; do
       mkdir _tmp_unpack_folder
       echo -ne "\n -- processing $file\n"
@@ -150,6 +150,19 @@ A: You can probably quickly chain or combine the small tools into small
       python mab_sco_repack.py _tmp_unpack_folder -o "$file" --missionobjects repack --aimesh keep --terrain keep
       rm -rf _tmp_unpack_folder
     done
+
+   This is how it's done in Batch (i.e. Windows):
+    @echo off
+    for %%file in (scn_*.sco) do (
+      mkdir _tmp_unpack_folder
+      echo. 
+      echo -- processing %%file
+      echo.
+      mab_sco_unpack.exe "%%file" -o _tmp_unpack_folder --dont-unpack-aimesh --dont-unpack-terrain
+      mab_sco_unpacked_reindex.exe _tmp_unpack_folder
+      mab_sco_repack.exe _tmp_unpack_folder -o "%%file" --missionobjects repack --aimesh keep --terrain keep
+      rmdir _tmp_unpack_folder /S /Q
+    )
 ''')
 
     parser.add_argument('input', metavar='<unpacked-sco-folder>', help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')

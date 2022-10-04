@@ -48,7 +48,7 @@ def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = Fal
     cur_line = 2 # swy: line 0 is the header magic, line 1 is the prop count, line 2 is where the first prop entry is
     for i in range(scene_prop_txt_count):
         scene_prop_txt_entries[scene_props_txt_lines[cur_line][0]] = i
-        cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5]) # swy: advance the current line (1), plus the two trailing lines (2), plus the variable amount of lines; one per extra prop trigger.
+        cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5]) # swy: advance the current line (1), plus the two compulsory trailing lines after each prop (2), plus the variable amount of lines; one per extra prop trigger.
 
     print(f'[-] successfully loaded all the mod\'s props; starting...\n')
 
@@ -95,7 +95,9 @@ def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = Fal
     # swy: add a nice summary at the end
     prop_count_total = prop_count_fine + prop_count_changed + prop_count_missing
     mission_objects_that_are_not_props = len(mission_objects) - prop_count_total
-    print(f"\n[/] finished; {prop_count_fine} props were fine, {prop_count_changed} props were reindexed and {prop_count_missing} props were missing\n    ({prop_count_total} in total, plus {mission_objects_that_are_not_props} asorted mission objects that are not props)")
+
+    print(f"\n[/] finished; {prop_count_fine} props were fine, {prop_count_changed} props were reindexed and {prop_count_missing} props were missing" +
+          f"\n    ({prop_count_total} in total, plus {mission_objects_that_are_not_props} asorted mission objects that are not props)")
 
     if prop_count_changed <= 0:
         print("[i] no need to overwrite the unchanged JSON file, we're done here")
@@ -110,6 +112,7 @@ def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = Fal
             fw.write(js)
     except OSError as e:
         print(f"[e] couldn't open the JSON file: {e}", file=sys.stderr)
+
 
 if __name__ == "__main__":
     # swy: add some helpful commands and their documentation
@@ -153,7 +156,7 @@ A: You can probably quickly chain or combine the small tools into small
     parser.add_argument('-sc', '--scenepropstxt', dest='scene_props_txt', default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='by default it will guess that we are under <mod folder>/SceneObj/scn_... and use the parent folder, which should be where the mod .txt files are')
     parser.add_argument('-rm', '--removemissing', dest='opt_remove_missing', action='store_true', required=False, help='automatically delete any props in the scene not part of the provided scene_props.txt, instead of skipping them')
 
-    args = parser.parse_args("-rm C:\\Users\\Usuario\\Documents\\github\\mab-tools\\scn_mont_st_michel --scenepropstxt C:\\Users\\Usuario\\Documents\\github\\tldmod\\scene_props.txt".split())
+    args = parser.parse_args()
 
     # swy: by default we will assume we are in the SceneObj folder and that the parent folder is where the mod's scene_props.txt is
     if not args.scene_props_txt:

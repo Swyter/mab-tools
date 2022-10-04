@@ -118,19 +118,24 @@ if __name__ == "__main__":
                                      description='''Fixes the scene prop indices in Mount&Blade SceneObj files to match the order of a mod's scene_props.txt. Created by Swyter in 2022.''',
                                      epilog='''\
 Q: What is this for? I don't get it. :(
-A: Even if each mission object entry includes a name for each prop instance, the game only ever uses the numeric index to match it against a mod's scene_props.txt file.
+A: Even if each mission object entry includes a name for each prop instance, the game only ever uses
+   the numeric index to match it against a mod's scene_props.txt file.
 
-So, in case the modder changes the order in which scene props are listed in the module system, either by re-sorting them or deleting an obsolete entry,
-any previously-edited SCO will be off; spawning the wrong prop. So if spr_fireplace_b was placed in an SCO when it was number 33 in the scene prop list
-the SCO will store both the spr_fireplace_b tag and the index 32 (indices start at zero). After moving the list around by removing a bunch of props
-that go before in your module system, spr_fireplace_b may now be prop number 20 instead, so index 19.
+   So, in case the modder changes the order in which scene props are listed in the module system, either
+   by re-sorting them or deleting an obsolete entry, any previously-edited SCO will be off; spawning the
+   wrong prop. So if spr_fireplace_b was placed in an SCO when it was number 33 in the scene prop list,
+   the SCO will store both the spr_fireplace_b tag and the index 32 (indices start at zero). After
+   moving the list around by removing a bunch of props that go before in your module system,
+   spr_fireplace_b may now be prop number 20 instead, so index 19.
 
-But the game still tries to use index 32 in that scene and maybe puts a spr_pillow_c there instead (which is the random prop that ended up in that line).
+   But the game still tries to use index 32 in that scene and maybe puts a spr_pillow_c there
+   instead (which is the random prop that ended up in that line).
 
-Thanks to this program we can match the spr_fireplace_b name/tag in the SCO with a newer scene_props.txt, then find that in the updated scene_props.txt
-our spr_fireplace_b now should be 19 instead of 32, and replace the number. We do that for every prop in the scene, if the prop no longer exists we
-throw a warning for the modder to fix. Easy peasy.
-
+   Thanks to this program we can match the spr_fireplace_b name/tag in the SCO with a newer
+   scene_props.txt, then find that in the updated scene_props.txt our spr_fireplace_b
+   should now be 19 instead of 32, and replace the number. We do that for every prop
+   in the scene, if the prop no longer exists we throw a warning for the
+   modder to fix. Easy peasy.
 ''')
 
     parser.add_argument('input', metavar='<unpacked-sco-folder>', help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')

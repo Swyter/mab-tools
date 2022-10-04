@@ -35,7 +35,7 @@ def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = Fal
         print(f"[e] the scene_props.txt file does not exist: {e}", file=sys.stderr)
         exit(2)
 
-    if ' '.join(scene_props_txt_lines[0]) != 'scene_propsfile version 1':
+    if len(scene_props_txt_lines) <= 3 or ' '.join(scene_props_txt_lines[0]) != 'scene_propsfile version 1':
         print("[!] bad scene_props.txt header; wrong file?")
         exit(3)
 

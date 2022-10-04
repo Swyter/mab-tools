@@ -13,6 +13,8 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
         print(f"[e] the unpacked «{input_folder}» SCO folder doesn't seem to exist")
         exit(1)
 
+    print(f"[i] reindexing the scene prop data from the «{input_folder}» folder via «{scene_props_txt}»")
+
     mission_objects = ""
 
     try:
@@ -22,7 +24,7 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
         print(f"[!] the mission_objects.json file does not exist: {e}", file=sys.stderr)
         exit(1)
 
-    print(f"[i] reindexing the scene prop data from the «{input_folder}» folder via «{scene_props_txt}»")
+    print(f'[-] loading {len(mission_objects)} used mission objects from the scene JSON file')
 
     # swy: split the mod's scene_props.txt file into a 2D tokenized array, each line is a row, which has as many columns as whitespace-separated words
     #      that way we can skip ahead quickly when actually reading and understanding the contents in a second step, we only need to do the bare minimum
@@ -39,24 +41,29 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
         print(f"[e] the scene_props.txt file does not exist: {e}", file=sys.stderr)
         exit(2)
 
-
-    #print(f'[>] unpacking {object_count} mission objects into a JSON file')
-
     if ' '.join(scene_props_txt_lines[0]) != 'scene_propsfile version 1':
         print(f"[!] bad header")
-
+        exit(3)
 
     # swy: actually parse the splitted text lines to get the sorted list of available props in this mod that hold their index, using a hash table
     scene_prop_txt_count = int(scene_props_txt_lines[1][0])
     scene_prop_txt_entries = {}
+
+    print(f'[-] loading {scene_prop_txt_count} total scene props from the mod TXT file')
+
     cur_line = 2 # swy: line 0 is the header magic, line 1 is the prop count, line 2 is where the first prop entry is
     for i in range(scene_prop_txt_count):
         scene_prop_txt_entries[scene_props_txt_lines[cur_line][0]] = i
         cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5]) # swy: advance the current line (1), plus the two trailing lines (2), plus the variable amount of lines; one per extra prop trigger.
 
+    print(f'[-] successfully loaded all the mod\'s props; starting...\n')
+
     # swy: go prop by prop in the loaded JSON scene and find if the prop is part of the mod or not,
     #       and if it is, update the old index to the newer one
     prop_already_mentioned = []
+    prop_count_fine = 0
+    prop_count_changed = 0
+    prop_count_missing = 0
 
     for i, object in enumerate(mission_objects):
         prop_type = object['type']
@@ -66,6 +73,7 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
             continue
         
         if prop_tag not in scene_prop_txt_entries:
+            prop_count_missing += 1
             if prop_tag not in prop_already_mentioned:
                 print(f"[!] prop not present in the mod's scene_props.txt file; skipping: {prop_tag}")
                 prop_already_mentioned.append(prop_tag)
@@ -77,15 +85,19 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
 
         # swy: if the indices match, all is fine; skip the entry
         if old_id == cur_id:
+            prop_count_fine += 1
             continue
         
         # swy: doesn't match; update it and talk about it if it's the first instance of this prop
         #      in the scene; we don't want to spam the user for each copy
-        object['id'] = cur_id
+        object['id'] = cur_id; prop_count_changed += 1
 
         if prop_tag not in prop_already_mentioned:
             print(f"[>] setting id of scene prop «{prop_tag}» to {cur_id}, it was {old_id}")
             prop_already_mentioned.append(prop_tag)
+
+
+    print(f"\n[/] finished; {prop_count_fine} props were fine, {prop_count_changed} props were reindexed and {prop_count_missing} props were missing ({prop_count_fine + prop_count_changed + prop_count_missing} in total)")
 
     # swy: save again as an updated JSON file, in-place
     js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)

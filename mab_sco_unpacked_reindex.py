@@ -1,11 +1,10 @@
-import pathlib
 import re
 from struct import *
-import json, os, io
+import json, os
 import sys
 import argparse
 
-def sco_unpacked_reindex(input_folder, scene_props_txt):
+def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = False):
     if not os.path.isdir(input_folder):
         print(f"[e] the unpacked «{input_folder}» SCO folder doesn't seem to exist")
         exit(1)
@@ -70,8 +69,10 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
         if prop_tag not in scene_prop_txt_entries:
             prop_count_missing += 1
             if prop_tag not in prop_already_mentioned:
-                print(f"[!] prop not present in the mod's scene_props.txt file; skipping: {prop_tag}")
+                print(f"[!] prop not present in the mod's scene_props.txt file; {opt_remove_missing and 'deleting' or 'skipping'}: {prop_tag}")
                 prop_already_mentioned.append(prop_tag)
+            if opt_remove_missing:
+                del mission_objects[i]
             continue
 
         # swy: scene_prop_txt_entries contains the entries that we just parsed
@@ -91,7 +92,7 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
             print(f"[>] setting id of scene prop «{prop_tag}» to {cur_id}, it was {old_id}")
             prop_already_mentioned.append(prop_tag)
 
-
+    # swy: add a nice summary at the end
     prop_count_total = prop_count_fine + prop_count_changed + prop_count_missing
     mission_objects_that_are_not_props = len(mission_objects) - prop_count_total
     print(f"\n[/] finished; {prop_count_fine} props were fine, {prop_count_changed} props were reindexed and {prop_count_missing} props were missing\n    ({prop_count_total} in total, plus {mission_objects_that_are_not_props} asorted mission objects that are not props)")
@@ -103,8 +104,6 @@ def sco_unpacked_reindex(input_folder, scene_props_txt):
     # swy: save again as an updated JSON file, in-place
     js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
     js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look
-
-    exit()
 
     try:
         with open(f"{input_folder}/mission_objects.json", mode='w') as fw:
@@ -140,11 +139,12 @@ A: Even if each mission object entry includes a name for each prop instance, the
 
     parser.add_argument('input', metavar='<unpacked-sco-folder>', help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')
     parser.add_argument('-sc', '--scenepropstxt', dest='scene_props_txt', default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='by default it will guess that we are under <mod folder>/SceneObj/scn_... and use the parent folder, which should be where the mod .txt files are')
+    parser.add_argument('-rm', '--removemissing', dest='opt_remove_missing', action='store_true', required=False, help='automatically delete any props in the scene not part of the provided scene_props.txt, instead of skipping them')
 
-    args = parser.parse_args("-h C:\\Users\\Usuario\\Documents\\github\\mab-tools\\scn_caras_galadhon_siege --scenepropstxt C:\\Users\\Usuario\\Documents\\github\\tldmod\\scene_props.txt".split())
+    args = parser.parse_args("-rm C:\\Users\\Usuario\\Documents\\github\\mab-tools\\scn_mont_st_michel --scenepropstxt C:\\Users\\Usuario\\Documents\\github\\tldmod\\scene_props.txt".split())
 
     # swy: by default we will assume we are in the SceneObj folder and that the parent folder is where the mod's scene_props.txt is
     if not args.scene_props_txt:
         args.scene_props_txt = '../scene_props.txt'
 
-    sco_unpacked_reindex(args.input, args.scene_props_txt)
+    sco_unpacked_reindex(args.input, args.scene_props_txt, opt_remove_missing=args.opt_remove_missing)

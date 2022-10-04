@@ -151,11 +151,12 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                     fw.write("\n# edges\n\n")
                     for i, elem in enumerate(ai_mesh['edges']):
                         face_data = [vtx_idx +1 for vtx_idx in elem]
-                        fw.write(f'e{" %i" * len(face_data)} \t\t# {i}\n' % tuple(face_data))
+                        # fw.write(f'e{" %i" * len(face_data)} \t\t# {i}\n' % tuple(face_data))
                     fw.write("\n# faces\n\n")
                     for i, elem in enumerate(ai_mesh['faces']):
                         face_data = [vtx_idx + 1 for vtx_idx in elem['idx_vertices']]
-                        fw.write(f'f{" %u" * len(face_data)} \t\t# {i} {repr(elem)}\n' % tuple(face_data))
+                        # fw.write(f'f{" %u" * len(face_data)} \t\t# {i} {repr(elem)}\n' % tuple(face_data))
+                        fw.write(f'f{" %u" * len(face_data)}\n' % tuple(face_data))
 
             # swy: some SCO files end at this point, with the terrain/ground section being
             #      completely optional for interiors, which use a custom entity mesh

@@ -131,13 +131,15 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
 
                 def getleftpart(line, token):
                         pos = line.find(token)
-                        return pos != -1 and line[:pos] or line
+                        if pos != -1:
+                            return line[:pos]
+                        else:
+                            return line
                 if not ai_mesh_from == 'empty':
                     try:
                         with open(f"{input_folder}/ai_mesh.obj") as f_obj:
                             for i, line in enumerate(f_obj):
                                 # swy: strip anything to the right of a line comment marker
-                                line = getleftpart(line, '//')
                                 line = getleftpart(line, '#' )
                                 line = line.split()
 

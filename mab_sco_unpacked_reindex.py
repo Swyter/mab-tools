@@ -117,8 +117,8 @@ if __name__ == "__main__":
                                      description='''Fixes the scene prop indices in Mount&Blade SceneObj files to match the order of a mod's scene_props.txt. Created by Swyter in 2022.''',
                                      epilog='''\
 Q: What is this for? I don't get it. :(
-A: Even if each mission object entry includes a name for each prop instance, the game only ever uses
-   the numeric index to match it against a mod's scene_props.txt file.
+A: Are your props suddenly all messed up? Even if each mission object entry includes a name for each prop
+   instance, the game only ever uses the numeric index to match it against a mod's scene_props.txt file.
 
    So, in case the modder changes the order in which scene props are listed in the module system, either
    by re-sorting them or deleting an obsolete entry, any previously-edited SCO will be off; spawning the
@@ -135,6 +135,18 @@ A: Even if each mission object entry includes a name for each prop instance, the
    should now be 19 instead of 32, and replace the number. We do that for every prop
    in the scene, if the prop no longer exists we throw a warning for the
    modder to fix. Easy peasy.
+
+Q: Doing it manually sounds cumbersome. Any way to automate all this for many files?
+A: You can probably quickly chain or combine the small tools into small
+   scripts to do this for you, something along these lines, in Bash:
+    for file in ./scn_*.sco; do
+      mkdir _tmp_unpack_folder
+      echo -ne "\n -- processing $file\n"
+      python mab_sco_unpack.py "$file" -o _tmp_unpack_folder --dont-unpack-aimesh --dont-unpack-terrain
+      python mab_sco_unpacked_reindex.py _tmp_unpack_folder
+      python mab_sco_repack.py _tmp_unpack_folder -o "$file" --missionobjects repack --aimesh keep --terrain keep
+      rm -rf _tmp_unpack_folder
+    done
 ''')
 
     parser.add_argument('input', metavar='<unpacked-sco-folder>', help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')

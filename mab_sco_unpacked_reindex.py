@@ -15,7 +15,7 @@ def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = Fal
         with open(f"{input_folder}/mission_objects.json") as f_json:
             mission_objects = json.load(f_json)
     except OSError as e:
-        print(f"[!] the mission_objects.json file does not exist: {e}", file=sys.stderr)
+        print(f"[!] the mission_objects.json file does not seem to exist: {e}", file=sys.stderr)
         exit(1)
 
     print(f'[-] loading {len(mission_objects)} used mission objects from the scene JSON file')
@@ -32,7 +32,7 @@ def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = Fal
                 scene_props_txt_lines.append(line)
 
     except OSError as e:
-        print(f"[e] the scene_props.txt file does not exist: {e}", file=sys.stderr)
+        print(f"[e] the scene_props.txt file does not seem to exist: {e}", file=sys.stderr)
         exit(2)
 
     if len(scene_props_txt_lines) <= 3 or ' '.join(scene_props_txt_lines[0]) != 'scene_propsfile version 1':
@@ -47,7 +47,7 @@ def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = Fal
 
     cur_line = 2 # swy: line 0 is the header magic, line 1 is the prop count, line 2 is where the first prop entry is
     for i in range(scene_prop_txt_count):
-        scene_prop_txt_entries[scene_props_txt_lines[cur_line][0]] = i
+        scene_prop_txt_entries[scene_props_txt_lines[cur_line][0]] = i # swy: add a new prop entry; its index is its value. doing it as a hashtable makes it easier below
         cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5]) # swy: advance the current line (1), plus the two compulsory trailing lines after each prop (2), plus the variable amount of lines; one per extra prop trigger.
 
     print(f'[-] successfully loaded all the mod\'s props; starting...\n')

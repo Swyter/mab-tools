@@ -65,17 +65,19 @@ jobs:
           curl -LO https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win32.zip
           unzip -o upx-*-win32.zip && mv upx-*-win32/upx.exe . && rm -rf upx-*
           
-          # swy: make strip work, sourced from: https://dl.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-win32/sjlj/i686-8.1.0-release-win32-sjlj-rt_v6-rev0.7z
-          curl -LO https://cdn.discordapp.com/attachments/470890531061366787/1024408065455423518/strip.exe
-          sudo cp strip.exe ~/.wine/drive_c/windows/system32/strip.exe
+          # swy: make strip work, sourced from the official mingw-w64 package
+          curl -L -o mingw.7z https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-win32/sjlj/i686-8.1.0-release-win32-sjlj-rt_v6-rev0.7z/download
+          7z e mingw.7z mingw32/bin/strip.exe # swy: extract into the current folder; don't recreate the original folder structure
+          rm mingw.7z && sudo cp strip.exe ~/.wine/drive_c/windows/system32/strip.exe
           
           wine pip install pyinstaller
           
           # swy: fix a weird Wine exception on win32api.EnumResourceTypes when the PE file doesn't have any resource, we can ignore it
           sed -i 's/raise exception/pass/' ~/.wine/drive_c/Program\ Files/Python38-32/Lib/site-packages/PyInstaller/utils/win32/winresource.py
           
-          wine pyinstaller mab_sco_unpack.py -i NONE --onefile --upx-dir . --strip
-          wine pyinstaller mab_sco_repack.py -i NONE --onefile --upx-dir . --strip
+          wine pyinstaller mab_sco_unpack.py           --icon NONE --onefile --upx-dir . --strip
+          wine pyinstaller mab_sco_unpacked_reindex.py --icon NONE --onefile --upx-dir . --strip
+          wine pyinstaller mab_sco_repack.py           --icon NONE --onefile --upx-dir . --strip
           
           # swy: PyInstaller drops the final .exe in a ./dist subfolder, go inside, zip them and go back
           pushd dist && 7z a "../swy-sco-tools-$(date +%Y.%m.%d-%H.%M -u).zip" mab_sco_*.exe && popd

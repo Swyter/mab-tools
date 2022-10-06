@@ -30,13 +30,17 @@ jobs:
         
         sudo apt install wine32  -yy --force-yes
 
-        sudo apt install --install-recommends xvfb tree flip curl unzip lsof -yy --force-yes
+        sudo apt install --install-recommends xvfb tree flip curl unzip lsof jq -yy --force-yes
         sudo apt install p7zip
 
     - name: Pack things up
       id: pack
       run: |
-        prev_run_sha="`curl -s --location --fail 'https://api.github.com/repos/swyter/mab-tools/actions/runs' | jq -r '.workflow_runs[] | select(.name | test(\"Zip it up\")) | .head_sha' | head -n1`"
+        git fetch --unshallow || git fetch --all
+
+        prev_run_shas="`curl -s --location --fail 'https://api.github.com/repos/swyter/mab-tools/actions/runs' | jq -r '.workflow_runs[] | select(.name | test("Zip it up")) | .head_sha'`"
+        echo -ne "[i] previous run revisions:\n$prev_run_shas"
+        prev_run_sha="`echo "$prev_run_shas" | head -n1`"
         echo "prev=$prev_run_sha cur=`git rev-parse --short HEAD`"
         
         # swy: replace the versioned date in the script descriptor; (2020, 10, 10) -> (2021, 05, 22)
@@ -81,6 +85,8 @@ jobs:
           
           # swy: PyInstaller drops the final .exe in a ./dist subfolder, go inside, zip them and go back
           pushd dist && 7z a "../swy-sco-tools-$(date +%Y.%m.%d-%H.%M -u).zip" mab_sco_*.exe && popd
+        else
+          echo "[no changes in the add-on folder this time around; skipped]"
         fi
 
     - name: Upload Release Asset

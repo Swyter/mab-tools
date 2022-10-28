@@ -252,7 +252,7 @@ string sceneprop_read(struct obj &m)
 {
          if (m.type == Prop ||
              m.type == Item ||
-             m.type == Plant)   return EnumToString(m.type) + " -- " + m.str.s;
+             m.type == Plant)   return EnumToString(m.type) + " -- " + (m.str.tag_len ? m.str.s : "<empty tag>");
     else if (m.type == Entry)   return EnumToString(m.type) + " point ["  + UIntToStr(m.entry_no) + "]";
     else if (m.type == Passage) return EnumToString(m.type) + " for menu item " + UIntToStr(m.menu_item_no);
     else                        return EnumToString(m.type);

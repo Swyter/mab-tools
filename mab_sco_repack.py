@@ -106,19 +106,20 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                 object_type = {'prop': 0, 'entry': 1, 'item': 2, 'unused': 3, 'plant': 4, 'passage': 5}
 
                 for i, object in enumerate(mission_objects):
-                    f.write(pack('<I',  object_type[object["type"]]))
-                    f.write(pack('<I',  object["id"]))
-                    f.write(pack('<I',  int(object["garbage"], 16)))
-                    f.write(pack('<3f', *object["rotation_matrix"][0]))
-                    f.write(pack('<3f', *object["rotation_matrix"][1]))
-                    f.write(pack('<3f', *object["rotation_matrix"][2]))
-                    f.write(pack('<3f', *object["pos"]))
-                    write_rgltag(object["str"])
+                    assert 'type' in object and object['type'] in object_type, f'the prop type for object {i} needs to be either «prop», «entry», «item», «unused», «plant» or «passage»'
 
-                    f.write(pack('<I',   object["entry_no"]))
-                    f.write(pack('<I',   object["menu_entry_no"]))
-                    f.write(pack('<3f', *object["scale"]))
+                    f.write(pack('<I',               'type' in object and object_type[object['type']]  or object_type['prop']))
+                    f.write(pack('<I',                 'id' in object and object['id']                 or 0                  ))
+                    f.write(pack('<I',            'garbage' in object and int(object['garbage'], 16)   or 0x1337             ))
+                    f.write(pack('<3f', *('rotation_matrix' in object and object['rotation_matrix'][0] or [1, 0, 0])         ))
+                    f.write(pack('<3f', *('rotation_matrix' in object and object['rotation_matrix'][1] or [0, 1, 0])         ))
+                    f.write(pack('<3f', *('rotation_matrix' in object and object['rotation_matrix'][2] or [0, 0, 1])         ))
+                    f.write(pack('<3f', *(            'pos' in object and object['pos']                or [0, 0, 0])         ))
+                    write_rgltag(                     'str' in object and object['str']                or ''                  )
 
+                    f.write(pack('<I',           'entry_no' in object and object['entry_no']           or  0                 ))
+                    f.write(pack('<I',      'menu_entry_no' in object and object['menu_entry_no']      or  0                 ))
+                    f.write(pack('<3f', *(          'scale' in object and object["scale"]              or [1, 1, 1])         ))
 
             if copy_over_instead_of_repacking(ai_mesh_from):
                 print(f"[>] copying over the AI mesh section from donor «{ai_mesh_from['donor_filename']}» file")

@@ -37,21 +37,14 @@ jobs:
       id: pack
       run: |
         git fetch --unshallow || git fetch --all
-
-        prev_run_shas="`curl -s --location --fail 'https://api.github.com/repos/swyter/mab-tools/actions/runs' | jq -r '.workflow_runs[] | select(.name | test("Zip it up")) | .head_sha'`"
+        # swy: find the previous run from the same type that is not us
+        prev_run_shas="`curl -s --location --fail 'https://api.github.com/repos/swyter/mab-tools/actions/runs' | jq -r '.workflow_runs[] | select(.name | test("Zip it up")) | select(.id != '$GITHUB_RUN_ID') | .head_sha'`"
         echo -ne "[i] previous run revisions:\n$prev_run_shas\n\n"
         prev_run_sha="`echo "$prev_run_shas" | head -n1`"
         echo "prev=$prev_run_sha cur=`git rev-parse --short HEAD`"
-        
-        # swy: replace the versioned date in the script descriptor; (2020, 10, 10) -> (2021, 05, 22)
-        #      the hyphen in the date formatter makes it not pad numbers to zero (2021, 05, 22) -> (2021, 5, 22)
-        #      we need to do this because python throws an error due to the invalid octal prefix:
-        #      https://unix.stackexchange.com/a/79372/295814
-        #      https://stackoverflow.com/a/1315213/674685 ' -> '\''
-        # sed -i --regexp-extended 's/('\''version'\'':) .+(,.+)/\1 '"$(date "+(%-Y, %-m, %-d)" -u)"'\2/'  io_scene_sphnx/__init__.py
-
+    
         # swy: only pack it when the folder has changed since the last time we ran a GitHub Actions job or there's a !force keyword in the last commit message
-        if true; then #if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- mab_sco_*.py || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then
+        if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- mab_sco_*.py || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then
           # swy: add a dummy screen for Wine to proceed headless, dial down the Wine log spam
           #      we need Wine to run the Windows version of PyInstaller to turn the .py into a self-contained .exe
           Xvfb :1 -screen 0 800x600x16 &

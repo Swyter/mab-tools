@@ -63,7 +63,11 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                     'scale': scale,
                 }
 
-                #print(i, object_type[type], str, entry_no)
+                if object['id'] == 0:
+                    del object['id']
+                if object['str'] == '':
+                    del object['str']
+
                 mission_objects.append(object)
 
             if skip_mission_objects:

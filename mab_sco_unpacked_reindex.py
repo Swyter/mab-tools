@@ -110,8 +110,11 @@ def sco_unpacked_reindex(input_folder, scene_props_txt, opt_remove_missing = Fal
     prop_count_missing = 0
 
     for i, object in enumerate(mission_objects):
-        prop_type = object['type']
-        prop_tag  = object['str']
+        prop_type = 'type' in object and object['type'] or None
+        prop_tag  = 'str' in object and object['str'] or None
+
+        if not prop_tag:
+            continue
 
         # swy: rename our prop's tag if it is part of the remapping table: old_name => new_name
         if prop_tag in scene_prop_txt_remaps:

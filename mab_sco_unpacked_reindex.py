@@ -83,14 +83,11 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
             opt_item_kinds1_txt_count = int(opt_item_kinds1_txt_lines[1][0])
             cur_line = 2
             for i in range(opt_item_kinds1_txt_count):
-                print(opt_item_kinds1_txt_lines[cur_line][0])
-                opt_item_kinds1_txt_entries[opt_item_kinds1_txt_lines[cur_line][0]] = i # swy: add a new prop entry; its index is its value. doing it as a hashtable makes it easier below
-                var_line_list_count = int(opt_item_kinds1_txt_lines[cur_line + 1][0])
-                item_trigger_count = int(opt_item_kinds1_txt_lines[cur_line + 1 + (var_line_list_count and 1 or 0) + 1][0])
+                opt_item_kinds1_txt_entries[opt_item_kinds1_txt_lines[cur_line][0]] = i # swy: see the prop parser above
+                var_line_list_count = int(opt_item_kinds1_txt_lines[cur_line + 1][0]) # swy: if this isn't zero there's another extra line underneath with X, space-separated elements
+                item_trigger_count  = int(opt_item_kinds1_txt_lines[cur_line + 1 + (var_line_list_count and 1 or 0) + 1][0]) # swy: if this isn't zero there are X extra lines, one with each item trigger
                 
-                cur_line += 1 + (var_line_list_count and 1 or 0) + 1 + item_trigger_count + 2
-
-        
+                cur_line += 1 + (var_line_list_count and 1 or 0) + 1 + item_trigger_count + 2 # swy: the last two count the extra empty line between entries
 
         except OSError as e:
             print(f"[!] the «item_kinds1.txt» file does not seem to exist, ignoring: {e}", file=sys.stderr)

@@ -51,31 +51,49 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         scene_prop_txt_entries[scene_props_txt_lines[cur_line][0]] = i # swy: add a new prop entry; its index is its value. doing it as a hashtable makes it easier below
         cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5]) # swy: advance the current line (1), plus the two compulsory trailing lines after each prop (2), plus the variable amount of lines; one per extra prop trigger.
 
-
+    opt_flora_kinds_txt_lines = []
+    opt_flora_kinds_txt_entries = {}
     if opt_flora_kinds_txt:
         try:
             with open(f"{opt_flora_kinds_txt}") as f_flora:
                 for i, line in enumerate(f_flora):
                     line = line.split()
                     line = [token.strip()  for token in line] # swy: make sure get rid of any extra leading/trailing spaces once separated
-                    scene_props_txt_lines.append(line)
+                    opt_flora_kinds_txt_lines.append(line)
+
+
 
         except OSError as e:
-            print(f"[e] the {opt_flora_kinds_txt} file does not seem to exist: {e}", file=sys.stderr)
-            exit(2)
+            print(f"[!] the «flora_kinds.txt» file does not seem to exist, ignoring: {e}", file=sys.stderr)
 
-
+    opt_item_kinds1_txt_lines = []
+    opt_item_kinds1_txt_entries = {}
     if opt_item_kinds1_txt:
         try:
             with open(f"{opt_item_kinds1_txt}") as f_items:
                 for i, line in enumerate(f_items):
                     line = line.split()
                     line = [token.strip()  for token in line] # swy: make sure get rid of any extra leading/trailing spaces once separated
-                    scene_props_txt_lines.append(line)
+                    opt_item_kinds1_txt_lines.append(line)
+
+            if len(opt_item_kinds1_txt_lines) <= 3 or ' '.join(opt_item_kinds1_txt_lines[0]) != 'itemsfile version 3':
+                print("[!] bad «item_kinds1.txt header; wrong file?")
+                exit(3)
+
+            opt_item_kinds1_txt_count = int(opt_item_kinds1_txt_lines[1][0])
+            cur_line = 2
+            for i in range(opt_item_kinds1_txt_count):
+                print(opt_item_kinds1_txt_lines[cur_line][0])
+                opt_item_kinds1_txt_entries[opt_item_kinds1_txt_lines[cur_line][0]] = i # swy: add a new prop entry; its index is its value. doing it as a hashtable makes it easier below
+                var_line_list_count = int(opt_item_kinds1_txt_lines[cur_line + 1][0])
+                item_trigger_count = int(opt_item_kinds1_txt_lines[cur_line + 1 + (var_line_list_count and 1 or 0) + 1][0])
+                
+                cur_line += 1 + (var_line_list_count and 1 or 0) + 1 + item_trigger_count + 2
+
+        
 
         except OSError as e:
-            print(f"[e] the {opt_item_kinds1_txt} file does not seem to exist: {e}", file=sys.stderr)
-            exit(2)
+            print(f"[!] the «item_kinds1.txt» file does not seem to exist, ignoring: {e}", file=sys.stderr)
 
     # swy: add a way to let the tool know that a prop changed names; via a plain text file with lines like «spr_old_name_in_sco = spr_new_name_in_mod»
     #      the tool will treat them like they are that new prop, for all intents and purposes. probably saves a lot of work in certain cases
@@ -245,7 +263,7 @@ A: You can probably quickly chain or combine the small tools into small scripts
         args.opt_flora_kinds_txt = args.input + '/../../Data/flora_kinds.txt'
 
     if not args.opt_item_kinds1_txt:
-        args.opt_flora_kinds_txt = args.input + '/../../item_kinds1.txt'
+        args.opt_item_kinds1_txt = args.input + '/../../item_kinds1.txt'
 
     sco_unpacked_reindex(
         args.input, opt_scene_props_txt=args.scene_props_txt,

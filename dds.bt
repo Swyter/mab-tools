@@ -719,7 +719,7 @@ struct bc1_block
 
 struct bc1_block_as_components
 {
-    ushort color_a, color_b; /* swy: when color_b <= color_a the last endpoint index value (I2) remaps as fully-transparent, and I1 is the average between the two C0 and C1 colors; so we lose one shade but gain punchout alpha */
+    ushort color_a, color_b; /* swy: when color_b <= color_a the last endpoint index value (I2) remaps as fully-transparent, and I1 is the average between the two C0 and C1 colors; so we lose one shade but gain punchout alpha */ /* e.g. F0 FA FF 03 78 00 00 B4 */
     ubyte a, b, c, d;
 };
 
@@ -732,15 +732,15 @@ union bc1_block_combined
 
 enum<uint64> bc4_endpoint_idx
 {
-    _a, _b, _c, _d, _e, _f,
+    g_C0, g_C1, g_I0, g_I1, g_I2, g_I3,
     black = 6,
-    white = 7 /* swy: when palette_a is   equal or less than pal_b; idx 0 is pal_a, 1 is pal_b, and the indices 2-3-4-5     interpolate between them; so when sorted by brightness: (6/black) (0/p0)  -2-3-4-5-  (1/p1) (7/white)  */ /* e.g. 64 96 86 C6 E6 B9 CB 09 */
-};            /* swy: when palette_a is bigger/brighter than pal_b; idx 0 is pal_a, 1 is pal_b, and the indices 2-3-4-5-6-7 interpolate between them; so when sorted by brightness:  <darker> (1/p1)-7-6-5-4-3-2-(0/p0) <brighter> */ /* e.g. FF 00 86 C6 E6 B9 CB 09 */
+    white = 7 /* swy: when col_a is   equal or less than col_b; idx 0 is col_a, 1 is col_b, and the indices 2-3-4-5     interpolate between them; so when sorted by brightness: (6/black) (0/p0)  -2-3-4-5-  (1/p1) (7/white)  */ /* e.g. 64 96 86 C6 E6 B9 CB 09 */
+};            /* swy: when col_a is bigger/brighter than col_b; idx 0 is col_a, 1 is col_b, and the indices 2-3-4-5-6-7 interpolate between them; so when sorted by brightness:  <darker> (1/p1)-7-6-5-4-3-2-(0/p0) <brighter> */ /* e.g. FF 00 86 C6 E6 B9 CB 09 */
 
 struct bc4_block_combined
 {
-    uint64 a: 8;
-    uint64 b: 8; /* swy: if a is less than b; index 6 is black and 7 is white; otherwise they all points fit between minimum and maximum with more steps */
+    uint64 grayscale_col_a: 8; /* swy: here called g_C0/col_a and g_C1/col_b, respectively */
+    uint64 grayscale_col_b: 8; /* swy: if a is less than b; index 6 is black and 7 is white; otherwise they all points fit between minimum and maximum with more steps */
 
     bc4_endpoint_idx endpoint_idx : 3; /* swy: top-left texel */
     bc4_endpoint_idx endpoint_idx : 3;

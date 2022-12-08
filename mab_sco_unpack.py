@@ -25,10 +25,10 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
 
     print(f'[i] unpacking «{input_sco_path}» into «{output_folder}»')
 
-    os.makedirs(output_folder, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
-
     try:
         with open(input_sco_path, mode='rb') as f:
+            os.makedirs(output_folder, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
+
             magic = unpack('<I', f.read(4))[0]; assert(magic == 0xFFFFFD33)
             versi = unpack('<I', f.read(4))[0]; assert(versi == 4)
 

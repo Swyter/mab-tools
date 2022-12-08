@@ -141,11 +141,13 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         # --
 
         # swy: skip any unsupported entry/type
-        if (opt_scene_props_txt and prop_type != 'prop') and (opt_flora_kinds_txt and prop_type != 'plant') and (opt_item_kinds1_txt and prop_type != 'item'):
+        if (len(     scene_prop_txt_entries) <= 0 and prop_type == 'prop' ) or \
+           (len(opt_flora_kinds_txt_entries) <= 0 and prop_type == 'plant') or \
+           (len(opt_item_kinds1_txt_entries) <= 0 and prop_type == 'item' ):
             continue
         
         # swy: in case this SCO is obsolete and has older props that are no longer part of the mod
-        if prop_tag not in scene_prop_txt_entries:
+        if prop_tag not in scene_prop_txt_entries and prop_type == 'prop':
             prop_count_missing += 1
             if prop_tag not in prop_already_mentioned:
                 print(f"[!] prop not present in the mod's scene_props.txt file; {opt_remove_missing and 'deleting' or 'skipping'}: {prop_tag}")

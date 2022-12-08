@@ -105,12 +105,17 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
 
                 object_type = {'prop': 0, 'entry': 1, 'item': 2, 'unused': 3, 'plant': 4, 'passage': 5}
 
+                last_garbage_val = 0x1337 # swy: we'll use this if the JSON doesn't have a custom garbage value set
+
                 for i, object in enumerate(mission_objects):
                     assert 'type' in object and object['type'] in object_type, f'the prop type for object {i} needs to be either «prop», «entry», «item», «unused», «plant» or «passage»'
 
+                    if 'garbage' in object and i == 0: # swy: if the first entry has a custom garbage value, reuse it for everyone else, the newer unpacker only writes them if they are different from the first one
+                        last_garbage_val = int(object['garbage'], 16)
+
                     f.write(pack('<I',               'type' in object and object_type[object['type']]  or object_type['prop']))
                     f.write(pack('<I',                 'id' in object and object['id']                 or 0                  ))
-                    f.write(pack('<I',            'garbage' in object and int(object['garbage'], 16)   or 0x1337             ))
+                    f.write(pack('<I',            'garbage' in object and int(object['garbage'], 16)   or last_garbage_val   ))
                     f.write(pack('<3f', *('rotation_matrix' in object and object['rotation_matrix'][0] or [1, 0, 0])         ))
                     f.write(pack('<3f', *('rotation_matrix' in object and object['rotation_matrix'][1] or [0, 1, 0])         ))
                     f.write(pack('<3f', *('rotation_matrix' in object and object['rotation_matrix'][2] or [0, 0, 1])         ))

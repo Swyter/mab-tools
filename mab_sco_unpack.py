@@ -67,6 +67,8 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                     del object['id']
                 if object['str'] == '':
                     del object['str']
+                if i > 0 and len(mission_objects) > 0 and mission_objects[0]['garbage'] == object['garbage']:
+                    del object['garbage'] # swy: get rid of repeated garbage values of subsequent entries after the first if they are the same, save some space without losing making 1:1 reconstructed files
 
                 mission_objects.append(object)
 

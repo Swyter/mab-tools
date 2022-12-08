@@ -108,7 +108,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     new_name = line[1] # swy: replace it by this one; doesn't matter if it exists at all in the files or it's a plant; we don't check
 
                     mission_obj_remaps[old_name] = new_name
-                    print(f"[+] added {old_name} as an older/mapped/renamed version of {new_name}!")
+                    print(f"[+] added {old_name} as an older/mapped/renamed version of {new_name}")
 
         except OSError as e:
             print(f"[e] the optional remapping file {opt_remapping_file} does not seem to exist, skipping: {e}", file=sys.stderr)
@@ -126,9 +126,9 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
 
     for i, object in enumerate(mission_objects):
         prop_type = 'type' in object and object['type'] or None
-        prop_tag  = 'str' in object and object['str'] or None
+        prop_tag  = 'str'  in object and object['str']  or None
 
-        if not prop_tag:
+        if not prop_type or not prop_tag:
             continue
 
         # swy: rename our object's tag if it is part of the remapping table: old_name => new_name
@@ -147,11 +147,16 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
            (len(opt_item_kinds1_txt_entries) <= 0 and prop_type == 'item' ):
             continue
         
+        def entries_for_type():
+            if   prop_type == 'prop' : return scene_prop_txt_entries
+            elif prop_type == 'plant': return opt_flora_kinds_txt_entries
+            elif prop_type == 'item' : return opt_item_kinds1_txt_entries
+
         # swy: in case this SCO is obsolete and has older props that are no longer part of the mod
-        if prop_tag not in scene_prop_txt_entries and prop_type == 'prop':
+        if prop_tag not in entries_for_type():
             prop_count_missing += 1
             if prop_tag not in prop_already_mentioned:
-                print(f"[!] prop not present in the mod's scene_props.txt file; {opt_remove_missing and 'deleting' or 'skipping'}: {prop_tag}")
+                print(f"[!] {prop_type} not present in the mod's scene_props.txt file; {opt_remove_missing and 'deleting' or 'skipping'}: {prop_tag}")
                 prop_already_mentioned.append(prop_tag)
             if opt_remove_missing:
                 objects_to_delete.append(object) # swy: defer the deletion for when we finally exit the loop; avoiding side effects of doing it now
@@ -159,7 +164,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
 
         # swy: 'scene_prop_txt_entries' contains the entries that we just parsed
         old_id    = object['id']
-        cur_id    = scene_prop_txt_entries[object['str']]
+        cur_id    = entries_for_type()[object['str']]
 
         # swy: if the indices match, all is fine; skip the entry
         if old_id == cur_id:
@@ -261,15 +266,15 @@ A: You can probably quickly chain or combine the small tools into small scripts
 
     args = parser.parse_args()
 
-    # swy: by default we will assume we are in the SceneObj folder and that the parent folder is where the mod's scene_props.txt is
+    # swy: by default we will assume we are in an sco_ directory under the SceneObj folder and that the parent folder is where the mod's scene_props.txt is
     if not args.scene_props_txt:
-        args.scene_props_txt = args.input + '/../../scene_props.txt'
+        args.scene_props_txt     = args.input + '/../' + '../scene_props.txt'
 
     if not args.opt_flora_kinds_txt:
-        args.opt_flora_kinds_txt = args.input + '/../../Data/flora_kinds.txt'
+        args.opt_flora_kinds_txt = args.input + '/../' + '../Data/flora_kinds.txt'
 
     if not args.opt_item_kinds1_txt:
-        args.opt_item_kinds1_txt = args.input + '/../../item_kinds1.txt'
+        args.opt_item_kinds1_txt = args.input + '/../' + '../item_kinds1.txt'
 
     sco_unpacked_reindex(
         args.input, opt_scene_props_txt=args.scene_props_txt,

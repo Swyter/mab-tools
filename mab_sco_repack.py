@@ -253,7 +253,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                         try:
                             with open(f"{input_folder}/layer_{ground_layer}", 'rb') as f_image:
                                 ascii_header = [] # swy: grab the three ASCII lines that make out the header of these NetPBM formats; strip their carriage returns and split each line into words/tokens
-
+                                ascii_header_flattened = []
                                 while True:
                                     try:
                                         line = f_image.readline().decode('utf-8').replace('\n', '').replace('\r', '').replace('\t', ' ').strip()
@@ -270,7 +270,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                                     ascii_header_flattened = [value.strip() for sub_list in ascii_header for value in sub_list if value != ''] # swy: photoshop exports width and height in different lines, and maxval in the fourth line, don't depend on the line position, only the 'token' order matters
 
                                     # swy: the format only has four tokens, that can be part of different lines or just separated by whitespace; this format is way too lax
-                                    if len(ascii_header_flattened) > 4:
+                                    if len(ascii_header_flattened) >= 4:
                                         break
 
                                 if ascii_header_flattened[0][0] != 'P':

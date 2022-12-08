@@ -42,7 +42,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     # swy: actually parse the splitted text lines to get the sorted list of available props in this mod that hold their index, using a hash table
     scene_prop_txt_count = int(scene_props_txt_lines[1][0])
     scene_prop_txt_entries = {}
-    scene_prop_txt_remaps  = {}
+    mission_obj_remaps  = {}
 
     print(f'[-] loading {scene_prop_txt_count} total scene props from the mod .txt file')
 
@@ -105,11 +105,10 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                         continue
 
                     old_name = line[0] # swy: find this tag in our SCO, probably obsolete, maybe we want to turn two props into one
-                    new_name = line[1] # swy: replace it by this one that should be present in scene_props.txt
+                    new_name = line[1] # swy: replace it by this one; doesn't matter if it exists at all in the files or it's a plant; we don't check
 
-                    if scene_prop_txt_entries[new_name]:
-                        scene_prop_txt_remaps[old_name] = new_name
-                        print(f"[+] added {old_name} as an older/mapped/renamed version of {new_name}")
+                    mission_obj_remaps[old_name] = new_name
+                    print(f"[+] added {old_name} as an older/mapped/renamed version of {new_name}!")
 
         except OSError as e:
             print(f"[e] the optional remapping file {opt_remapping_file} does not seem to exist, skipping: {e}", file=sys.stderr)
@@ -119,7 +118,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
 
     # swy: go prop by prop in the loaded JSON scene and find if the prop is part of the mod or not,
     #       and if it is, update the old index to the newer one
-    prop_already_mentioned = []
+    prop_already_mentioned = []; mission_obj_remap_already_mentioned = []
     prop_count_fine = 0
     prop_count_changed = 0
     prop_count_missing = 0
@@ -132,10 +131,12 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         if not prop_tag:
             continue
 
-        # swy: rename our prop's tag if it is part of the remapping table: old_name => new_name
-        if prop_tag in scene_prop_txt_remaps:
-            object['str'] = scene_prop_txt_remaps[prop_tag]
-            print(f"[.] renaming prop from {prop_tag} to {object['str']}")
+        # swy: rename our object's tag if it is part of the remapping table: old_name => new_name
+        if prop_tag in mission_obj_remaps:
+            object['str'] = mission_obj_remaps[prop_tag]
+            if prop_tag not in mission_obj_remap_already_mentioned:
+                print(f"[.] renaming mission object from {prop_tag} to {object['str']}")
+                mission_obj_remap_already_mentioned.append(prop_tag)
             prop_tag = object['str']
 
         # --
@@ -254,7 +255,7 @@ A: You can probably quickly chain or combine the small tools into small scripts
     parser.add_argument('input', metavar='<unpacked-sco-folder>', help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')
     parser.add_argument('-sc', '--scenepropstxt', dest='scene_props_txt',     default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='by default it will guess that we are under <mod folder>/SceneObj/scn_... and use the parent folder, which should be where the mod .txt files are')
     parser.add_argument('-rm', '--removemissing', dest='opt_remove_missing',  action='store_true', required=False, help='automatically delete any props in the scene not part of the provided scene_props.txt, instead of skipping them')
-    parser.add_argument('-re', '--remappingfile', dest='opt_remapping_file',  default='', metavar='<path-to-the-_mab_sco_mo_remap.txt-file>', help='provide the tool with a plain text file with lines like «spr_old_name_in_sco = spr_new_name_in_mod», the tool will rename each prop acording to your rules. also useful to potentially swap props in batch')
+    parser.add_argument('-re', '--remappingfile', dest='opt_remapping_file',  default='', metavar='<path-to-the-_mab_sco_mo_remap.txt-file>', help='provide the tool with a plain text file with lines like «spr_old_name_in_sco = spr_new_name_in_mod», the tool will rename each mission object name acording to your rules. also useful to potentially swap props in batch')
     parser.add_argument('-fl', '--florakindstxt', dest='opt_flora_kinds_txt', default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='also reindexes mission objects of type «plant» via a provided flora_kinds.txt, if set to «default» it will pick «../Data/flora_kinds.txt»')
     parser.add_argument('-it', '--itemkinds1txt', dest='opt_item_kinds1_txt', default='', metavar='<path-to-the-updated-item_kinds.txt-file>', required=False, help='also reindexes mission objects of type «item» via a provided item_kinds1.txt, if set to «default» it will pick «../item_kinds1.txt»')
 

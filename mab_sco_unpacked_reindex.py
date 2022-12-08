@@ -123,6 +123,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     prop_count_fine = 0
     prop_count_changed = 0
     prop_count_missing = 0
+    objects_to_delete = []
 
     for i, object in enumerate(mission_objects):
         prop_type = 'type' in object and object['type'] or None
@@ -150,7 +151,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                 print(f"[!] prop not present in the mod's scene_props.txt file; {opt_remove_missing and 'deleting' or 'skipping'}: {prop_tag}")
                 prop_already_mentioned.append(prop_tag)
             if opt_remove_missing:
-                del mission_objects[i]
+                objects_to_delete.append(object) # swy: defer the deletion for when we finally exit the loop; avoiding side effects of doing it now
             continue
 
         # swy: 'scene_prop_txt_entries' contains the entries that we just parsed
@@ -177,7 +178,12 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     print(f"\n[/] finished; {prop_count_fine} props were fine, {prop_count_changed} props were reindexed and {prop_count_missing} props were missing" +
           f"\n    ({prop_count_total} in total, plus {mission_objects_that_are_not_props} asorted mission objects that are not props)")
 
-    if prop_count_changed <= 0:
+    # swy: we shouldn't pull the rug and delete elements above while we are still looping through indices
+    if len(objects_to_delete) > 0:
+        for obj in objects_to_delete:
+            mission_objects.remove(obj)
+
+    if prop_count_changed <= 0 and not opt_remove_missing:
         print("[i] no need to overwrite the unchanged JSON file, we're done here")
         exit(0)
 

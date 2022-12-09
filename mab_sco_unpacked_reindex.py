@@ -69,19 +69,17 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                 cur_line = 1; cumular = 0
                 for i in range(opt_flora_kinds_txt_count):
                     opt_flora_kinds_txt_entries[opt_flora_kinds_txt_lines[cur_line][0]] = i # swy: see the prop parser above
+                    elem_flag = int(opt_flora_kinds_txt_lines[cur_line][1])
                     var_line_list_count = int(opt_flora_kinds_txt_lines[cur_line][2]) # swy: if this isn't zero there's another extra line underneath with X, space-separated elements
 
-                    cumular |= int(opt_flora_kinds_txt_lines[cur_line][1])
+                    cumular |= elem_flag
 
-                    hex = ("%013x" % int(opt_flora_kinds_txt_lines[cur_line][1]))
+                    hex = ("%013x" % elem_flag)
                     cum = ("%013x" % cumular) # 0x07fe011e0c0c ^ 0x07fe015e0c0c = 0x400000 # swy: append all the previous flags until this point to find which ones are different for trees
                     print(f"{hex} {cum} {opt_flora_kinds_txt_lines[cur_line][0]}")
-                    cur_line += 1 + var_line_list_count
+                    cur_line += 1 + var_line_list_count * (elem_flag & 0x400000 and 2 or 1) # swy: trees seem to have two lines per mesh variant
 
-
-
-                print(f'[-] loading {opt_item_kinds1_txt_count} total flora kinds from the mod .txt file')
-
+                print(f'[-] loading {opt_flora_kinds_txt_count} total flora kinds from the mod .txt file')
 
         except OSError as e:
             print(f"[!] the «flora_kinds.txt» file does not seem to exist, ignoring: {e}", file=sys.stderr)

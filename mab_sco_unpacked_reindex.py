@@ -18,7 +18,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         print(f"[!] the mission_objects.json file does not seem to exist: {e}", file=sys.stderr)
         exit(1)
 
-    print(f'[-] loading {len(mission_objects)} used mission objects from the scene JSON file')
+    print(f'[-] loading {len(mission_objects):4} used mission objects from the scene JSON file')
 
     # swy: split the mod's scene_props.txt file into a 2D tokenized array, each line is a row, which has as many columns as whitespace-separated words
     #      that way we can skip ahead quickly when actually reading and understanding the contents in a second step, we only need to do the bare minimum
@@ -44,7 +44,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     scene_prop_txt_entries = {}
     mission_obj_remaps  = {}
 
-    print(f'[-] loading {scene_prop_txt_count} total scene props from the mod .txt file')
+    print(f'[-] loading {scene_prop_txt_count:4} total scene props from the mod .txt file')
 
     cur_line = 2 # swy: line 0 is the header magic, line 1 is the prop count, line 2 is where the first prop entry is
     for i in range(scene_prop_txt_count):
@@ -69,17 +69,15 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                 cur_line = 1; cumular = 0
                 for i in range(opt_flora_kinds_txt_count):
                     opt_flora_kinds_txt_entries[opt_flora_kinds_txt_lines[cur_line][0]] = i # swy: see the prop parser above
-                    elem_flag = int(opt_flora_kinds_txt_lines[cur_line][1])
-                    var_line_list_count = int(opt_flora_kinds_txt_lines[cur_line][2]) # swy: if this isn't zero there's another extra line underneath with X, space-separated elements
+                    elem_flag          = int(opt_flora_kinds_txt_lines[cur_line][1])
+                    elem_num_of_meshes = int(opt_flora_kinds_txt_lines[cur_line][2]) #
 
-                    cumular |= elem_flag
+                    # cumular |= elem_flag; hex = ("%013x" % elem_flag); cum = ("%013x" % cumular) # 0x07fe011e0c0c ^ 0x07fe015e0c0c = 0x400000 # swy: append all the previous flags until this point to find which ones are different for trees
+                    # print(f"{hex} {cum} {opt_flora_kinds_txt_lines[cur_line][0]}")
+                    elem_is_flagged_as_tree = elem_flag & 0x400000
+                    cur_line += 1 + elem_num_of_meshes * (elem_is_flagged_as_tree and 2 or 1) # swy: trees seem to have two lines per mesh variant, others just one line per mesh
 
-                    hex = ("%013x" % elem_flag)
-                    cum = ("%013x" % cumular) # 0x07fe011e0c0c ^ 0x07fe015e0c0c = 0x400000 # swy: append all the previous flags until this point to find which ones are different for trees
-                    print(f"{hex} {cum} {opt_flora_kinds_txt_lines[cur_line][0]}")
-                    cur_line += 1 + var_line_list_count * (elem_flag & 0x400000 and 2 or 1) # swy: trees seem to have two lines per mesh variant
-
-                print(f'[-] loading {opt_flora_kinds_txt_count} total flora kinds from the mod .txt file')
+                print(f'[-] loading {opt_flora_kinds_txt_count:4} total flora kinds from the mod .txt file')
 
         except OSError as e:
             print(f"[!] the «flora_kinds.txt» file does not seem to exist, ignoring: {e}", file=sys.stderr)
@@ -107,7 +105,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                 
                 cur_line += 1 + (var_line_list_count and 1 or 0) + 1 + item_trigger_count + 2 # swy: the last two count the extra empty line between entries
 
-            print(f'[-] loading {opt_item_kinds1_txt_count} total item kinds from the mod .txt file')
+            print(f'[-] loading {opt_item_kinds1_txt_count:4} total  item kinds from the mod .txt file')
 
         except OSError as e:
             print(f"[!] the «item_kinds1.txt» file does not seem to exist, ignoring: {e}", file=sys.stderr)

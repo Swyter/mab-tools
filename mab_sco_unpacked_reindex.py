@@ -92,18 +92,23 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     line = [token.strip()  for token in line] # swy: make sure get rid of any extra leading/trailing spaces once separated
                     opt_item_kinds1_txt_lines.append(line)
 
-            if len(opt_item_kinds1_txt_lines) <= 3 or ' '.join(opt_item_kinds1_txt_lines[0]) != 'itemsfile version 3':
+            if len(opt_item_kinds1_txt_lines) <= 3 or ' '.join(opt_item_kinds1_txt_lines[0]) not in ('itemsfile version 2' or 'itemsfile version 3'):
                 print("[!] bad «item_kinds1.txt header; wrong file?")
                 exit(3)
 
+            item_file_version = int(opt_item_kinds1_txt_lines[0][2])
             opt_item_kinds1_txt_count = int(opt_item_kinds1_txt_lines[1][0])
             cur_line = 2
             for i in range(opt_item_kinds1_txt_count):
                 opt_item_kinds1_txt_entries[opt_item_kinds1_txt_lines[cur_line][0]] = i # swy: see the prop parser above
-                var_line_list_count = int(opt_item_kinds1_txt_lines[cur_line + 1][0]) # swy: if this isn't zero there's another extra line underneath with X, space-separated elements
-                item_trigger_count  = int(opt_item_kinds1_txt_lines[cur_line + 1 + (var_line_list_count and 1 or 0) + 1][0]) # swy: if this isn't zero there are X extra lines, one with each item trigger
-                
-                cur_line += 1 + (var_line_list_count and 1 or 0) + 1 + item_trigger_count + 2 # swy: the last two count the extra empty line between entries
+                if item_file_version == 3: # swy: newer, more complex, Warband item format
+                    var_line_list_count = int(opt_item_kinds1_txt_lines[cur_line + 1][0]) # swy: if this isn't zero there's another extra line underneath with X, space-separated elements
+                    item_trigger_count  = int(opt_item_kinds1_txt_lines[cur_line + 1 + (var_line_list_count and 1 or 0) + 1][0]) # swy: if this isn't zero there are X extra lines, one with each item trigger
+                    cur_line += 1 + (var_line_list_count and 1 or 0) + 1 + item_trigger_count + 2 # swy: the last two count the extra empty line between entries
+                elif item_file_version == 2: # swy: TLD uses the older M&B 1.011 item format
+                    var_line_list_count = 0
+                    item_trigger_count  = int(opt_item_kinds1_txt_lines[cur_line + 1][0])
+                    cur_line += 1 + 1 + item_trigger_count + 1
 
             print(f'[-] loading {opt_item_kinds1_txt_count:4} total  item kinds from the mod .txt file')
 

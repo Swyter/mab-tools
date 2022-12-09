@@ -174,7 +174,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         if prop_tag not in entries_for_type():
             prop_count_missing += 1
             if prop_tag not in prop_already_mentioned:
-                print(f"[!] {prop_type} not present in the mod's scene_props.txt file; {opt_remove_missing and 'deleting' or 'skipping'}: {prop_tag}")
+                print(f"[!] {prop_type} not present in the mod's .txt file; {opt_remove_missing and 'deleting' or 'skipping'}: {prop_tag}")
                 prop_already_mentioned.append(prop_tag)
             if opt_remove_missing:
                 objects_to_delete.append(object) # swy: defer the deletion for when we finally exit the loop; avoiding side effects of doing it now
@@ -194,24 +194,24 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         object['id'] = cur_id; prop_count_changed += 1
 
         if prop_tag not in prop_already_mentioned:
-            print(f"[>] setting id of scene prop «{prop_tag}» to {cur_id}, it was {old_id}")
+            print(f"[>] setting id of {prop_type} «{prop_tag}» to {cur_id}, it was {old_id}")
             prop_already_mentioned.append(prop_tag)
 
     # swy: add a nice summary at the end
     prop_count_total = prop_count_fine + prop_count_changed + prop_count_missing
     mission_objects_that_are_not_props = len(mission_objects) - prop_count_total
 
-    print(f"\n[/] finished; {prop_count_fine} props were fine, {prop_count_changed} props were reindexed and {prop_count_missing} props were missing" +
-          f"\n    ({prop_count_total} in total, plus {mission_objects_that_are_not_props} asorted mission objects that are not props)")
+    print(f"\n[/] finished; {prop_count_fine} mission objects were fine, {prop_count_changed} objects were reindexed and {prop_count_missing} objects were missing" +
+          f"\n    ({prop_count_total} in total, plus {mission_objects_that_are_not_props} asorted mission objects that are not props/plants/items)")
 
     # swy: we shouldn't pull the rug and delete elements above while we are still looping through indices
     if len(objects_to_delete) > 0:
         for obj in objects_to_delete:
             mission_objects.remove(obj)
-
-    if prop_count_changed <= 0 and not opt_remove_missing:
-        print("[i] no need to overwrite the unchanged JSON file, we're done here")
-        exit(0)
+    else: # swy: if nothing to delete and no mission objects have been altered then we'll just spit the same thing; skip that
+        if prop_count_changed <= 0:
+            print("[i] no need to overwrite the unchanged JSON file, we're done here")
+            exit(0)
 
     # swy: save again as an updated JSON file, in-place
     js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
@@ -276,7 +276,7 @@ A: You can probably quickly chain or combine the small tools into small scripts
 ''')
 
     parser.add_argument('input', metavar='<unpacked-sco-folder>', help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')
-    parser.add_argument('-sc', '--scenepropstxt', dest='scene_props_txt',     default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='by default it will guess that we are under <mod folder>/SceneObj/scn_... and use the parent folder, which should be where the mod .txt files are')
+    parser.add_argument('-sc', '--scenepropstxt', dest='opt_scene_props_txt', default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='by default it will guess that we are under <mod folder>/SceneObj/scn_... and use the parent folder, which should be where the mod .txt files are')
     parser.add_argument('-rm', '--removemissing', dest='opt_remove_missing',  action='store_true', required=False, help='automatically delete any props in the scene not part of the provided scene_props.txt, instead of skipping them')
     parser.add_argument('-re', '--remappingfile', dest='opt_remapping_file',  default='', metavar='<path-to-the-_mab_sco_mo_remap.txt-file>', help='provide the tool with a plain text file with lines like «spr_old_name_in_sco = spr_new_name_in_mod», the tool will rename each mission object name acording to your rules. also useful to potentially swap props in batch')
     parser.add_argument('-fl', '--florakindstxt', dest='opt_flora_kinds_txt', default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='also reindexes mission objects of type «plant» via a provided flora_kinds.txt, if set to «default» it will pick «../Data/flora_kinds.txt»')
@@ -285,8 +285,8 @@ A: You can probably quickly chain or combine the small tools into small scripts
     args = parser.parse_args()
 
     # swy: by default we will assume we are in an «scn_something» directory under the SceneObj folder and that the parent folder is where the mod's scene_props.txt is
-    if not args.scene_props_txt:
-        args.scene_props_txt     = args.input + '/../' + '../scene_props.txt'
+    if not args.opt_scene_props_txt:
+        args.opt_scene_props_txt = args.input + '/../' + '../scene_props.txt'
 
     if not args.opt_flora_kinds_txt:
         args.opt_flora_kinds_txt = args.input + '/../' + '../Data/flora_kinds.txt'
@@ -295,7 +295,7 @@ A: You can probably quickly chain or combine the small tools into small scripts
         args.opt_item_kinds1_txt = args.input + '/../' + '../item_kinds1.txt'
 
     sco_unpacked_reindex(
-        args.input, opt_scene_props_txt=args.scene_props_txt,
+        args.input, opt_scene_props_txt=args.opt_scene_props_txt,
                     opt_remove_missing=args.opt_remove_missing,
                     opt_remapping_file=args.opt_remapping_file,
                     opt_flora_kinds_txt=args.opt_flora_kinds_txt,

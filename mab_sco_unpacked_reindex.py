@@ -61,6 +61,26 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     line = [token.strip()  for token in line] # swy: make sure get rid of any extra leading/trailing spaces once separated
                     opt_flora_kinds_txt_lines.append(line)
 
+                if len(opt_flora_kinds_txt_lines) < 1:
+                    print("[!] bad «flora_kinds.txt header; wrong file?")
+                    exit(3)
+
+                opt_flora_kinds_txt_count = int(opt_flora_kinds_txt_lines[0][0])
+                cur_line = 1; cumular = 0
+                for i in range(opt_flora_kinds_txt_count):
+                    opt_flora_kinds_txt_entries[opt_flora_kinds_txt_lines[cur_line][0]] = i # swy: see the prop parser above
+                    var_line_list_count = int(opt_flora_kinds_txt_lines[cur_line][2]) # swy: if this isn't zero there's another extra line underneath with X, space-separated elements
+
+                    cumular |= int(opt_flora_kinds_txt_lines[cur_line][1])
+
+                    hex = ("%013x" % int(opt_flora_kinds_txt_lines[cur_line][1]))
+                    cum = ("%013x" % cumular) # 0x07fe011e0c0c ^ 0x07fe015e0c0c = 0x400000 # swy: append all the previous flags until this point to find which ones are different for trees
+                    print(f"{hex} {cum} {opt_flora_kinds_txt_lines[cur_line][0]}")
+                    cur_line += 1 + var_line_list_count
+
+
+
+                print(f'[-] loading {opt_item_kinds1_txt_count} total flora kinds from the mod .txt file')
 
 
         except OSError as e:
@@ -88,6 +108,8 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                 item_trigger_count  = int(opt_item_kinds1_txt_lines[cur_line + 1 + (var_line_list_count and 1 or 0) + 1][0]) # swy: if this isn't zero there are X extra lines, one with each item trigger
                 
                 cur_line += 1 + (var_line_list_count and 1 or 0) + 1 + item_trigger_count + 2 # swy: the last two count the extra empty line between entries
+
+            print(f'[-] loading {opt_item_kinds1_txt_count} total item kinds from the mod .txt file')
 
         except OSError as e:
             print(f"[!] the «item_kinds1.txt» file does not seem to exist, ignoring: {e}", file=sys.stderr)
@@ -266,7 +288,7 @@ A: You can probably quickly chain or combine the small tools into small scripts
 
     args = parser.parse_args()
 
-    # swy: by default we will assume we are in an sco_ directory under the SceneObj folder and that the parent folder is where the mod's scene_props.txt is
+    # swy: by default we will assume we are in an «scn_something» directory under the SceneObj folder and that the parent folder is where the mod's scene_props.txt is
     if not args.scene_props_txt:
         args.scene_props_txt     = args.input + '/../' + '../scene_props.txt'
 

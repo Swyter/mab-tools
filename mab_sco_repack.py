@@ -392,7 +392,6 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                     #      the game will add the same amount of zeros later, padding/inflating those empty zones while loading.
                     #      funnily enough the game doesn't detect if creating/splitting into a new block has more overhead/wastes more bytes
                     #      than just adding a few zeros like normal, if the string is short enough. this happens a lot ¯\_(ツ)_/¯
-
                     first_zero = None; last_zero = None
 
                     if layer_name == 'ground_elevation':
@@ -428,7 +427,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                         if im_zero and not next_exists: # swy: e.g.  00 [00]     |    FF [00]
                             write_block = True          #            ------/     |    _/       if we are the last element of the thing
                             last_zero = i
-                            
+
                         if not next_exists: # we're the last element, zero or not we'll need to end and save
                             write_block = True
 
@@ -464,8 +463,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                                     f.write(pack(f'<{len(data_slice)}B', *data_slice))
 
                             # swy: reset the state machine back, a new block may start at this (i) element
-                            first_zero = None
-                            last_zero = None
+                            first_zero = None; last_zero = None
                             write_block = False
 
                 # swy: fill terrain_section_size afterwards, once we know how big the section really is

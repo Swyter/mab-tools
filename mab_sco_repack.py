@@ -393,9 +393,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                     #      funnily enough the game doesn't detect if creating/splitting into a new block has more overhead/wastes more bytes
                     #      than just adding a few zeros like normal, if the string is short enough. this happens a lot ¯\_(ツ)_/¯
 
-                    first_zero = None
-                    last_zero = None
-                    in_a_string_of_zeroes = False
+                    first_zero = None; last_zero = None
 
                     if layer_name == 'ground_elevation':
                         zero = False # swy: don't compress the floating point heightmap, use a single block
@@ -404,7 +402,6 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                     else:
                         zero = 0 # swy: everything else is grayscale; pure black
 
-                    block_begins_at = 0
                     write_block = False
 
                     for i in range(layer_data_len):
@@ -431,6 +428,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                         if im_zero and not next_exists: # swy: e.g.  00 [00]     |    FF [00]
                             write_block = True          #            ------/     |    _/       if we are the last element of the thing
                             last_zero = i
+                            
                         if not next_exists: # we're the last element, zero or not we'll need to end and save
                             write_block = True
 
@@ -445,11 +443,10 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                             else:
                                 data_slice = layer_data[last_zero + 1: i + 1]
                                 
-
                             if last_zero is None or first_zero is None:
                                 amount_of_preceding_zeros = 0
                             else:
-                                amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1  # VS Code doesn't know that whitespace is important
+                                amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1
 
                             if (amount_of_preceding_zeros < 0):
                                 print("[e] the amount of preceding zeroes can't be negative")

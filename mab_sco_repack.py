@@ -430,8 +430,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                             
                         if im_zero and not next_exists: # swy: e.g.  00 [00]     |    FF [00]
                             write_block = True          #            ------/     |    _/       if we are the last element of the thing
-                            last_zero = i # VS Code doesn't know that whitespace is important
-                        
+                            last_zero = i
                         if not next_exists: # we're the last element, zero or not we'll need to end and save
                             write_block = True
 
@@ -450,7 +449,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                             if last_zero is None or first_zero is None:
                                 amount_of_preceding_zeros = 0
                             else:
-                            amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1
+                                amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1  # VS Code doesn't know that whitespace is important
 
                             if (amount_of_preceding_zeros < 0):
                                 print("[e] the amount of preceding zeroes can't be negative")

@@ -356,6 +356,10 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                 last_scene_width  = last_scene_width  and last_scene_width  or 0
                 last_scene_height = last_scene_height and last_scene_height or 0
 
+                if last_scene_width == 0 and last_scene_height == 0:
+                    print(f'[i] no need to write a terrain block when this looks like an interior scene; no layers. done!')
+                    exit(0)
+
                 f.write(pack('<I', 0xFF4AD1A6)) # swy: terrain_magic value
                 terrain_section_size_start_pos = f.tell()
                 f.write(pack('<I', 0)) # swy: terrain_section_size, we go back and fix/overwrite this one at the end

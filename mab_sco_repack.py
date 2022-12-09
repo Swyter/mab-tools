@@ -408,43 +408,48 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                     write_block = False
 
                     for i in range(layer_data_len):
-                        is_zero = (layer_data[i] == zero)
+                        im_zero = layer_data[i] == zero
 
-                        if block_begins_at == i and is_zero and not in_a_string_of_zeroes: # swy: if our block starts with zeroes, note it down
-                            in_a_string_of_zeroes = True
+                        prev_exists = (i - 1) >= 0
+                        next_exists = (i + 1) <= layer_last_idx
+
+                        prev_is_zero = prev_exists and (layer_data[i - 1] == zero) or False
+                        next_is_zero = next_exists and (layer_data[i + 1] == zero) or False
+
+                        if im_zero and not prev_exists: # swy: we're the first element and the first zero
                             first_zero = i
-                        elif not is_zero and in_a_string_of_zeroes: # swy: if our block started and continued being all zeroes, note down where it ended
-                            last_zero = i - 1
-                            in_a_string_of_zeroes = False
-                        elif not is_zero and not first_zero and not last_zero: # swy: if the block didn't start with zeroes at all, mark the variables in a way that amount_of_preceding_zeros gets set to 0
-                            first_zero =  0
-                            last_zero  = -1
 
-                        # swy: write the final block if we've reached the end
-                        if i >= layer_last_idx:
-                            write_block = True
+                        if im_zero and prev_exists and not prev_is_zero: # swy: we're the first zero after a non-zero block
+                            first_zero = i
 
-                            # swy: mark us (the last element in the array) as the last zero, the condition above only detects the 
-                            #      last zero in retrospective by looking at the following (non-zero) entry
-                            if is_zero and in_a_string_of_zeroes:
-                                last_zero = i
-                                in_a_string_of_zeroes = False
+                        if im_zero and next_exists and next_is_zero: # swy: e.g.  00 [00] 00 FF
+                            continue                                 #            ----------____  we're here, skip until the last zero
 
+                        if im_zero and next_exists and not next_is_zero: # swy: e.g.  00 FF FF FF [00] FF
+                            last_zero = i                                #            --________/  || we're here, write the first zero as a zero-count and write the rest. we'll head the following block
+                            
+                        if im_zero and not next_exists: # swy: e.g.  00 [00]     |    FF [00]
+                            write_block = True          #            ------/     |    _/       if we are the last element of the thing
+                            last_zero = i # VS Code doesn't know that whitespace is important
                         
-                        # swy: write and then start a new block if we find zeroes after a non-zero block
-                        if (is_zero and not in_a_string_of_zeroes and last_zero):
+                        if not next_exists: # we're the last element, zero or not we'll need to end and save
                             write_block = True
 
-                        if (is_zero and not in_a_string_of_zeroes): # swy: e.g.  00 FF FF FF [00] FF
-                            write_block = True                      #            --________/  || we're here, write the first zero as a zero-count and write the rest. we'll head the following block
+                        if not im_zero and next_exists and next_is_zero: # swy: we're the last non-zero and end of the block
+                            write_block = True
 
                         if write_block:
-                            # swy: fix ground_elevation being off by one when there are no preceding zeroes
-                            #      we are at the end of the line, writing the block due to being the last idx
-                            #      and we want a slice as big as the entire data array (i + 1)
-                            last_slice_idx = i >= layer_last_idx and i + 1 or i
+                            if last_zero == i:
+                                data_slice = None
+                            if last_zero is None or first_zero is None: # swy: the whole block started with a non-zero and is non-zeroes all the way; no preceding zeroes at all; grab the whole chunk
+                                data_slice = layer_data[0: i + 1]
+                            else:
+                                data_slice = layer_data[last_zero + 1: i + 1]
+                                
 
-                            data_slice = layer_data[last_zero + 1: last_slice_idx]
+                            if last_zero is None or first_zero is None:
+                                amount_of_preceding_zeros = 0
+                            else:
                             amount_of_preceding_zeros = ((last_zero + 1) - (first_zero + 1)) + 1
 
                             if (amount_of_preceding_zeros < 0):
@@ -463,17 +468,9 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                                     f.write(pack(f'<{len(data_slice)}B', *data_slice))
 
                             # swy: reset the state machine back, a new block may start at this (i) element
-                            block_begins_at = i
                             first_zero = None
                             last_zero = None
-                            in_a_string_of_zeroes = False
                             write_block = False
-
-                            # swy: there is no goto in Python to rewind this loop and parse a possible first zero in the new block,
-                            #      so duplicate the condition above that we wouldn't ever reach and call it a day
-                            if is_zero:
-                                in_a_string_of_zeroes = True
-                                first_zero = i
 
                 # swy: fill terrain_section_size afterwards, once we know how big the section really is
                 terrain_section_end_pos = f.tell()

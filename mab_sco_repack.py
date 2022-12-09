@@ -126,6 +126,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                     f.write(pack('<I',      'menu_entry_no' in object and object['menu_entry_no']      or  0                 ))
                     f.write(pack('<3f', *(          'scale' in object and object["scale"]              or [1, 1, 1])         ))
 
+
             if copy_over_instead_of_repacking(ai_mesh_from):
                 print(f"[>] copying over the AI mesh section from donor «{ai_mesh_from['donor_filename']}» file")
                 write_over_from(f, ai_mesh_from, write_ai_mesh=True)
@@ -433,6 +434,9 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                         # swy: write and then start a new block if we find zeroes after a non-zero block
                         if (is_zero and not in_a_string_of_zeroes and last_zero):
                             write_block = True
+
+                        if (is_zero and not in_a_string_of_zeroes): # swy: e.g.  00 FF FF FF [00] FF
+                            write_block = True                      #            --________/  || we're here, write the first zero as a zero-count and write the rest. we'll head the following block
 
                         if write_block:
                             # swy: fix ground_elevation being off by one when there are no preceding zeroes

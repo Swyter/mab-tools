@@ -4,7 +4,7 @@ import json, os
 import sys
 import argparse
 
-def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_missing = False, opt_remapping_file = '', opt_flora_kinds_txt = '', opt_item_kinds1_txt = ''):
+def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_missing = False, opt_remapping_file = '', opt_flora_kinds_txt = '', opt_item_kinds1_txt = '', opt_dont_reindex = False):
     if not os.path.isdir(input_folder):
         print(f"[e] the unpacked «{input_folder}» SCO folder doesn't seem to exist")
         exit(1)
@@ -190,10 +190,10 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         cur_id    = entries_for_type()[object['str']]
 
         # swy: if the indices match, all is fine; skip the entry
-        if old_id == cur_id:
+        if old_id == cur_id or opt_dont_reindex:
             prop_count_fine += 1
             continue
-        
+
         # swy: doesn't match; update it and talk about it if it's the first instance of this prop
         #      in the scene; we don't want to spam the user for each copy
         object['id'] = cur_id; prop_count_changed += 1
@@ -286,6 +286,7 @@ A: You can probably quickly chain or combine the small tools into small scripts
     parser.add_argument('-re', '--remappingfile', dest='opt_remapping_file',  default='', metavar='<path-to-the-_mab_sco_mo_remap.txt-file>', help='provide the tool with a plain text file with lines like «spr_old_name_in_sco = spr_new_name_in_mod», the tool will rename each mission object name acording to your rules. also useful to potentially swap props in batch')
     parser.add_argument('-fl', '--florakindstxt', dest='opt_flora_kinds_txt', default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='also reindexes mission objects of type «plant» via a provided flora_kinds.txt, if set to «default» it will pick «../Data/flora_kinds.txt»')
     parser.add_argument('-it', '--itemkinds1txt', dest='opt_item_kinds1_txt', default='', metavar='<path-to-the-updated-item_kinds.txt-file>', required=False, help='also reindexes mission objects of type «item» via a provided item_kinds1.txt, if set to «default» it will pick «../item_kinds1.txt»')
+    parser.add_argument('-nx', '--dont-reindex',  dest='opt_dont_reindex',    action='store_true', required=False, help='this can be useful when you only want to delete obsolete objects or use the replacement functionality without changing anything else, reindexing can be noisy and modify too many files that otherwise work fine')
 
     args = parser.parse_args()
 
@@ -304,5 +305,6 @@ A: You can probably quickly chain or combine the small tools into small scripts
                     opt_remove_missing=args.opt_remove_missing,
                     opt_remapping_file=args.opt_remapping_file,
                     opt_flora_kinds_txt=args.opt_flora_kinds_txt,
-                    opt_item_kinds1_txt=args.opt_item_kinds1_txt
+                    opt_item_kinds1_txt=args.opt_item_kinds1_txt,
+                    opt_dont_reindex=args.opt_dont_reindex
     )

@@ -106,12 +106,13 @@ struct
         uint32 entry_no;
         uint32 menu_item_no;
     
-        float scale[3]; /* scaling multiplier, per axis; x, y, z */
+        if (head.version > 2) /* swy: scale seems to have been added in v3, see scn_salt_mine.sco */
+            float scale[3]; /* scaling multiplier, per axis; x, y, z */
     } objects[object_count] <optimize=false, read=sceneprop_read>;
 } mission_objects;
 
 
-if (head.version > 3) { /* swy: weird leftovers like scn_zendar_merchant.sco from Native use version 3 and don't have AI mesh section */
+if (head.version > 3) { /* swy: weird leftovers like  from Native use version 3 and don't have AI mesh section */
 /* -- ai mesh vertices; probably */
 struct
 {
@@ -155,12 +156,13 @@ struct
 
 if (!FEof()) /* swy: if the file ends here it means that it's an interior and that we don't have any terrain/paint stuff */
 {
-    rglmarker terrain_marker; /* swy: this is just here to ensure that the end of the ai_mesh stuff lines up automatically with the next section without needing fseek(), as a bit of a canary */
+    if (head.version > 3) rglmarker terrain_marker; /* swy: this is just here to ensure that the end of the ai_mesh stuff lines up automatically with the next section without needing fseek(), as a bit of a canary */
 
     /* -- ground layers */
-    FSeek(startof(ai_mesh.section_size) + sizeof(int) + ai_mesh.section_size);
+    if (head.version > 3) FSeek(startof(ai_mesh.section_size) + sizeof(int) + ai_mesh.section_size);
     //FSeek(0xe8f5); // tldmod\SceneObj\scn_cair_andros_center.sco
     //FSeek(0x83d8); // MountBlade Warband\Modules\Native\SceneObj\scn_town_13_center.sco
+
     struct
     {
         rglmarker magic <bgcolor=cDkRed>; /* ¦ÑJÿ / 0xff4ad1a6 / ground_paint_saved_magic */

@@ -30,7 +30,7 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
             os.makedirs(output_folder, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
 
             magic = unpack('<I', f.read(4))[0]; assert(magic == 0xFFFFFD33)
-            versi = unpack('<I', f.read(4))[0]; assert(versi == 4)
+            versi = unpack('<I', f.read(4))[0]; assert(versi in (3, 4))
 
             object_count = unpack('<I', f.read(4))[0]
 
@@ -88,83 +88,87 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                 except OSError as e:
                     print(f"[e] couldn't open the JSON file: {e}", file=sys.stderr)
                 
-            # swy: read the AI mesh data structures
-            ai_mesh = {'vertices': [], 'edges': [], 'faces': []}
+            # swy: it seems like the AI mesh section was added with .SCO version 4; for a good example version 3 see scn_zendar_merchant.sco, from Native
+            if versi > 3:
+                # swy: read the AI mesh data structures
+                ai_mesh = {'vertices': [], 'edges': [], 'faces': []}
 
-            ai_mesh_section_size = unpack('<I', f.read(4))[0]
-            vertex_count = unpack('<I', f.read(4))[0]
+                ai_mesh_section_size = unpack('<I', f.read(4))[0]
+                vertex_count = unpack('<I', f.read(4))[0]
 
-            for i in range(vertex_count):
-                vertex = unpack('<3f', f.read(4 * 3))
-                ai_mesh['vertices'].append(vertex)
+                for i in range(vertex_count):
+                    vertex = unpack('<3f', f.read(4 * 3))
+                    ai_mesh['vertices'].append(vertex)
 
-            edge_count = unpack('<I', f.read(4))[0]
+                edge_count = unpack('<I', f.read(4))[0]
 
-            for i in range(edge_count):
-                edge = unpack('<5i', f.read(4 * 5))
-                ai_mesh['edges'].append(edge)
+                for i in range(edge_count):
+                    edge = unpack('<5i', f.read(4 * 5))
+                    ai_mesh['edges'].append(edge)
 
-            face_count = unpack('<I', f.read(4))[0]
+                face_count = unpack('<I', f.read(4))[0]
 
-            for i in range(face_count):
-                vtx_and_edge_count = unpack('<I', f.read(4))[0]
-                idx_vertices       = unpack(f'<{vtx_and_edge_count}I', f.read(4 * vtx_and_edge_count))
-                idx_edges          = unpack(f'<{vtx_and_edge_count}I', f.read(4 * vtx_and_edge_count))
-                has_more           = unpack('<I', f.read(4))[0]
+                for i in range(face_count):
+                    vtx_and_edge_count = unpack('<I', f.read(4))[0]
+                    idx_vertices       = unpack(f'<{vtx_and_edge_count}I', f.read(4 * vtx_and_edge_count))
+                    idx_edges          = unpack(f'<{vtx_and_edge_count}I', f.read(4 * vtx_and_edge_count))
+                    has_more           = unpack('<I', f.read(4))[0]
 
-                ai_mesh_id = has_more and unpack('<I', f.read(4))[0] or 0
+                    ai_mesh_id = has_more and unpack('<I', f.read(4))[0] or 0
 
-                ai_mesh['faces'].append({'vtx_and_edge_count': vtx_and_edge_count, 'idx_vertices': idx_vertices, 'idx_edges': idx_edges, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
+                    ai_mesh['faces'].append({'vtx_and_edge_count': vtx_and_edge_count, 'idx_vertices': idx_vertices, 'idx_edges': idx_edges, 'has_more': has_more, 'ai_mesh_id': ai_mesh_id})
 
-            # swy: try to recompute the edge data for debugging purposes to see how well it matches the original values
-        #    edgelist = {}
-        #    edgelist_idx = {}
-        #    facelist = {}
-        #    for i, elem in enumerate(ai_mesh['faces']):
-        #        face_data = elem['face']
-        #        facelist[i] = []
-        #        for j, elem in enumerate(face_data):
-        #            a = face_data[j]; b = face_data[((j+1) % len(face_data))]
+                # swy: try to recompute the edge data for debugging purposes to see how well it matches the original values
+                #    edgelist = {}
+                #    edgelist_idx = {}
+                #    facelist = {}
+                #    for i, elem in enumerate(ai_mesh['faces']):
+                #        face_data = elem['face']
+                #        facelist[i] = []
+                #        for j, elem in enumerate(face_data):
+                #            a = face_data[j]; b = face_data[((j+1) % len(face_data))]
+                #            
         #            
-        #            if f'{a}-{b}' in edgelist:
-        #                print(f'{a}-{b} detected non-manifold edge at face index {i} -- between {repr(ai_mesh["vertices"][a])} and {repr(ai_mesh["vertices"][b])}')
-        #                exit(4)
-        #            if f'{b}-{a}' in edgelist:
-        #                print(f'{b}-{a} already exists (r) -- {edgelist[f"{b}-{a}"]} {i}')
-        #                edgelist[f'{b}-{a}'].append(i)
-        #                facelist[i].append(edgelist_idx[f'{b}-{a}'])
-        #                continue
-        #
-        #            print(f'new {a}-{b} -- {i}')
-        #            edgelist_idx[f'{a}-{b}'] = len(edgelist)
-        #            edgelist[f'{a}-{b}'] = [i]
-        #            facelist[i].append(edgelist_idx[f'{a}-{b}'])
-        #
-        #    # swy: orig edge count 615
-        #    print((len(edgelist))) # len(edgelist) => 938, without dupes: 615
-        #    exit()
+                #            
+                #            if f'{a}-{b}' in edgelist:
+                #                print(f'{a}-{b} detected non-manifold edge at face index {i} -- between {repr(ai_mesh["vertices"][a])} and {repr(ai_mesh["vertices"][b])}')
+                #                exit(4)
+                #            if f'{b}-{a}' in edgelist:
+                #                print(f'{b}-{a} already exists (r) -- {edgelist[f"{b}-{a}"]} {i}')
+                #                edgelist[f'{b}-{a}'].append(i)
+                #                facelist[i].append(edgelist_idx[f'{b}-{a}'])
+                #                continue
+                #
+                #            print(f'new {a}-{b} -- {i}')
+                #            edgelist_idx[f'{a}-{b}'] = len(edgelist)
+                #            edgelist[f'{a}-{b}'] = [i]
+                #            facelist[i].append(edgelist_idx[f'{a}-{b}'])
+                #
+                #    # swy: orig edge count 615
+                #    print((len(edgelist))) # len(edgelist) => 938, without dupes: 615
+                #    exit()
 
-            if not vertex_count and not edge_count and not face_count:
-                print(f'[-] AI mesh section empty; nothing to unpack')
-            elif skip_ai_mesh:
-                print(f'[i] skipping AI mesh section')
-            else:
-                print(f'[>] unpacking AI mesh with {vertex_count} vertices, {edge_count} edges and {face_count} faces into a Wavefront OBJ file')
+                if not vertex_count and not edge_count and not face_count:
+                    print(f'[-] AI mesh section empty; nothing to unpack')
+                elif skip_ai_mesh:
+                    print(f'[i] skipping AI mesh section')
+                else:
+                    print(f'[>] unpacking AI mesh with {vertex_count} vertices, {edge_count} edges and {face_count} faces into a Wavefront OBJ file')
 
-                with open(f"{output_folder}/ai_mesh.obj", mode='w') as fw:
-                    fw.write(f'# Mount&Blade AI mesh exported by Swyter\'s SCO unpacker from\n# <{scene_file}.sco> on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
-                    for elem in ai_mesh['vertices']:
-                        floats_as_text = " ".join([repr(fnum)  for fnum in elem])
-                        fw.write(f'v {floats_as_text}\n') # swy: write the text floats with as much precision/decimals as possible to get exact results when parsing them back: https://stackoverflow.com/a/3481575/674685
-                    fw.write("\n# edges\n\n")
-                    for i, elem in enumerate(ai_mesh['edges']):
-                        face_data = [vtx_idx +1 for vtx_idx in elem]
-                        # fw.write(f'e{" %i" * len(face_data)} \t\t# {i}\n' % tuple(face_data))
-                    fw.write("\n# faces\n\n")
-                    for i, elem in enumerate(ai_mesh['faces']):
-                        face_data = [vtx_idx + 1 for vtx_idx in elem['idx_vertices']]
-                        # fw.write(f'f{" %u" * len(face_data)} \t\t# {i} {repr(elem)}\n' % tuple(face_data))
-                        fw.write(f'f{" %u" * len(face_data)}\n' % tuple(face_data))
+                    with open(f"{output_folder}/ai_mesh.obj", mode='w') as fw:
+                        fw.write(f'# Mount&Blade AI mesh exported by Swyter\'s SCO unpacker from\n# <{scene_file}.sco> on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
+                        for elem in ai_mesh['vertices']:
+                            floats_as_text = " ".join([repr(fnum)  for fnum in elem])
+                            fw.write(f'v {floats_as_text}\n') # swy: write the text floats with as much precision/decimals as possible to get exact results when parsing them back: https://stackoverflow.com/a/3481575/674685
+                        fw.write("\n# edges\n\n")
+                        for i, elem in enumerate(ai_mesh['edges']):
+                            face_data = [vtx_idx +1 for vtx_idx in elem]
+                            # fw.write(f'e{" %i" * len(face_data)} \t\t# {i}\n' % tuple(face_data))
+                        fw.write("\n# faces\n\n")
+                        for i, elem in enumerate(ai_mesh['faces']):
+                            face_data = [vtx_idx + 1 for vtx_idx in elem['idx_vertices']]
+                            # fw.write(f'f{" %u" * len(face_data)} \t\t# {i} {repr(elem)}\n' % tuple(face_data))
+                            fw.write(f'f{" %u" * len(face_data)}\n' % tuple(face_data))
 
             # swy: some SCO files end at this point, with the terrain/ground section being
             #      completely optional for interiors, which use a custom entity mesh

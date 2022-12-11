@@ -111,6 +111,7 @@ struct
 } mission_objects;
 
 
+if (head.version > 3) { /* swy: weird leftovers like scn_zendar_merchant.sco from Native use version 3 and don't have AI mesh section */
 /* -- ai mesh vertices; probably */
 struct
 {
@@ -150,6 +151,7 @@ struct
 
     } face[face_count] <optimize=false>;     
 } ai_mesh;
+}
 
 if (!FEof()) /* swy: if the file ends here it means that it's an interior and that we don't have any terrain/paint stuff */
 {

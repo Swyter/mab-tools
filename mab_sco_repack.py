@@ -1,7 +1,7 @@
 import pathlib
 from struct import *
 import json, os, io
-import sys
+import sys; from sys import exit
 import argparse
 
 # swy: source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data
@@ -500,8 +500,9 @@ Quick examples:
     parser.add_argument('-te', '--terrain',        dest='sect_terrain',         default='repack', metavar='<option>', required=False,
                         help='by default the <option> is «repack», it will convert back the unpacked data in the folder you provide. You can use «keep» to retain the original data in the target SCO if it exists and avoid modifying that part, which is also faster than repacking and lossless, you can use «empty» or «blank» to completely remove any data previously that section, or, finally; you can provide a path to a different donor .sco file to copy that section over directly into the target .sco, losslessly replacing a section/block without having to unpack it first or merge it manually.')
 
-    args = parser.parse_args() #'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_lebennin_coast_3 -mo C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_lebennin_coast_3_orig.sco'.split())
-
+    args = parser.parse_args() # args = parser.parse_args('/home/swyter/Descargas/scn_village_57 -o scn_village_repacked.sco'.split()) #'C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_lebennin_coast_3 -mo C:\\Users\\Usuario\\Documents\\github\\tldmod\\SceneObj\\scn_lebennin_coast_3_orig.sco'.split())
+    #args = parser.parse_args(["/home/swyter/.local/share/Steam/steamapps/common/MountBlade Warband/Modules/TLD/SceneObj_copy_sco/scn_gundabad_mirkwood_outpost", "-mo", "repack", "-ai", "/home/swyter/.local/share/Steam/steamapps/common/MountBlade Warband/Modules/TLD/SceneObj_copy_sco/scn_gundabad_mirkwood_outpost.sco", "-te", "repack", "-o", "/home/swyter/github/mab-tools/scn_gundabad_mirkwood_outpost_out.sco"])
+    #args = parser.parse_args(["/home/swyter/.local/share/Steam/steamapps/common/MountBlade Warband/Modules/TLD/SceneObj_copy_sco/scn_scout_camp_mirk_evil_big", "-mo", "repack", "-ai", "/home/swyter/.local/share/Steam/steamapps/common/MountBlade Warband/Modules/TLD/SceneObj_copy_sco/scn_scout_camp_mirk_evil_big.sco", "-te", "repack", "-o", "/home/swyter/.local/share/Steam/steamapps/common/MountBlade Warband/Modules/TLD/SceneObj_copy_sco/scn_scout_camp_mirk_evil_big_out.sco"])
 
     if args.sect_mission_objects == args.sect_ai_mesh == args.sect_terrain == 'keep':
         print(f"[i] we were asked to keep all the three sections of «{args.output}» as-is. so we don't need to touch the file. ¯\_(ツ)_/¯")
@@ -538,3 +539,5 @@ Quick examples:
                                          ai_mesh_from=args.sect_ai_mesh,
                                          terrain_from=args.sect_terrain
     )
+
+    #os.system("md5sum /home/swyter/.local/share/Steam/steamapps/common/MountBlade\ Warband/Modules/TLD/SceneObj_copy_sco/scn_gundabad_mirkwood_outpost.sco /home/swyter/github/mab-tools/scn_gundabad_mirkwood_outpost_out.sco")

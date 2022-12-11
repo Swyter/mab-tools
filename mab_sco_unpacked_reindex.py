@@ -1,7 +1,7 @@
 import re
 from struct import *
 import json, os
-import sys
+import sys; from sys import exit
 import argparse
 
 def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_missing = False, opt_remapping_file = '', opt_flora_kinds_txt = '', opt_item_kinds1_txt = '', opt_dont_reindex = False):
@@ -63,7 +63,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
 
                 if len(opt_flora_kinds_txt_lines) < 1:
                     print("[!] bad «flora_kinds.txt header; wrong file?")
-                    exit(3)
+                    raise OSError
 
                 opt_flora_kinds_txt_count = int(opt_flora_kinds_txt_lines[0][0])
                 cur_line = 1; cumular = 0
@@ -94,7 +94,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
 
             if len(opt_item_kinds1_txt_lines) <= 3 or ' '.join(opt_item_kinds1_txt_lines[0]) not in ('itemsfile version 2' or 'itemsfile version 3'):
                 print("[!] bad «item_kinds1.txt header; wrong file?")
-                exit(3)
+                raise OSError
 
             item_file_version = int(opt_item_kinds1_txt_lines[0][2])
             opt_item_kinds1_txt_count = int(opt_item_kinds1_txt_lines[1][0])

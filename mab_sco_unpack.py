@@ -4,7 +4,7 @@ import pathlib
 import re
 from struct import *
 import json, os
-import sys
+import sys; from sys import exit
 import io
 def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip_ai_mesh = False, skip_terrain = False):
     def read_rgltag():

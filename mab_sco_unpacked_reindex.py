@@ -92,7 +92,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     line = [token.strip()  for token in line] # swy: make sure get rid of any extra leading/trailing spaces once separated
                     opt_item_kinds1_txt_lines.append(line)
 
-            if len(opt_item_kinds1_txt_lines) <= 3 or ' '.join(opt_item_kinds1_txt_lines[0]) not in ('itemsfile version 2' or 'itemsfile version 3'):
+            if len(opt_item_kinds1_txt_lines) <= 3 or len(opt_item_kinds1_txt_lines[0]) != 3 or ' '.join(opt_item_kinds1_txt_lines[0]) not in ('itemsfile version 2', 'itemsfile version 3'):
                 print("[!] bad «item_kinds1.txt header; wrong file?")
                 raise OSError
 

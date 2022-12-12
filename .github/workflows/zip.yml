@@ -43,7 +43,7 @@ jobs:
         echo "prev=$prev_run_sha cur=`git rev-parse --short HEAD`"
     
         # swy: only pack it when the folder has changed since the last time we ran a GitHub Actions job or there's a !force keyword in the last commit message
-        if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- mab_sco_*.py || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then
+        if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- mab_sco_*.py mab_sco_drag_and_drop_here.cmd || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then
           # swy: add a dummy screen for Wine to proceed headless, dial down the Wine log spam
           #      we need Wine to run the Windows version of PyInstaller to turn the .py into a self-contained .exe
           Xvfb :1 -screen 0 800x600x16 &
@@ -76,7 +76,7 @@ jobs:
           wine pyinstaller mab_sco_repack.py           --icon NONE --onefile --upx-dir . --strip
           
           # swy: PyInstaller drops the final .exe in a ./dist subfolder, go inside, zip them and go back
-          pushd dist && 7z a "../swy-sco-tools-$(date +%Y.%m.%d-%H.%M -u).zip" mab_sco_*.exe && popd
+          pushd dist && 7z a "../swy-sco-tools-$(date +%Y.%m.%d-%H.%M -u).zip" mab_sco_*.exe ../mab_sco_drag_and_drop_here.cmd && popd
         else
           echo "[no changes in the add-on folder this time around; skipped]"
         fi

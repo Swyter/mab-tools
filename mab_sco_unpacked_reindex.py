@@ -74,8 +74,10 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
 
                     # cumular |= elem_flag; hex = ("%013x" % elem_flag); cum = ("%013x" % cumular) # 0x07fe011e0c0c ^ 0x07fe015e0c0c = 0x400000 # swy: append all the previous flags until this point to find which ones are different for trees
                     # print(f"{hex} {cum} {opt_flora_kinds_txt_lines[cur_line][0]}")
-                    elem_is_flagged_as_tree = elem_flag & 0x400000
-                    cur_line += 1 + elem_num_of_meshes * (elem_is_flagged_as_tree and 2 or 1) # swy: trees seem to have two lines per mesh variant, others just one line per mesh
+                    fkf_tree      = 0x00400000
+                    fkf_speedtree = 0x02000000
+                    elem_is_flagged_as_speedtree = (elem_flag & (fkf_tree | fkf_speedtree)) == (fkf_tree | fkf_speedtree)
+                    cur_line += 1 + elem_num_of_meshes * (elem_is_flagged_as_speedtree and 2 or 1) # swy: trees seem to have two lines per mesh variant, others just one line per mesh
 
                 print(f'[-] loading {opt_flora_kinds_txt_count:4} total flora kinds from the mod .txt file')
 

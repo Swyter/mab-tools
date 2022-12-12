@@ -82,7 +82,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     #      entry, if that's there it has to be generated for Warband, otherwise it's not.
                     #      update: it seems like it's not always zeroes, "mb_test1 tree_a" "mb_test1 tree_b" exist, so use something else
                     elem_has_wb_format = 1
-                    if elem_is_flagged_as_tree:
+                    if elem_is_flagged_as_tree and elem_num_of_meshes >= 1:
                         if len(opt_flora_kinds_txt_lines[cur_line + 1 + elem_num_of_meshes]) == 3: # swy: in the M&B format this should be the first line of the next entry, which should have three elements
                             elem_has_wb_format = 0
 
@@ -311,6 +311,10 @@ A: You can probably quickly chain or combine the small tools into small scripts
 
     if not args.opt_flora_kinds_txt:
         args.opt_flora_kinds_txt = args.input + '/../' + '../Data/flora_kinds.txt'
+
+        # swy: some mods don't really have a per-module «Data» folder and fall back to the common one in the root folder
+        if not os.path.exists(args.opt_flora_kinds_txt):
+            args.opt_flora_kinds_txt = args.input + '/../' + '../../../Data/flora_kinds.txt'
 
     if not args.opt_item_kinds1_txt:
         args.opt_item_kinds1_txt = args.input + '/../' + '../item_kinds1.txt'

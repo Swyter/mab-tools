@@ -25,17 +25,17 @@ goto :show_help
 
 :unpack
     echo.[/] calling «mab_sco_unpack» %~1 && echo.    -- && title sco_unpack %~1
-    "%~dp0/mab_sco_unpack" %~1
+    "%~dp0/mab_sco_unpack" "%~1"
     goto :end
 
 :unpacked_reindex
     echo.[/] calling «mab_sco_unpacked_reindex» %~dp1 && echo.    -- && title sco_unpacked_reindex %~dp1
-    "%~dp0/mab_sco_unpacked_reindex" %~dp1
+    "%~dp0/mab_sco_unpacked_reindex" "%~dp1"
     goto :end
 
 :repack
     echo.[/] calling «mab_sco_repack» %~1 && echo.    -- && title sco_repack %~1
-    "%~dp0/mab_sco_repack" %~1
+    "%~dp0/mab_sco_repack" "%~1"
     goto :end
 
 :end

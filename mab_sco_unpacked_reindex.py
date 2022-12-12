@@ -196,6 +196,10 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                 objects_to_delete.append(object) # swy: defer the deletion for when we finally exit the loop; avoiding side effects of doing it now
             continue
 
+        if not 'id' in object or not 'str' in object:
+            print(f"[!] skipping {prop_type} with missing «id» or «str» data")
+            continue
+
         # swy: 'scene_prop_txt_entries' contains the entries that we just parsed
         old_id    = object['id']
         cur_id    = entries_for_type()[object['str']]

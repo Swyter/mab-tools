@@ -112,7 +112,7 @@ struct
 } mission_objects;
 
 
-if (head.version > 3) { /* swy: weird leftovers like  from Native use version 3 and don't have AI mesh section */
+if (head.version > 3) { /* swy: weird leftovers like scn_zendar_merchant.sco from Native use version 3 and don't have AI mesh section */
 /* -- ai mesh vertices; probably */
 struct
 {

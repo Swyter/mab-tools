@@ -78,7 +78,8 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
         print(f"[e] the unpacked «{input_folder}» SCO folder doesn't seem to exist")
         exit(1)
 
-    print(f"[i] repacking the data from the «{input_folder}» folder into «{output_sco}»")
+    print(f'[i] repacking the data from the «{input_folder}» folder\n' + \
+          f'                           into «{output_sco}»')
 
     try:
         with open(output_sco, mode='wb') as f:

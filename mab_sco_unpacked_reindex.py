@@ -9,7 +9,8 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         print(f"[e] the unpacked «{input_folder}» SCO folder doesn't seem to exist")
         exit(1)
 
-    print(f"[i] reindexing the scene prop data from the «{input_folder}» folder via «{opt_scene_props_txt}»")
+    print(f'[i] reindexing the scene prop data from the «{input_folder}» folder\n' + \
+          f'                                        via «{opt_scene_props_txt}»')
 
     try:
         with open(f"{input_folder}/mission_objects.json") as f_json:

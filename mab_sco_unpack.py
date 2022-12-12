@@ -23,7 +23,8 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
     if not output_folder:
         output_folder = f'{pathlib.Path(input_sco_path).parent}/{scene_file}/'
 
-    print(f'[i] unpacking «{input_sco_path}» into «{output_folder}»')
+    print(f'[i] unpacking «{input_sco_path}» into\n' + \
+          f'              «{output_folder}»')
 
     try:
         with open(input_sco_path, mode='rb') as f:

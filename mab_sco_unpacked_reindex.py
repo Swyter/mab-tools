@@ -73,7 +73,6 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     elem_flag          = int(opt_flora_kinds_txt_lines[cur_line][1])
                     elem_num_of_meshes = int(opt_flora_kinds_txt_lines[cur_line][2]) #
 
-
                     fkf_tree      = 0x00400000; fkf_speedtree = 0x02000000
                     elem_is_flagged_as_tree = not not (elem_flag & (fkf_tree | fkf_speedtree))
 
@@ -81,12 +80,11 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     #      expects the extra " 0 0" line after each tree mesh and there's no header with version 
                     #      indication, so to handle both we'll need to look for the two zeros in the first mesh
                     #      entry, if that's there it has to be generated for Warband, otherwise it's not.
-                    elem_has_wb_format = 0
+                    #      update: it seems like it's not always zeroes, "mb_test1 tree_a" "mb_test1 tree_b" exist, so use something else
+                    elem_has_wb_format = 1
                     if elem_is_flagged_as_tree:
-                        if len(opt_flora_kinds_txt_lines[cur_line + 2]) == 2 and \
-                            opt_flora_kinds_txt_lines[cur_line + 2][0] == '0' and \
-                            opt_flora_kinds_txt_lines[cur_line + 2][1] == '0':
-                            elem_has_wb_format = 1
+                        if len(opt_flora_kinds_txt_lines[cur_line + 1 + elem_num_of_meshes]) == 3: # swy: in the M&B format this should be the first line of the next entry, which should have three elements
+                            elem_has_wb_format = 0
 
                     cur_line += 1 + elem_num_of_meshes * (elem_is_flagged_as_tree and elem_has_wb_format and 2 or 1) # swy: in warband only, trees seem to have two lines per mesh variant, others just one line per mesh
 

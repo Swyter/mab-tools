@@ -64,7 +64,7 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                     'scale': scale,
                 }
 
-                if object['id'] == 0:
+                if object['id'] == 0 and object['type'] not in ('prop', 'item', 'plant'):
                     del object['id']
                 if object['str'] == '':
                     del object['str']

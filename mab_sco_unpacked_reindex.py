@@ -247,7 +247,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
 if __name__ == "__main__":
     # swy: add some helpful commands and their documentation
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
-                                     description='''Fixes the scene prop indices in Mount&Blade SceneObj files to match the order of a mod's scene_props.txt. Created by Swyter in 2022.''',
+                                     description='''Updates mission object indices in Mount&Blade SceneObj files using mod .txt data. Detects and removes obsolete objects, and allows easy prop swapping. Created by Swyter in 2022.''',
                                      epilog='''\
 Q: What is this for? I don't get it. :(
 A: Are your props suddenly all messed up? Even if each mission object entry includes a name for each prop
@@ -299,8 +299,8 @@ A: You can probably quickly chain or combine the small tools into small scripts
     parser.add_argument('-sc', '--scenepropstxt', dest='opt_scene_props_txt', default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='by default it will guess that we are under <mod folder>/SceneObj/scn_... and use the parent folder, which should be where the mod .txt files are')
     parser.add_argument('-rm', '--removemissing', dest='opt_remove_missing',  action='store_true', required=False, help='automatically delete any props in the scene not part of the provided scene_props.txt, instead of skipping them')
     parser.add_argument('-re', '--remappingfile', dest='opt_remapping_file',  default='', metavar='<path-to-the-_mab_sco_mo_remap.txt-file>', help='provide the tool with a plain text file with lines like «spr_old_name_in_sco = spr_new_name_in_mod», the tool will rename each mission object name acording to your rules. also useful to potentially swap props in batch')
-    parser.add_argument('-fl', '--florakindstxt', dest='opt_flora_kinds_txt', default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='also reindexes mission objects of type «plant» via a provided flora_kinds.txt, if set to «default» it will pick «../Data/flora_kinds.txt»')
-    parser.add_argument('-it', '--itemkinds1txt', dest='opt_item_kinds1_txt', default='', metavar='<path-to-the-updated-item_kinds.txt-file>', required=False, help='also reindexes mission objects of type «item» via a provided item_kinds1.txt, if set to «default» it will pick «../item_kinds1.txt»')
+    parser.add_argument('-fl', '--florakindstxt', dest='opt_flora_kinds_txt', default='', metavar='<path-to-the-updated-flora_kinds.txt-file>', required=False, help='also reindexes mission objects of type «plant» via a provided flora_kinds.txt, by default «../Data/flora_kinds.txt»')
+    parser.add_argument('-it', '--itemkinds1txt', dest='opt_item_kinds1_txt', default='', metavar='<path-to-the-updated-item_kinds.txt-file>', required=False, help='also reindexes mission objects of type «item» via a provided item_kinds1.txt, by default «../item_kinds1.txt»')
     parser.add_argument('-nx', '--dont-reindex',  dest='opt_dont_reindex',    action='store_true', required=False, help='this can be useful when you only want to delete obsolete objects or use the replacement functionality without changing anything else, reindexing can be noisy and modify too many files that otherwise work fine')
 
     args = parser.parse_args()

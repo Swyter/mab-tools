@@ -315,10 +315,10 @@ if __name__ == "__main__":
 | Quick-ish help and how to open extracted terrain images /
 \________________________________________________________/
 
-  for a «scn_advcamp_dale.sco» it will unpack the internal data
-  into a «scn_advcamp_dale» directory in the same folder as this script
-  the folder will contain a mission_objects.json and various layer_* image files
-  storing each ground/terrain in their appropriate format.
+  for a «scn_advcamp_dale.sco» it will unpack the internal data into a «scn_advcamp_dale»
+  directory in the same folder as this script, the folder will contain a mission_objects.json (text),
+  an ai_mesh.obj (3D model), and various layer_* image files storing each ground/terrain
+  in their appropriate (2D bitmap) format:
 
    - layer_ground_leveling.ppm actually stores the RGB color paint, the name Armagan used is just stupid. ¯\_(ツ)_/¯
    - layer_ground_elevation.pfm stores the heightmap data as unnormalized (i.e. -3.0 is three meters

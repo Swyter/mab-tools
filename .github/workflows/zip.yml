@@ -57,26 +57,26 @@ jobs:
           curl -LO https://www.python.org/ftp/python/3.8.9/python-3.8.9.exe
           wine python-3.8.9.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0 Include_launcher=0 Include_tcltk=0
           
-          # swy: make upx work
-          curl -LO https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win32.zip
-          unzip -o upx-*-win32.zip && mv upx-*-win32/upx.exe . && rm -rf upx-*
-          
-          # swy: make strip work, sourced from the official mingw-w64 package
-          curl -L -o mingw.7z https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-win32/sjlj/i686-8.1.0-release-win32-sjlj-rt_v6-rev0.7z/download
-          7z e mingw.7z mingw32/bin/strip.exe # swy: extract into the current folder; don't recreate the original folder structure
-          rm mingw.7z && sudo cp strip.exe ~/.wine/drive_c/windows/system32/strip.exe
-          
-          wine pip install pyinstaller
-          
-          # swy: fix a weird Wine exception on win32api.EnumResourceTypes when the PE file doesn't have any resource, we can ignore it
-          sed -i 's/raise exception/pass/' ~/.wine/drive_c/Program\ Files/Python38-32/Lib/site-packages/PyInstaller/utils/win32/winresource.py
-          
-          wine pyinstaller mab_sco_unpack.py           --icon NONE --onefile --upx-dir . --strip
-          wine pyinstaller mab_sco_unpacked_reindex.py --icon NONE --onefile --upx-dir . --strip
-          wine pyinstaller mab_sco_repack.py           --icon NONE --onefile --upx-dir . --strip
-          
+          wine pip install nuitka --no-python-version-warning --disable-pip-version-check # swy: investigate potentially building or downloading orderedset with msys2, the compiler complains about not using it, for speed
+
+          cur_date_ver_tiny="$(date +%Y.%m.%d -u)"
+          cur_date_ver_long="$(date +%Y.%m.%d-%H.%M -u)"
+
+          # swy: compile the individual Python 3 binaries as native code with Nuitka, leaving only the shared python38.dll behind
+          wine python -m nuitka mab_sco_unpack.py           --assume-yes-for-downloads --mingw64 --lto=yes --show-anti-bloat-changes --standalone --remove-output --show-modules --follow-imports --follow-stdlib --windows-file-description="Mount&Blade SceneObj Tools" --company-name=Swyter --product-version="${cur_date_ver_tiny}" --force-dll-dependency-cache-update
+          wine python -m nuitka mab_sco_unpacked_reindex.py --assume-yes-for-downloads --mingw64 --lto=yes --show-anti-bloat-changes --standalone --remove-output --show-modules --follow-imports --follow-stdlib --windows-file-description="Mount&Blade SceneObj Tools" --company-name=Swyter --product-version="${cur_date_ver_tiny}" --force-dll-dependency-cache-update
+          wine python -m nuitka mab_sco_repack.py           --assume-yes-for-downloads --mingw64 --lto=yes --show-anti-bloat-changes --standalone --remove-output --show-modules --follow-imports --follow-stdlib --windows-file-description="Mount&Blade SceneObj Tools" --company-name=Swyter --product-version="${cur_date_ver_tiny}" --force-dll-dependency-cache-update
+
+          # swy: each binary has its own folder with full DLL dependencies, move them to a common one called «dist» to follow the PyInstaller folder scheme
+          mkdir dist && cp -r mab_sco_unpack.dist/* dist
+          cp mab_sco_unpacked_reindex.dist/mab_sco_unpacked_reindex.exe dist
+          cp mab_sco_repack.dist/mab_sco_repack.exe                     dist
+
+          pushd dist && rm api-*.dll ucrt*.dll *.pyd vcruntime*.dll || true
+
           # swy: PyInstaller drops the final .exe in a ./dist subfolder, go inside, zip them and go back
-          pushd dist && 7z a "../swy-sco-tools-$(date +%Y.%m.%d-%H.%M -u).zip" mab_sco_*.exe ../mab_sco_drag_and_drop_here.cmd && popd
+          7z -mm=Deflate -mfb=258 -mpass=15 a "../swy-sco-tools-${cur_date_ver_long}.zip" mab_sco_*.exe *.dll ../mab_sco_drag_and_drop_here.cmd
+          popd
         else
           echo "[no changes in the add-on folder this time around; skipped]"
         fi

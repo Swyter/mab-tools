@@ -155,6 +155,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     prop_already_mentioned = []; mission_obj_remap_already_mentioned = []
     prop_count_fine = 0
     prop_count_changed = 0
+    prop_count_renamed = 0
     prop_count_missing = 0
     objects_to_delete = []
 
@@ -171,7 +172,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
             if prop_tag not in mission_obj_remap_already_mentioned:
                 print(f"[.] renaming mission object from {prop_tag} to {object['str']}")
                 mission_obj_remap_already_mentioned.append(prop_tag)
-            prop_tag = object['str']
+            prop_tag = object['str']; prop_count_renamed += 1
 
         # --
 
@@ -221,7 +222,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     prop_count_total = prop_count_fine + prop_count_changed + prop_count_missing
     mission_objects_that_are_not_props = len(mission_objects) - prop_count_total
 
-    print(f"\n[/] finished; {prop_count_fine} mission objects were fine, {prop_count_changed} objects were reindexed and {prop_count_missing} objects were missing" +
+    print(f"\n[/] finished; {prop_count_fine} mission objects were fine, {prop_count_changed} objects were reindexed, {prop_count_renamed} renamed and {prop_count_missing} missing" +
           f"\n    ({prop_count_total} in total, plus {mission_objects_that_are_not_props} asorted mission objects that are not props/plants/items)")
 
     # swy: we shouldn't pull the rug and delete elements above while we are still looping through indices
@@ -229,7 +230,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         for obj in objects_to_delete:
             mission_objects.remove(obj)
     else: # swy: if nothing to delete and no mission objects have been altered then we'll just spit the same thing; skip that
-        if prop_count_changed <= 0:
+        if prop_count_changed <= 0 and prop_count_renamed <= 0:
             print("[i] no need to overwrite the unchanged JSON file, we're done here")
             exit(0)
 

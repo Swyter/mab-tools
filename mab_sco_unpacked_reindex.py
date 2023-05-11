@@ -138,6 +138,10 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     if len(line) < 2:
                         continue
 
+                    for idx, token in enumerate(line):
+                        arr = token.split()
+                        line[idx] = arr[0] # swy: use the first word in each part of the equals sign, to skip inline comments, IDs can't have spaces anyway
+
                     old_name = line[0] # swy: find this tag in our SCO, probably obsolete, maybe we want to turn two props into one
                     new_name = line[1] # swy: replace it by this one; doesn't matter if it exists at all in the files or it's a plant; we don't check
 

@@ -43,14 +43,17 @@ jobs:
         echo "prev=$prev_run_sha cur=`git rev-parse --short HEAD`"
     
         # swy: only pack it when the folder has changed since the last time we ran a GitHub Actions job or there's a !force keyword in the last commit message
-        if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- mab_sco_*.py mab_sco_drag_and_drop_here.cmd || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then
+        if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- mab_sco_*.py mab_sco_*.cmd  mab_sco_*.txt || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then
           # swy: add a dummy screen for Wine to proceed headless, dial down the Wine log spam
           #      we need Wine to run the Windows version of PyInstaller to turn the .py into a self-contained .exe
           Xvfb :1 -screen 0 800x600x16 &
           export DISPLAY=:1
           export WINEDLLOVERRIDES="mscoree,mshtml="
           export WINEDEBUG=fixme-all
-          
+
+          # swy: try to add a small fudge factor for things to settle down; otherwise Wine complains about the X server not existing
+          sleep 5
+
           WINEARCH=win32 wineboot -u
 
           # swy: newer versions of Python don't really seem to install properly under Wine; we could also use the embedded version and install pip on top by removing the python310._pth file from the extracted .zip first

@@ -1,6 +1,7 @@
 # swy: this is a sample file that «mab_sco_unpacked_reindex» can read to rename (i.e. remap) props in your scenes;
 #      you can either double click mab_sco_mo_remap_all.cmd directly (it will run for all .sco files in your
 #      SceneObj folder, so careful about that) or use it as reference to easily adapt it to your needs.
-spr_my_old_prop_name=spr_new_prop_name
-itm_my_old_item_name=itm_my_new_item_name
-my_old_plant_or_rock_name=my_new_plant_or_rock_name # swy: as you can see, flora/plants don't have any spr_ or itm_ prefix
+
+spr_my_old_prop_name = spr_new_prop_name
+itm_my_old_item_name = itm_my_new_item_name
+my_old_plant_or_rock_name = my_new_plant_or_rock_name  # swy: as you can see, flora/plants don't have any spr_ or itm_ prefix

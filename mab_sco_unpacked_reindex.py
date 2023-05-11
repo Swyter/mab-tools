@@ -13,7 +13,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
           f'                                        via «{opt_scene_props_txt}»')
 
     try:
-        with open(f"{input_folder}/mission_objects.json") as f_json:
+        with open(f"{input_folder}/mission_objects.json", mode='r', encoding='utf-8') as f_json:
             mission_objects = json.load(f_json)
     except OSError as e:
         print(f"[!] the mission_objects.json file does not seem to exist: {e}", file=sys.stderr)
@@ -26,7 +26,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     scene_props_txt_lines = []
 
     try:
-        with open(f"{opt_scene_props_txt}") as f_obj:
+        with open(f"{opt_scene_props_txt}", mode='r', encoding='utf-8') as f_obj:
             for i, line in enumerate(f_obj):
                 line = line.split()
                 line = [token.strip()  for token in line] # swy: make sure get rid of any extra leading/trailing spaces once separated
@@ -56,7 +56,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     opt_flora_kinds_txt_entries = {}
     if opt_flora_kinds_txt:
         try:
-            with open(f"{opt_flora_kinds_txt}") as f_flora:
+            with open(f"{opt_flora_kinds_txt}", mode='r', encoding='utf-8') as f_flora:
                 for i, line in enumerate(f_flora):
                     line = line.split()
                     line = [token.strip()  for token in line] # swy: make sure get rid of any extra leading/trailing spaces once separated
@@ -97,7 +97,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     opt_item_kinds1_txt_entries = {}
     if opt_item_kinds1_txt:
         try:
-            with open(f"{opt_item_kinds1_txt}") as f_items:
+            with open(f"{opt_item_kinds1_txt}", mode='r', encoding='utf-8') as f_items:
                 for i, line in enumerate(f_items):
                     line = line.split()
                     line = [token.strip()  for token in line] # swy: make sure get rid of any extra leading/trailing spaces once separated
@@ -130,7 +130,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     #      the tool will treat them like they are that new prop, for all intents and purposes. probably saves a lot of work in certain cases
     if opt_remapping_file:
         try:
-            with open(f"{opt_remapping_file}") as f_remap:
+            with open(f"{opt_remapping_file}", mode='r', encoding='utf-8') as f_remap:
                 for i, line in enumerate(f_remap):
                     line = line.split('=')
                     line = [token.strip()  for token in line]
@@ -239,7 +239,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look
 
     try:
-        with open(f"{input_folder}/mission_objects.json", mode='w') as fw:
+        with open(f"{input_folder}/mission_objects.json", mode='w', encoding='utf-8') as fw:
             fw.write(js)
     except OSError as e:
         print(f"[e] couldn't open the JSON file: {e}", file=sys.stderr)

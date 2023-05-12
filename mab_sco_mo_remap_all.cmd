@@ -3,13 +3,13 @@
 setlocal enableextensions
 setlocal enabledelayedexpansion
 
-:: swy: remaps any props in every .sco in this folder, like changing every pr_palisade_longer to spr_palisade_a;
+:: swy: remaps any props in every .sco in this folder, like changing every spr_palisade_longer to spr_palisade_a;
 ::      just edit mab_sco_mo_remap.txt to set your own. Effectively renaming them mod-wide.
 ::
 ::      keep in mind that without a valid scene_props.txt in the right place (i.e. when you run this outside the
 ::      SceneObj folder it won't know where to find it) the reindexing command will fail.
 
-if not exist "../../scene_props.txt" (
+if not exist "../scene_props.txt" (
     MODE CON: COLS=91 LINES=7
     echo. 
     echo [e] Make sure you run this from your mod's SceneObj folder, so that the program can find

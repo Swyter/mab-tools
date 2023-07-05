@@ -11,6 +11,7 @@
 // File Mask: sg*.sav
 //  ID Bytes: 57 52 44 52
 //------------------------------------------------
+typedef byte bool;
 
 typedef struct
 {
@@ -50,14 +51,14 @@ struct game_t
     
     uint hour, day, week, month, year, unused;
     float global_cloud_amount, global_haze_amount, average_difficulty, average_difficulty_period;
-    rgltag unused; uint unused;
+    rgltag unused; bool unused;
     uint tutorial_flags, default_prisoner_price, encountered_party_1_id, encountered_party_2_id;
     uint current_menu_id, current_site_id, current_entry_no;
     uint current_mission_template_id;
     
     int32 	 	current_mission_template_id;
     int32 	 	party_creation_min_random_value;
-    int32 		party_creation_max_random_value;
+    //int32 		party_creation_max_random_value;
     rgltag 	 	game_log;
     int32 	 	unused_b[6];
     int64 	 	unused_c;
@@ -96,7 +97,7 @@ struct game_t
         rgltag 	 	text;
         int32 	 	value;
         int32 	 	tableau_material_id;
-        int32 	 	available;
+        bool 	 	available;
     };
     
     struct  quest
@@ -108,24 +109,24 @@ struct game_t
         rgltag 	 	title;
         rgltag 	 	text;
         rgltag 	 	giver;
-        note 	 	notes[16];
+        note 	 	notes[16] <optimize=false>;
         int32 	 	num_slots;
         int64 	 	slots[num_slots];
     };
     
     
     int32 		num_quests;
-    quest 	 	quests[num_quests];
+    quest 	 	quests[num_quests] <optimize=false>;
     
     
     struct info_page
     {
-        note notes[16];
+        note notes[16] <optimize=false>;
     };
     
     
     int32 		num_info_pages;
-    info_page 	 	info_pages[num_info_pages];
+    info_page 	 	info_pages[num_info_pages] <optimize=false>;
     
     
     struct site
@@ -136,7 +137,7 @@ struct game_t
     
     
     int32 	num_sites;
-    site 	 	sites[num_sites];
+    site 	 	sites[num_sites] <optimize=false>;
     
     
     struct faction

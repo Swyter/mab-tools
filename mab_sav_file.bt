@@ -26,7 +26,7 @@ string read_rgltag(struct rgltag& _thing)
         return _thing.s;
 }
 
-uint magic;
+char magic[4];
 uint game_ver;
 uint zero;
 
@@ -40,7 +40,7 @@ uint two, two, two, two;
 
 
 byte ss[113];
-//rgltag game_log;
+rgltag game_log;
 
 uint co[12];
 //rgltag group[9] <optimize=false>;
@@ -52,4 +52,4 @@ struct party
 {
     rgltag id, display_name;
     uint a[1134]; byte aaa[14];
-} p[3] <optimize=false>;
+} p[5] <optimize=false>;

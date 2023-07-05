@@ -4,8 +4,9 @@
 //      File: Mount&Blade Savegame file
 //   Authors: Swyter
 //    E-mail: swyterzone+mab@gmail.com
-//   Version: 
+//   Version: 2023.07.05
 //   Purpose: Opens save files (Savegames/<mod name>/sg*.sav) on M&B 1.011 and Warband
+//            Format documented by cmpxchg8b: https://mbmodwiki.github.io/Savegame.html
 //  Category: Game
 // File Mask: sg*.sav
 //  ID Bytes: 57 52 44 52
@@ -28,11 +29,141 @@ string read_rgltag(struct rgltag& _thing)
 
 char magic[4];
 uint game_ver;
-uint zero;
+uint mod_ver;
 
-rgltag player_name, name;
+rgltag save_name, player_name;
+uint player_level;
+float date;
 
-uint count;
+uint64 game_time;
+uint random_seed, save_mode;
+
+uint combat_difficulty, combat_difficulty_friendlies;
+uint reduce_combat_ai, reduce_campaign_ai;
+uint combat_speed;
+
+uint64 date_timer;
+
+uint hour, day, week, month, year, unused;
+float global_cloud_amount, global_haze_amount, average_difficulty, average_difficulty_period;
+rgltag unused; uint unused;
+uint tutorial_flags, default_prisoner_price, encountered_party_1_id, encountered_party_2_id;
+uint current_menu_id, current_site_id, current_entry_no;
+uint current_mission_template_id;
+
+int32 	 	current_mission_template_id; 		
+int32 	 	party_creation_min_random_value; 		
+int32 		party_creation_max_random_value; 		
+string 	 	game_log; 		
+int32 	 	unused[6]; 		
+int64 	 	unused; 		
+float 	 	rest_period; 		
+int32 	 	rest_time_speed; 		
+int32 	 	rest_is_interactive; 		
+int32 	rest_remain_attackable; 		
+string 	class_names[9]; 		
+int32 	num_global_variables; 		
+int64 	 	global_variables[num_global_variables]; 		
+		
+
+struct trigger
+{
+    int32 	 	status; 		
+    int64 	 	check_timer; 		
+    int64 	 	delay_timer; 		
+    int64 	 	rearm_timer; 	
+};
+
+int32 	num_triggers; 
+trigger 	 	triggers[num_triggers]; 		
+	
+
+struct  simple_trigger
+{
+    int64 	 	check_timer; 		
+};
+
+int32 	num_simple_triggers; 	
+simple_trigger 	 	simple_triggers[num_simple_triggers]; 
+
+
+struct note
+{
+    rgltag 	 	text 	;	
+    int32 	 	value 	;	
+    int32 	 	tableau_material_id 		;
+    int32 	 	available ;
+};
+
+struct  quest
+{	
+    int32 	 	progression; 		
+    int32 	 	giver_troop_id; 		
+    int32 	 	number; 		
+    float 	 	start_date ;		
+    rgltag 	 	title; 		
+    rgltag 	 	text; 		
+    rgltag 	 	giver; 		
+    note 	 	notes[16]; 		
+    int32 	 	num_slots; 		
+    int64 	 	slots[num_slots]; 		
+};
+
+
+int32 		num_quests; 		
+quest 	 	quests[num_quests]; 		
+
+
+struct info_page
+{
+    note notes[16];
+};
+
+
+int32 		num_info_pages; 		
+info_page 	 	info_pages[num_info_pages]; 	
+
+
+struct site
+{
+    int32 		num_slots; 		
+    int64 	 	slots[num_slots];	
+};
+
+	
+int32 	num_sites; 		
+site 	 	sites[num_sites]; 	
+
+
+/*
+
+	
+int32 		num_factions; 		
+faction 	 	factions[num_factions]; 		
+int32 	 	num_map_tracks; 		
+map_track 	 	map_tracks[num_map_tracks];		
+int32 		num_party_templates; 		
+party_template 	 	party_templates[num_party_templates]; 		
+int32 	num_party_records; 		
+int32 	num_parties_created; 		
+party_record 	 	party_records[num_party_records]; 		
+player_party_stack 	 	player_party_stack_additional_info[player_party.num_stacks]; 		
+int32 	num_map_event_records; 		
+int32 	num_map_events_created; 		
+map_event_record 	 	map_event_records[num_map_event_records]; 		
+int32 		num_troops 		
+troop 	 	troops[num_troops]; 		
+int32 	 	unused[42]; 		
+int32 	num_item_kinds 		
+item_kind 	 	item_kind[num_item_kinds]; 		
+uint64 player_face_keys[0]; 		
+uint64 	player_face_keys[1]; 		
+int32 	player_kill_count; 		
+int32 	player_wounded_count; 		
+int32 	player_own_troop_kill_count;
+int32 player_own_troop_wounded_count;
+
+
 
 byte skip[count];
 byte pad[3];

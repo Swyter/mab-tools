@@ -258,12 +258,84 @@ int32 	num_party_records;
 int32 	num_parties_created; 		
 party_record 	 	party_records[num_party_records]; 	
 
-/*	
+
+struct player_party_stack
+{
+    float 	 	experience; //	 !(cur_stack_troop_flags & hero) 	
+    int32 	 	num_upgradeable; //	 !(cur_stack_troop_flags & hero) 	
+    int32 	 	troop_dnas[32]; // 	cur_stack_no < 32 && !(cur_stack_troop_flags & hero) 	
+};
+
+
 player_party_stack 	 	player_party_stack_additional_info[player_party.num_stacks]; 		
 int32 	num_map_event_records; 		
 int32 	num_map_events_created; 		
+
+
+
+struct map_event
+{
+    string 	 	unused 		;
+    int32 	 	type 	;	
+    float 	 	position_x 	;	
+    float 	 	position_y 		;
+    float 	 	land_position_x ;		
+    float 	 	land_position_y ;		
+    float 	 	unused 		;
+    float 	 	unused 		;
+    int32 	 	attacker_party_id ;		
+    int32 	 	defender_party_id ;		
+    int64 	 	battle_simulation_timer; 		
+    float 	 	next_battle_simulation; 		
+};
+
+struct map_event_record
+{
+    int32 	 	valid 		;
+    int32 	 	id; // 	valid == 1 	
+    map_event 	 	map_event_; // 	valid == 1 	
+};
+
+
 map_event_record 	 	map_event_records[num_map_event_records]; 		
-int32 		num_troops 		
+int32 		num_troops; 		
+
+
+
+struct item
+{
+    int32 	 	item_kind_id; 		
+    int32 	 	item_flags; // 		modifier (LineNo - 1 from item_modifiers.txt) = (item_flags >> 24) & 0xFF, ammo = item_flags & 0xFF, hit_points = item_flags & 0xFFFF 
+};
+
+struct troop
+{
+    int32 	 	num_slots; 		
+    int64 	 	slots[num_slots]; 		
+    int32 	 	attributes[4]; 		
+    float 	 	proficiencies[7]; 		
+    uint32 	 	skills[6]; 		
+    note 	 	notes[16]; 		
+    uint64 	 	flags; 		
+    int32 	 	site_id_and_entry_no; 		
+    int32 	 	skill_points; 		
+    int32 	 	attribute_points; 		
+    int32 	 	proficiency_points; 		
+    int32 	 	level; 		
+    uint32 	 	gold; // 	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
+    int32 	 	experience; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
+    float 	 	health; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
+    int32 	 	faction_id; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
+    item 	 	inventory_items[96]; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
+    item 	 	equipped_items[10];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
+    uint64 	 	face_keys[4];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
+    uint 	 	renamed; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
+    string 	 	name; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false) 	
+    string 	 	name_plural; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false) 	
+    int32 	 	class_no; 		
+};
+
+/*
 troop 	 	troops[num_troops]; 		
 int32 	 	unused[42]; 		
 int32 	num_item_kinds 		

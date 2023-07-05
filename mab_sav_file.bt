@@ -135,15 +135,61 @@ int32 	num_sites;
 site 	 	sites[num_sites]; 	
 
 
-/*
+struct faction
+{
+     int32 	 	num_slots; 		
+    int64 	 	slots[num_slots]; 		
+    float 	 	relations[game.num_factions]; 		
+    rgltag 	 	name; 		
+    uint 	 	renamed; 		
+    uint32 	 	color; 		
+    int32 	 	unused; 		
+    note 	 	notes[16]; 		
+};
 
-	
 int32 		num_factions; 		
-faction 	 	factions[num_factions]; 		
+faction 	 	factions[num_factions]; 	
+
+
+
+struct map_track
+{
+    float 	 	position_x; 		
+    float 	 	position_y; 		
+    float 	 	position_z; 		
+    float 	 	rotation; 		
+    float 	 	age; 		
+    int32 	 	flags; 		
+};
+	
 int32 	 	num_map_tracks; 		
 map_track 	 	map_tracks[num_map_tracks];		
+
+
+struct party_template
+{
+    int32 	 	num_parties_created 		;
+    int32 	 	num_parties_destroyed 		;
+    int32 	 	num_parties_destroyed_by_player 	;	
+    int32 	 	num_slots ;		
+    int64 	 	slots[num_slots]; 
+};
+
 int32 		num_party_templates; 		
 party_template 	 	party_templates[num_party_templates]; 		
+
+/*
+struct party_record
+{
+    int32 	 	valid; 		
+    if (valid)
+    {
+        int32 	 	raw_id; //	valid == 1 	
+        int32 	 	id; //	valid == 1 	
+        party 	 	party;// 	valid == 1 	
+    };
+};
+
 int32 	num_party_records; 		
 int32 	num_parties_created; 		
 party_record 	 	party_records[num_party_records]; 		

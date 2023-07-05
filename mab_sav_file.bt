@@ -1,0 +1,55 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.1 Binary Template
+//
+//      File: Mount&Blade Savegame file
+//   Authors: Swyter
+//    E-mail: swyterzone+mab@gmail.com
+//   Version: 
+//   Purpose: Opens save files (Savegames/<mod name>/sg*.sav) on M&B 1.011 and Warband
+//  Category: Game
+// File Mask: sg*.sav
+//  ID Bytes: 57 52 44 52
+//------------------------------------------------
+
+typedef struct
+{
+    uint tag_len;
+    if (tag_len)
+        char s[tag_len];
+} rgltag <read=read_rgltag>;
+
+string read_rgltag(struct rgltag& _thing)
+{
+    if (_thing.tag_len <= 0)
+        return "";
+    else
+        return _thing.s;
+}
+
+uint magic;
+uint game_ver;
+uint zero;
+
+rgltag player_name, name;
+
+uint count;
+
+byte skip[count];
+byte pad[3];
+uint two, two, two, two;
+
+
+byte ss[113];
+//rgltag game_log;
+
+uint co[12];
+//rgltag group[9] <optimize=false>;
+
+
+FSeek(0x661b3 - 4);
+int aa;
+struct party
+{
+    rgltag id, display_name;
+    uint a[1134]; byte aaa[14];
+} p[3] <optimize=false>;

@@ -27,6 +27,8 @@ string read_rgltag(struct rgltag& _thing)
         return _thing.s;
 }
 
+struct game_t
+{
 
 struct header_t
 {
@@ -54,67 +56,67 @@ uint tutorial_flags, default_prisoner_price, encountered_party_1_id, encountered
 uint current_menu_id, current_site_id, current_entry_no;
 uint current_mission_template_id;
 
-int32 	 	current_mission_template_id; 		
-//int32 	 	party_creation_min_random_value; 		
-//int32 		party_creation_max_random_value; 		
-rgltag 	 	game_log; 		
-int32 	 	unused_b[6]; 		
-int64 	 	unused_c; 		
-float 	 	rest_period; 		
-int32 	 	rest_time_speed; 		
-int32 	 	rest_is_interactive; 		
-int32 	rest_remain_attackable; 		
-rgltag 	class_names[9] <optimize=false>; 		
-int32 	num_global_variables; 		
-int64 	 	global_variables[num_global_variables]; 		
-		
+int32 	 	current_mission_template_id;
+int32 	 	party_creation_min_random_value;
+int32 		party_creation_max_random_value;
+rgltag 	 	game_log;
+int32 	 	unused_b[6];
+int64 	 	unused_c;
+float 	 	rest_period;
+int32 	 	rest_time_speed;
+int32 	 	rest_is_interactive;
+int32 	rest_remain_attackable;
+rgltag 	class_names[9] <optimize=false>;
+int32 	num_global_variables;
+int64 	 	global_variables[num_global_variables];
+
 
 struct trigger
 {
-    int32 	 	status; 		
-    int64 	 	check_timer; 		
-    int64 	 	delay_timer; 		
-    int64 	 	rearm_timer; 	
+    int32 	 	status;
+    int64 	 	check_timer;
+    int64 	 	delay_timer;
+    int64 	 	rearm_timer;
 };
 
-int32 	num_triggers; 
-trigger 	 	triggers[num_triggers]; 		
-	
+int32 	num_triggers;
+trigger 	 	triggers[num_triggers];
+
 
 struct  simple_trigger
 {
-    int64 	 	check_timer; 		
+    int64 	 	check_timer;
 };
 
-int32 	num_simple_triggers; 	
-simple_trigger 	 	simple_triggers[num_simple_triggers]; 
+int32 	num_simple_triggers;
+simple_trigger 	 	simple_triggers[num_simple_triggers];
 
 
 struct note
 {
-    rgltag 	 	text 	;	
-    int32 	 	value 	;	
-    int32 	 	tableau_material_id 		;
-    int32 	 	available ;
+    rgltag 	 	text;
+    int32 	 	value;
+    int32 	 	tableau_material_id;
+    int32 	 	available;
 };
 
 struct  quest
-{	
-    int32 	 	progression; 		
-    int32 	 	giver_troop_id; 		
-    int32 	 	number; 		
-    float 	 	start_date ;		
-    rgltag 	 	title; 		
-    rgltag 	 	text; 		
-    rgltag 	 	giver; 		
-    note 	 	notes[16]; 		
-    int32 	 	num_slots; 		
-    int64 	 	slots[num_slots]; 		
+{
+    int32 	 	progression;
+    int32 	 	giver_troop_id;
+    int32 	 	number;
+    float 	 	start_date;
+    rgltag 	 	title;
+    rgltag 	 	text;
+    rgltag 	 	giver;
+    note 	 	notes[16];
+    int32 	 	num_slots;
+    int64 	 	slots[num_slots];
 };
 
 
-int32 		num_quests; 		
-quest 	 	quests[num_quests]; 		
+int32 		num_quests;
+quest 	 	quests[num_quests];
 
 
 struct info_page
@@ -123,231 +125,231 @@ struct info_page
 };
 
 
-int32 		num_info_pages; 		
-info_page 	 	info_pages[num_info_pages]; 	
+int32 		num_info_pages;
+info_page 	 	info_pages[num_info_pages];
 
 
 struct site
 {
-    int32 		num_slots; 		
-    int64 	 	slots[num_slots];	
+    int32 		num_slots;
+    int64 	 	slots[num_slots];
 };
 
-	
-int32 	num_sites; 		
-site 	 	sites[num_sites]; 	
+
+int32 	num_sites;
+site 	 	sites[num_sites];
 
 
 struct faction
 {
-     int32 	 	num_slots; 		
-    int64 	 	slots[num_slots]; 		
-    float 	 	relations[game.num_factions]; 		
-    rgltag 	 	name; 		
-    uint 	 	renamed; 		
-    uint32 	 	color; 		
-    int32 	 	unused; 		
-    note 	 	notes[16]; 		
+     int32 	 	num_slots;
+    int64 	 	slots[num_slots];
+    float 	 	relations[game.num_factions];
+    rgltag 	 	name;
+    uint 	 	renamed;
+    uint32 	 	color;
+    int32 	 	unused;
+    note 	 	notes[16];
 };
 
-int32 		num_factions; 		
-faction 	 	factions[num_factions]; 	
+int32 		num_factions;
+faction 	 	factions[num_factions];
 
 
 
 struct map_track
 {
-    float 	 	position_x; 		
-    float 	 	position_y; 		
-    float 	 	position_z; 		
-    float 	 	rotation; 		
-    float 	 	age; 		
-    int32 	 	flags; 		
+    float 	 	position_x;
+    float 	 	position_y;
+    float 	 	position_z;
+    float 	 	rotation;
+    float 	 	age;
+    int32 	 	flags;
 };
-	
-int32 	 	num_map_tracks; 		
-map_track 	 	map_tracks[num_map_tracks];		
+
+int32 	 	num_map_tracks;
+map_track 	 	map_tracks[num_map_tracks];
 
 
 struct party_template
 {
-    int32 	 	num_parties_created 		;
-    int32 	 	num_parties_destroyed 		;
-    int32 	 	num_parties_destroyed_by_player 	;	
-    int32 	 	num_slots ;		
-    int64 	 	slots[num_slots]; 
+    int32 	 	num_parties_created;
+    int32 	 	num_parties_destroyed;
+    int32 	 	num_parties_destroyed_by_player;
+    int32 	 	num_slots;
+    int64 	 	slots[num_slots];
 };
 
-int32 		num_party_templates; 		
-party_template 	 	party_templates[num_party_templates]; 		
-} game <open=true, optimize=false>;
+int32 		num_party_templates;
+party_template 	 	party_templates[num_party_templates];
 
 
 struct party_stack
 {
-    int32 	 	troop_id ;		
-    int32 	 	num_troops 	;	
-    int32 	 	num_wounded_troops 	;	
-    int32 	 	flags ;		
+    int32 	 	troop_id;
+    int32 	 	num_troops;
+    int32 	 	num_wounded_troops;
+    int32 	 	flags;
 };
 struct party
 {
-    rgltag 	 	id ;		
-    rgltag 	 	name ;		
-    uint64 	 	flags 		;
-    int32 	 	menu_id 		;
-    int32 	 	party_template_id 		;
-    int32 	 	faction_id 		;
-    int32 	 	personality ;		
-    int32 	 	default_behavior; 		
-    int32 	 	current_behavior ;		
-    int32 	 	default_behavior_object_id 	;	
-    int32 	 	current_behavior_object_id ;		
-    float 	 	initial_position_x 	;	
-    float 	 	initial_position_y 	;	
-    float 	 	target_position_x ;		
-    float 	 	target_position_y ;		
-    float 	 	position_x 	;	
-    float 	 	position_y 	;	
-    float 	 	position_z 	;	
-    int32 	 	num_stacks 	;	
-    party_stack 	 	stacks[num_stacks]; 		
-    float 	 	bearing ;		
-    uint 	 	renamed ;		
-    rgltag 	 	extra_text 	;	
-    float 	 	morale 	;	
-    float 	 	hunger 	;	
-    float 	 	unused 		;
-    float 	 	patrol_radius 	;	
-    float 	 	initiative 	;	
-    float 	 	helpfulness ;		
-    int32 	 	label_visible ;		
-    float 	 	bandit_attraction ;		
-    int32 	 	marshall;// 	(game.header.game_version >= 900 && game.header.game_version < 1000) || game.header.game_version >= 1020 	
-    int64 	 	ignore_player_timer; 		
-    int32 	 	banner_map_icon_id; 		
-    int32 	 	extra_map_icon_id; //	game.header.game_version > 1136 	
-    float 	 	extra_map_icon_up_down_distance; //	game.header.game_version > 1136 	
-    float 	 	extra_map_icon_up_down_frequency; //	game.header.game_version > 1136 	
-    float 	 	extra_map_icon_rotate_frequency; //	game.header.game_version > 1136 	
-    float 	 	extra_map_icon_fade_frequency; //	game.header.game_version > 1136 	
-    int32 	 	attached_to_party_id; 		
-    uint 	 	is_attached; 		
-    int32 	 	num_attached_party_ids; 		
-    int32 	 	attached_party_ids[num_attached_party_ids]; 		
-    int32 	 	num_particle_system_ids; 		
-    int32 	 	particle_system_ids[num_particle_system_ids]; 		
-    note 	 	notes[16]; 		
-    int32 	 	num_slots; 		
-    int64 	 	slots[num_slots]; 
+    rgltag 	 	id;
+    rgltag 	 	name;
+    uint64 	 	flags;
+    int32 	 	menu_id;
+    int32 	 	party_template_id;
+    int32 	 	faction_id;
+    int32 	 	personality;
+    int32 	 	default_behavior;
+    int32 	 	current_behavior;
+    int32 	 	default_behavior_object_id;
+    int32 	 	current_behavior_object_id;
+    float 	 	initial_position_x;
+    float 	 	initial_position_y;
+    float 	 	target_position_x;
+    float 	 	target_position_y;
+    float 	 	position_x;
+    float 	 	position_y;
+    float 	 	position_z;
+    int32 	 	num_stacks;
+    party_stack 	 	stacks[num_stacks];
+    float 	 	bearing;
+    uint 	 	renamed;
+    rgltag 	 	extra_text;
+    float 	 	morale;
+    float 	 	hunger;
+    float 	 	unused;
+    float 	 	patrol_radius;
+    float 	 	initiative;
+    float 	 	helpfulness;
+    int32 	 	label_visible;
+    float 	 	bandit_attraction;
+    int32 	 	marshall;// 	(game.header.game_version >= 900 && game.header.game_version < 1000) || game.header.game_version >= 1020
+    int64 	 	ignore_player_timer;
+    int32 	 	banner_map_icon_id;
+    int32 	 	extra_map_icon_id; //	game.header.game_version > 1136
+    float 	 	extra_map_icon_up_down_distance; //	game.header.game_version > 1136
+    float 	 	extra_map_icon_up_down_frequency; //	game.header.game_version > 1136
+    float 	 	extra_map_icon_rotate_frequency; //	game.header.game_version > 1136
+    float 	 	extra_map_icon_fade_frequency; //	game.header.game_version > 1136
+    int32 	 	attached_to_party_id;
+    uint 	 	is_attached;
+    int32 	 	num_attached_party_ids;
+    int32 	 	attached_party_ids[num_attached_party_ids];
+    int32 	 	num_particle_system_ids;
+    int32 	 	particle_system_ids[num_particle_system_ids];
+    note 	 	notes[16];
+    int32 	 	num_slots;
+    int64 	 	slots[num_slots];
 };
 
 struct party_record
 {
-    int32 	 	valid; 		
+    int32 	 	valid;
     if (valid)
     {
-        int32 	 	raw_id; //	valid == 1 	
-        int32 	 	id; //	valid == 1 	
-        party 	 	party_;// 	valid == 1 	
+        int32 	 	raw_id; //	valid == 1
+        int32 	 	id; //	valid == 1
+        party 	 	party_;// 	valid == 1
     };
 };
 
-int32 	num_party_records; 		
-int32 	num_parties_created; 		
-party_record 	 	party_records[num_party_records]; 	
+int32 	num_party_records;
+int32 	num_parties_created;
+party_record 	 	party_records[num_party_records];
 
 
 struct player_party_stack
 {
-    float 	 	experience; //	 !(cur_stack_troop_flags & hero) 	
-    int32 	 	num_upgradeable; //	 !(cur_stack_troop_flags & hero) 	
-    int32 	 	troop_dnas[32]; // 	cur_stack_no < 32 && !(cur_stack_troop_flags & hero) 	
+    float 	 	experience; //	 !(cur_stack_troop_flags & hero)
+    int32 	 	num_upgradeable; //	 !(cur_stack_troop_flags & hero)
+    int32 	 	troop_dnas[32]; // 	cur_stack_no < 32 && !(cur_stack_troop_flags & hero)
 };
 
 
-player_party_stack 	 	player_party_stack_additional_info[player_party.num_stacks]; 		
-int32 	num_map_event_records; 		
-int32 	num_map_events_created; 		
+player_party_stack 	 	player_party_stack_additional_info[player_party.num_stacks];
+int32 	num_map_event_records;
+int32 	num_map_events_created;
 
 
 
 struct map_event
 {
-    string 	 	unused 		;
-    int32 	 	type 	;	
-    float 	 	position_x 	;	
-    float 	 	position_y 		;
-    float 	 	land_position_x ;		
-    float 	 	land_position_y ;		
-    float 	 	unused 		;
-    float 	 	unused 		;
-    int32 	 	attacker_party_id ;		
-    int32 	 	defender_party_id ;		
-    int64 	 	battle_simulation_timer; 		
-    float 	 	next_battle_simulation; 		
+    string 	 	unused;
+    int32 	 	type;
+    float 	 	position_x;
+    float 	 	position_y;
+    float 	 	land_position_x;
+    float 	 	land_position_y;
+    float 	 	unused;
+    float 	 	unused;
+    int32 	 	attacker_party_id;
+    int32 	 	defender_party_id;
+    int64 	 	battle_simulation_timer;
+    float 	 	next_battle_simulation;
 };
 
 struct map_event_record
 {
-    int32 	 	valid 		;
-    int32 	 	id; // 	valid == 1 	
-    map_event 	 	map_event_; // 	valid == 1 	
+    int32 	 	valid;
+    int32 	 	id; // 	valid == 1
+    map_event 	 	map_event_; // 	valid == 1
 };
 
 
-map_event_record 	 	map_event_records[num_map_event_records]; 		
-int32 		num_troops; 		
-
+map_event_record 	 	map_event_records[num_map_event_records];
+int32 		num_troops;
 
 
 struct item
 {
-    int32 	 	item_kind_id; 		
-    int32 	 	item_flags; // 		modifier (LineNo - 1 from item_modifiers.txt) = (item_flags >> 24) & 0xFF, ammo = item_flags & 0xFF, hit_points = item_flags & 0xFFFF 
+    int32 	 	item_kind_id;
+    int32 	 	item_flags; // 		modifier (LineNo - 1 from item_modifiers.txt) = (item_flags >> 24) & 0xFF, ammo = item_flags & 0xFF, hit_points = item_flags & 0xFFFF
 };
 
 struct troop
 {
-    int32 	 	num_slots; 		
-    int64 	 	slots[num_slots]; 		
-    int32 	 	attributes[4]; 		
-    float 	 	proficiencies[7]; 		
-    uint32 	 	skills[6]; 		
-    note 	 	notes[16]; 		
-    uint64 	 	flags; 		
-    int32 	 	site_id_and_entry_no; 		
-    int32 	 	skill_points; 		
-    int32 	 	attribute_points; 		
-    int32 	 	proficiency_points; 		
-    int32 	 	level; 		
-    uint32 	 	gold; // 	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
-    int32 	 	experience; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
-    float 	 	health; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
-    int32 	 	faction_id; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
-    item 	 	inventory_items[96]; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
-    item 	 	equipped_items[10];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
-    uint64 	 	face_keys[4];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
-    uint 	 	renamed; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false 	
-    string 	 	name; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false) 	
-    string 	 	name_plural; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false) 	
-    int32 	 	class_no; 		
+    int32 	 	num_slots;
+    int64 	 	slots[num_slots];
+    int32 	 	attributes[4];
+    float 	 	proficiencies[7];
+    uint32 	 	skills[6];
+    note 	 	notes[16];
+    uint64 	 	flags;
+    int32 	 	site_id_and_entry_no;
+    int32 	 	skill_points;
+    int32 	 	attribute_points;
+    int32 	 	proficiency_points;
+    int32 	 	level;
+    uint32 	 	gold; // 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+    int32 	 	experience; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+    float 	 	health; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+    int32 	 	faction_id; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+    item 	 	inventory_items[96]; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+    item 	 	equipped_items[10];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+    uint64 	 	face_keys[4];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+    uint 	 	renamed; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+    string 	 	name; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
+    string 	 	name_plural; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
+    int32 	 	class_no;
 };
 
-troop 	 	troops[num_troops]; 		
-int32 	 	unused[42]; 	
+troop 	 	troops[num_troops];
+int32 	 	unused[42];
 
 struct  item_kind
 {
-    int32 	 	num_slots 		;
+    int32 	 	num_slots;
     int64 	 	slots 	[num_slots];
 };
-	
-int32 	num_item_kinds; 		
-item_kind 	 	item_kind_[num_item_kinds]; 		
-uint64 player_face_keys[0]; 		
-uint64 	player_face_keys[1]; 		
-int32 	player_kill_count; 		
-int32 	player_wounded_count; 		
+
+int32 	num_item_kinds;
+item_kind 	 	item_kind_[num_item_kinds];
+uint64 player_face_keys[0];
+uint64 	player_face_keys[1];
+int32 	player_kill_count;
+int32 	player_wounded_count;
 int32 	player_own_troop_kill_count;
 int32 player_own_troop_wounded_count;
+
+} game <open=true, optimize=false>;

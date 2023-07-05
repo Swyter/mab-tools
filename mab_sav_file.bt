@@ -27,8 +27,7 @@ string read_rgltag(struct rgltag& _thing)
         return _thing.s;
 }
 
-struct game_t
-{
+
 struct header_t
 {
     char magic_number[4];
@@ -335,36 +334,20 @@ struct troop
     int32 	 	class_no; 		
 };
 
-/*
 troop 	 	troops[num_troops]; 		
-int32 	 	unused[42]; 		
-int32 	num_item_kinds 		
-item_kind 	 	item_kind[num_item_kinds]; 		
+int32 	 	unused[42]; 	
+
+struct  item_kind
+{
+    int32 	 	num_slots 		;
+    int64 	 	slots 	[num_slots];
+};
+	
+int32 	num_item_kinds; 		
+item_kind 	 	item_kind_[num_item_kinds]; 		
 uint64 player_face_keys[0]; 		
 uint64 	player_face_keys[1]; 		
 int32 	player_kill_count; 		
 int32 	player_wounded_count; 		
 int32 	player_own_troop_kill_count;
 int32 player_own_troop_wounded_count;
-
-
-
-byte skip[count];
-byte pad[3];
-uint two, two, two, two;
-
-
-byte ss[113];
-rgltag game_log;
-
-uint co[12];
-//rgltag group[9] <optimize=false>;
-
-
-FSeek(0x661b3 - 4);
-int aa;
-struct party
-{
-    rgltag id, display_name;
-    uint a[1134]; byte aaa[14];
-} p[5] <optimize=false>;

@@ -27,13 +27,17 @@ string read_rgltag(struct rgltag& _thing)
         return _thing.s;
 }
 
-char magic[4];
-uint game_ver;
-uint mod_ver;
-
-rgltag save_name, player_name;
-uint player_level;
-float date;
+struct game_t
+{
+struct header_t
+{
+    char magic_number[4];
+    uint game_version;
+    uint module_version;
+    rgltag savegame_name, player_name;
+    uint player_level;
+    float date;
+} header;
 
 uint64 game_time;
 uint random_seed, save_mode;
@@ -52,16 +56,16 @@ uint current_menu_id, current_site_id, current_entry_no;
 uint current_mission_template_id;
 
 int32 	 	current_mission_template_id; 		
-int32 	 	party_creation_min_random_value; 		
-int32 		party_creation_max_random_value; 		
-string 	 	game_log; 		
-int32 	 	unused[6]; 		
-int64 	 	unused; 		
+//int32 	 	party_creation_min_random_value; 		
+//int32 		party_creation_max_random_value; 		
+rgltag 	 	game_log; 		
+int32 	 	unused_b[6]; 		
+int64 	 	unused_c; 		
 float 	 	rest_period; 		
 int32 	 	rest_time_speed; 		
 int32 	 	rest_is_interactive; 		
 int32 	rest_remain_attackable; 		
-string 	class_names[9]; 		
+rgltag 	class_names[9] <optimize=false>; 		
 int32 	num_global_variables; 		
 int64 	 	global_variables[num_global_variables]; 		
 		
@@ -177,8 +181,68 @@ struct party_template
 
 int32 		num_party_templates; 		
 party_template 	 	party_templates[num_party_templates]; 		
+} game <open=true, optimize=false>;
 
-/*
+
+struct party_stack
+{
+    int32 	 	troop_id ;		
+    int32 	 	num_troops 	;	
+    int32 	 	num_wounded_troops 	;	
+    int32 	 	flags ;		
+};
+struct party
+{
+    rgltag 	 	id ;		
+    rgltag 	 	name ;		
+    uint64 	 	flags 		;
+    int32 	 	menu_id 		;
+    int32 	 	party_template_id 		;
+    int32 	 	faction_id 		;
+    int32 	 	personality ;		
+    int32 	 	default_behavior; 		
+    int32 	 	current_behavior ;		
+    int32 	 	default_behavior_object_id 	;	
+    int32 	 	current_behavior_object_id ;		
+    float 	 	initial_position_x 	;	
+    float 	 	initial_position_y 	;	
+    float 	 	target_position_x ;		
+    float 	 	target_position_y ;		
+    float 	 	position_x 	;	
+    float 	 	position_y 	;	
+    float 	 	position_z 	;	
+    int32 	 	num_stacks 	;	
+    party_stack 	 	stacks[num_stacks]; 		
+    float 	 	bearing ;		
+    uint 	 	renamed ;		
+    rgltag 	 	extra_text 	;	
+    float 	 	morale 	;	
+    float 	 	hunger 	;	
+    float 	 	unused 		;
+    float 	 	patrol_radius 	;	
+    float 	 	initiative 	;	
+    float 	 	helpfulness ;		
+    int32 	 	label_visible ;		
+    float 	 	bandit_attraction ;		
+    int32 	 	marshall;// 	(game.header.game_version >= 900 && game.header.game_version < 1000) || game.header.game_version >= 1020 	
+    int64 	 	ignore_player_timer; 		
+    int32 	 	banner_map_icon_id; 		
+    int32 	 	extra_map_icon_id; //	game.header.game_version > 1136 	
+    float 	 	extra_map_icon_up_down_distance; //	game.header.game_version > 1136 	
+    float 	 	extra_map_icon_up_down_frequency; //	game.header.game_version > 1136 	
+    float 	 	extra_map_icon_rotate_frequency; //	game.header.game_version > 1136 	
+    float 	 	extra_map_icon_fade_frequency; //	game.header.game_version > 1136 	
+    int32 	 	attached_to_party_id; 		
+    uint 	 	is_attached; 		
+    int32 	 	num_attached_party_ids; 		
+    int32 	 	attached_party_ids[num_attached_party_ids]; 		
+    int32 	 	num_particle_system_ids; 		
+    int32 	 	particle_system_ids[num_particle_system_ids]; 		
+    note 	 	notes[16]; 		
+    int32 	 	num_slots; 		
+    int64 	 	slots[num_slots]; 
+};
+
 struct party_record
 {
     int32 	 	valid; 		
@@ -186,13 +250,15 @@ struct party_record
     {
         int32 	 	raw_id; //	valid == 1 	
         int32 	 	id; //	valid == 1 	
-        party 	 	party;// 	valid == 1 	
+        party 	 	party_;// 	valid == 1 	
     };
 };
 
 int32 	num_party_records; 		
 int32 	num_parties_created; 		
-party_record 	 	party_records[num_party_records]; 		
+party_record 	 	party_records[num_party_records]; 	
+
+/*	
 player_party_stack 	 	player_party_stack_additional_info[player_party.num_stacks]; 		
 int32 	num_map_event_records; 		
 int32 	num_map_events_created; 		

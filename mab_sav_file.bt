@@ -13,6 +13,9 @@
 //------------------------------------------------
 typedef byte bool;
 
+const uint tf_hero = 0x00000010;
+const uint dont_load_regular_troop_inventories = true;
+
 typedef struct
 {
     uint tag_len;
@@ -194,7 +197,7 @@ struct game_t
     {
         rgltag 	 	id;
         rgltag 	 	name;
-        uint64 	 	flags;
+        uint64 	 	flags <format=hex>;
         int32 	 	menu_id;
         int32 	 	party_template_id;
         int32 	 	faction_id;
@@ -241,7 +244,7 @@ struct game_t
         int32 	 	attached_to_party_id;
         bool 	 	is_attached;
 
-        int32 a[(11 + 0xd)/4];
+        uint32 _fix_me[6] <format=hex>; /* swy: (11 + 0xd) / 4 */
 
 
         int32 	 	num_attached_party_ids;
@@ -251,7 +254,7 @@ struct game_t
         note 	 	notes[16] <optimize=false>;
         int32 	 	num_slots;
         int64 	 	slots[num_slots];
-    } party <read=read_rgltag(id)>;
+    } party_t <read=read_rgltag(id)>;
     
     typedef struct 
     {
@@ -261,23 +264,34 @@ struct game_t
         {
             int32 	 	raw_id; //	valid == 1
             int32 	 	id; //	valid == 1
-            party 	 	party_;// 	valid == 1
+            party_t	 	party;// 	valid == 1
         };
-    } party_record <read=Str("%u - %s", valid, valid ? read_rgltag(party_.id) : "<?>")>;
+    } party_record <read=Str("%u - %s", valid, valid ? read_rgltag(party.id) : "<?>")>;
     
     int32 	num_party_records;
     int32 	num_parties_created;
 
     party_record 	 	party_records[num_party_records] <optimize=false>;
     
+
+    local uint i = 0;
+
     struct player_party_stack
     {
-        float 	 	experience; //	 !(cur_stack_troop_flags & hero)
-        int32 	 	num_upgradeable; //	 !(cur_stack_troop_flags & hero)
-        int32 	 	troop_dnas[32] <format=hex>; // 	cur_stack_no < 32 && !(cur_stack_troop_flags & hero)
+        local uint cur_stack_no = i; i++;
+        local uint64 cur_stack_troop_flags = 0x00000010;//game.party_records[0].party.stacks[cur_stack_no].flags;
+        const uint hero = 0x00000010;
+
+        if (!(cur_stack_troop_flags & hero))
+        {
+            float 	 	experience; //	 !(cur_stack_troop_flags & hero)
+            int32 	 	num_upgradeable; //	 !(cur_stack_troop_flags & hero)
+        }
+        if (cur_stack_no < 32 && !(cur_stack_troop_flags & hero))
+            int32 	 	troop_dnas[32] <format=hex>; // 	cur_stack_no < 32 && !(cur_stack_troop_flags & hero)
     };
     
-    player_party_stack 	 	player_party_stack_additional_info[game.party_records[0].party_.num_stacks]; // [player_party.num_stacks]
+    player_party_stack 	 	player_party_stack_additional_info[game.party_records[0].party.num_stacks] <optimize=false>; // [player_party.num_stacks]
 
 
     int32 	num_map_event_records;
@@ -326,27 +340,35 @@ struct game_t
         int32 	 	attributes[4];
         float 	 	proficiencies[7];
         uint32 	 	skills[6];
-        note 	 	notes[16];
+        note 	 	notes[16] <optimize=false>;
         uint64 	 	flags <format=hex>;
         int32 	 	site_id_and_entry_no;
         int32 	 	skill_points;
         int32 	 	attribute_points;
         int32 	 	proficiency_points;
         int32 	 	level;
-        uint32 	 	gold; // 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-        int32 	 	experience; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-        float 	 	health; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-        int32 	 	faction_id; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-        item 	 	inventory_items[96]; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-        item 	 	equipped_items[10];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-        uint64 	 	face_keys[4];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-        bool 	 	renamed; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-        string 	 	name; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
-        string 	 	name_plural; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
-        int32 	 	class_no;
+
+        if ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
+        {
+            uint32 	 	gold; // 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            int32 	 	experience; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            float 	 	health; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            int32 	 	faction_id; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            item 	 	inventory_items[96]; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            item 	 	equipped_items[10];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            uint64 	 	face_keys[4];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            bool 	 	renamed; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+
+            if (renamed)
+            {
+                string 	 	name; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
+                string 	 	name_plural; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
+                int32 	 	class_no;
+            }
+        }
     };
     
-    troop 	 	troops[num_troops];
+    troop 	 	troops[num_troops] <optimize=false>;
     int32 	 	unused_d[42];
     
     struct  item_kind

@@ -240,11 +240,14 @@ struct game_t
 
         int32 	 	attached_to_party_id;
         bool 	 	is_attached;
+
+        int32 a[(11 + 0xd)/4];
+
+
         int32 	 	num_attached_party_ids;
         int32 	 	attached_party_ids[num_attached_party_ids];
         int32 	 	num_particle_system_ids;
         int32 	 	particle_system_ids[num_particle_system_ids] <optimize=false>;
-        byte a[11 + 0xd];
         note 	 	notes[16] <optimize=false>;
         int32 	 	num_slots;
         int64 	 	slots[num_slots];
@@ -353,7 +356,7 @@ struct game_t
     };
     
     int32 	num_item_kinds;
-    item_kind 	 	item_kind_[num_item_kinds];
+    item_kind 	 	item_kind_[num_item_kinds] <optimize=false>;
     uint64 player_face_keys[0];
     uint64 	player_face_keys[1];
     int32 	player_kill_count;

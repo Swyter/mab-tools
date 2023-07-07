@@ -111,7 +111,7 @@ struct game_t
         note 	 	notes[16] <optimize=false>;
         int32 	 	num_slots;
         int64 	 	slots[num_slots];
-    } quest <read=title.s>;
+    } quest <read=read_rgltag(title)>;
     
     
     int32 		num_quests;
@@ -163,7 +163,7 @@ struct game_t
         float 	 	position_z;
         float 	 	rotation;
         float 	 	age;
-        int32 	 	flags;
+        int32 	 	flags <format=hex>;
     };
     
     int32 	 	num_map_tracks;
@@ -213,7 +213,7 @@ struct game_t
         int32 	 	num_stacks;
         party_stack 	 	stacks[num_stacks];
         float 	 	bearing;
-        uint 	 	renamed;
+        bool 	 	renamed;
         rgltag 	 	extra_text;
         float 	 	morale;
         float 	 	hunger;
@@ -223,16 +223,22 @@ struct game_t
         float 	 	helpfulness;
         int32 	 	label_visible;
         float 	 	bandit_attraction;
-        int32 	 	marshall;// 	(game.header.game_version >= 900 && game.header.game_version < 1000) || game.header.game_version >= 1020
+        if ((game.header.game_version >= 900 && game.header.game_version < 1000) || game.header.game_version >= 1020)
+            int32 	 	marshall;// 	(game.header.game_version >= 900 && game.header.game_version < 1000) || game.header.game_version >= 1020
         int64 	 	ignore_player_timer;
         int32 	 	banner_map_icon_id;
-        int32 	 	extra_map_icon_id; //	game.header.game_version > 1136
-        float 	 	extra_map_icon_up_down_distance; //	game.header.game_version > 1136
-        float 	 	extra_map_icon_up_down_frequency; //	game.header.game_version > 1136
-        float 	 	extra_map_icon_rotate_frequency; //	game.header.game_version > 1136
-        float 	 	extra_map_icon_fade_frequency; //	game.header.game_version > 1136
+
+        if (game.header.game_version > 1136)
+        {
+            int32 	 	extra_map_icon_id; //	game.header.game_version > 1136
+            float 	 	extra_map_icon_up_down_distance; //	game.header.game_version > 1136
+            float 	 	extra_map_icon_up_down_frequency; //	game.header.game_version > 1136
+            float 	 	extra_map_icon_rotate_frequency; //	game.header.game_version > 1136
+            float 	 	extra_map_icon_fade_frequency; //	game.header.game_version > 1136
+        }
+
         int32 	 	attached_to_party_id;
-        uint 	 	is_attached;
+        bool 	 	is_attached;
         int32 	 	num_attached_party_ids;
         int32 	 	attached_party_ids[num_attached_party_ids];
         int32 	 	num_particle_system_ids;
@@ -245,6 +251,7 @@ struct game_t
     struct party_record
     {
         int32 	 	valid;
+
         if (valid)
         {
             int32 	 	raw_id; //	valid == 1
@@ -262,7 +269,7 @@ struct game_t
     {
         float 	 	experience; //	 !(cur_stack_troop_flags & hero)
         int32 	 	num_upgradeable; //	 !(cur_stack_troop_flags & hero)
-        int32 	 	troop_dnas[32]; // 	cur_stack_no < 32 && !(cur_stack_troop_flags & hero)
+        int32 	 	troop_dnas[32] <format=hex>; // 	cur_stack_no < 32 && !(cur_stack_troop_flags & hero)
     };
     
     
@@ -291,8 +298,11 @@ struct game_t
     struct map_event_record
     {
         int32 	 	valid;
-        int32 	 	id; // 	valid == 1
-        map_event 	 	map_event_; // 	valid == 1
+        if (valid)
+        {
+            int32 	 	id; // 	valid == 1
+            map_event 	 	map_event_; // 	valid == 1
+        }
     };
     
     
@@ -303,7 +313,7 @@ struct game_t
     struct item
     {
         int32 	 	item_kind_id;
-        int32 	 	item_flags; // 		modifier (LineNo - 1 from item_modifiers.txt) = (item_flags >> 24) & 0xFF, ammo = item_flags & 0xFF, hit_points = item_flags & 0xFFFF
+        int32 	 	item_flags <format=hex>; // 		modifier (LineNo - 1 from item_modifiers.txt) = (item_flags >> 24) & 0xFF, ammo = item_flags & 0xFF, hit_points = item_flags & 0xFFFF
     };
     
     struct troop
@@ -314,7 +324,7 @@ struct game_t
         float 	 	proficiencies[7];
         uint32 	 	skills[6];
         note 	 	notes[16];
-        uint64 	 	flags;
+        uint64 	 	flags <format=hex>;
         int32 	 	site_id_and_entry_no;
         int32 	 	skill_points;
         int32 	 	attribute_points;
@@ -327,7 +337,7 @@ struct game_t
         item 	 	inventory_items[96]; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
         item 	 	equipped_items[10];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
         uint64 	 	face_keys[4];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-        uint 	 	renamed; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+        bool 	 	renamed; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
         string 	 	name; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
         string 	 	name_plural; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
         int32 	 	class_no;

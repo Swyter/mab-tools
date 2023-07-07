@@ -327,13 +327,13 @@ struct game_t
     int32 		num_troops;
     
     
-    struct item
+    typedef struct
     {
         int32 	 	item_kind_id;
         int32 	 	item_flags <format=hex>; // 		modifier (LineNo - 1 from item_modifiers.txt) = (item_flags >> 24) & 0xFF, ammo = item_flags & 0xFF, hit_points = item_flags & 0xFFFF
-    };
+    } item <read=Str("%i", item_kind_id)>;
     
-    struct troop
+    typedef struct
     {
         int32 	 	num_slots;
         int64 	 	slots[num_slots];
@@ -348,6 +348,8 @@ struct game_t
         int32 	 	proficiency_points;
         int32 	 	level;
 
+        local string buf = "";
+
         if ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
         {
             uint32 	 	gold; // 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
@@ -356,7 +358,7 @@ struct game_t
             int32 	 	faction_id; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
             item 	 	inventory_items[96]; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
             item 	 	equipped_items[10];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-            uint64 	 	face_keys[4];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            uint64 	 	face_keys[4] <format=hex>;// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
             bool 	 	renamed; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
 
             if (renamed)
@@ -364,10 +366,12 @@ struct game_t
                 string 	 	name; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
                 string 	 	name_plural; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
                 int32 	 	class_no;
+
+                buf = "renamed!";
             }
         }
-        uint more;
-    };
+        uint more; /* swy: what's this? padding? */
+    } troop <read=Str("%s %s", (flags & tf_hero) ? "hero" : "-", buf)>;
     
     troop 	 	troops[num_troops] <optimize=false>;
     int32 	 	unused_d[42];

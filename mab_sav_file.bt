@@ -260,13 +260,17 @@ struct game_t
     {
         int32 	 	valid;
 
+        local string buf = "";
+
         if (valid)
         {
             int32 	 	raw_id; //	valid == 1
             int32 	 	id; //	valid == 1
             party_t	 	party;// 	valid == 1
+
+            buf = Str(" (%u, %u)", raw_id, id);
         };
-    } party_record <read=Str("%u - %s", valid, valid ? read_rgltag(party.id) : "<?>")>;
+    } party_record <read=Str("%u - %s %s", valid, valid ? read_rgltag(party.id) : "<?>", buf)>;
     
     int32 	num_party_records;
     int32 	num_parties_created;
@@ -323,7 +327,7 @@ struct game_t
         }
     };
   
-    map_event_record 	 	map_event_records[num_map_event_records];
+    map_event_record 	 	map_event_records[num_map_event_records] <optimize=false>;
     int32 		num_troops;
     
     
@@ -384,8 +388,7 @@ struct game_t
     
     int32 	num_item_kinds;
     item_kind 	 	item_kind_[num_item_kinds] <optimize=false>;
-    uint64 player_face_keys[0];
-    uint64 	player_face_keys[1];
+    uint64 player_face_keys[2] <format=hex>;
     int32 	player_kill_count;
     int32 	player_wounded_count;
     int32 	player_own_troop_kill_count;

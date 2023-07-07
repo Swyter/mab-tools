@@ -16,7 +16,7 @@ typedef byte bool;
 typedef struct
 {
     uint tag_len;
-    if (tag_len)
+    if (tag_len < 1000000)
         char s[tag_len];
 } rgltag <read=read_rgltag>;
 
@@ -91,13 +91,13 @@ struct game_t
     simple_trigger 	 	simple_triggers[num_simple_triggers];
     
     
-    struct note
+    typedef struct 
     {
         rgltag 	 	text;
-        int32 	 	value;
+        char 	 	value[4]; /* swy: NOTE: int32, but contains four characters of string garbage data */
         int32 	 	tableau_material_id;
         bool 	 	available;
-    };
+    } note <read=value>;
     
     typedef struct
     {
@@ -183,13 +183,13 @@ struct game_t
     party_template 	 	party_templates[num_party_templates] <optimize=false>;
     
     
-    struct party_stack
+    typedef struct
     {
         int32 	 	troop_id;
         int32 	 	num_troops;
         int32 	 	num_wounded_troops;
         int32 	 	flags;
-    };
+    } party_stack <read=Str("%u (%u) (%u)", troop_id, num_troops, num_wounded_troops)>;
     typedef struct
     {
         rgltag 	 	id;
@@ -243,7 +243,8 @@ struct game_t
         int32 	 	num_attached_party_ids;
         int32 	 	attached_party_ids[num_attached_party_ids];
         int32 	 	num_particle_system_ids;
-        int32 	 	particle_system_ids[num_particle_system_ids];
+        int32 	 	particle_system_ids[num_particle_system_ids] <optimize=false>;
+        byte a[11 + 0xd];
         note 	 	notes[16] <optimize=false>;
         int32 	 	num_slots;
         int64 	 	slots[num_slots];
@@ -259,7 +260,7 @@ struct game_t
             int32 	 	id; //	valid == 1
             party 	 	party_;// 	valid == 1
         };
-    } party_record <read=Str("%u", valid)>;
+    } party_record <read=Str("%u - %s", valid, valid ? read_rgltag(party_.id) : "<?>")>;
     
     int32 	num_party_records;
     int32 	num_parties_created;

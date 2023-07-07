@@ -56,9 +56,8 @@ struct game_t
     uint current_menu_id, current_site_id, current_entry_no;
     uint current_mission_template_id;
     
-    int32 	 	current_mission_template_id;
     int32 	 	party_creation_min_random_value;
-    //int32 		party_creation_max_random_value;
+    int32 		party_creation_max_random_value;
     rgltag 	 	game_log;
     int32 	 	unused_b[6];
     int64 	 	unused_c;
@@ -100,7 +99,7 @@ struct game_t
         bool 	 	available;
     };
     
-    struct  quest
+    typedef struct
     {
         int32 	 	progression;
         int32 	 	giver_troop_id;
@@ -112,7 +111,7 @@ struct game_t
         note 	 	notes[16] <optimize=false>;
         int32 	 	num_slots;
         int64 	 	slots[num_slots];
-    };
+    } quest <read=title.s>;
     
     
     int32 		num_quests;
@@ -140,20 +139,20 @@ struct game_t
     site 	 	sites[num_sites] <optimize=false>;
     
     
-    struct faction
+    typedef struct 
     {
          int32 	 	num_slots;
         int64 	 	slots[num_slots];
         float 	 	relations[game.num_factions];
         rgltag 	 	name;
-        uint 	 	renamed;
+        bool 	 	renamed;
         uint32 	 	color;
         int32 	 	unused;
-        note 	 	notes[16];
-    };
+        note 	 	notes[16] <optimize=false>;
+    } faction <read=read_rgltag(name)>;
     
     int32 		num_factions;
-    faction 	 	factions[num_factions];
+    faction 	 	factions[num_factions] <optimize=false>;
     
     
     
@@ -181,7 +180,7 @@ struct game_t
     };
     
     int32 		num_party_templates;
-    party_template 	 	party_templates[num_party_templates];
+    party_template 	 	party_templates[num_party_templates] <optimize=false>;
     
     
     struct party_stack
@@ -191,7 +190,7 @@ struct game_t
         int32 	 	num_wounded_troops;
         int32 	 	flags;
     };
-    struct party
+    typedef struct
     {
         rgltag 	 	id;
         rgltag 	 	name;
@@ -241,7 +240,7 @@ struct game_t
         note 	 	notes[16];
         int32 	 	num_slots;
         int64 	 	slots[num_slots];
-    };
+    } party <read=read_rgltag(id)>;
     
     struct party_record
     {

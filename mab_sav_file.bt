@@ -49,11 +49,11 @@ struct game_t
     
     uint64 date_timer;
     
-    uint hour, day, week, month, year, unused;
+    uint hour, day, week, month, year; int unused;
     float global_cloud_amount, global_haze_amount, average_difficulty, average_difficulty_period;
     rgltag unused; bool unused;
     uint tutorial_flags, default_prisoner_price, encountered_party_1_id, encountered_party_2_id;
-    uint current_menu_id, current_site_id, current_entry_no;
+    int current_menu_id, current_site_id, current_entry_no;
     uint current_mission_template_id;
     
     int32 	 	party_creation_min_random_value;
@@ -128,11 +128,11 @@ struct game_t
     info_page 	 	info_pages[num_info_pages] <optimize=false>;
     
     
-    struct site
+    typedef struct
     {
         int32 		num_slots;
         int64 	 	slots[num_slots];
-    };
+    } site <read=Str("%u slots", num_slots)>;
     
     
     int32 	num_sites;
@@ -156,7 +156,7 @@ struct game_t
     
     
     
-    struct map_track
+    typedef struct
     {
         float 	 	position_x;
         float 	 	position_y;
@@ -164,20 +164,20 @@ struct game_t
         float 	 	rotation;
         float 	 	age;
         int32 	 	flags <format=hex>;
-    };
+    } map_track<read=Str("{%.0f, %.0f} rot: %.2f age: %.2f",position_x, position_y, rotation, age)>;
     
     int32 	 	num_map_tracks;
     map_track 	 	map_tracks[num_map_tracks];
     
     
-    struct party_template
+    typedef struct
     {
         int32 	 	num_parties_created;
         int32 	 	num_parties_destroyed;
         int32 	 	num_parties_destroyed_by_player;
         int32 	 	num_slots;
         int64 	 	slots[num_slots];
-    };
+    } party_template <read=Str("creat: %u destr: %u dest_player: %u", num_parties_created, num_parties_destroyed, num_parties_destroyed_by_player)>;
     
     int32 		num_party_templates;
     party_template 	 	party_templates[num_party_templates] <optimize=false>;
@@ -223,12 +223,13 @@ struct game_t
         float 	 	helpfulness;
         int32 	 	label_visible;
         float 	 	bandit_attraction;
-        if ((game.header.game_version >= 900 && game.header.game_version < 1000) || game.header.game_version >= 1020)
+        if ((game.header.game_version >=  900 && game.header.game_version < 1000) ||
+             game.header.game_version >= 1020)
             int32 	 	marshall;// 	(game.header.game_version >= 900 && game.header.game_version < 1000) || game.header.game_version >= 1020
         int64 	 	ignore_player_timer;
         int32 	 	banner_map_icon_id;
 
-        if (game.header.game_version > 1136)
+        if (0)//game.header.game_version > 1136)
         {
             int32 	 	extra_map_icon_id; //	game.header.game_version > 1136
             float 	 	extra_map_icon_up_down_distance; //	game.header.game_version > 1136
@@ -243,12 +244,12 @@ struct game_t
         int32 	 	attached_party_ids[num_attached_party_ids];
         int32 	 	num_particle_system_ids;
         int32 	 	particle_system_ids[num_particle_system_ids];
-        note 	 	notes[16];
+        note 	 	notes[16] <optimize=false>;
         int32 	 	num_slots;
         int64 	 	slots[num_slots];
     } party <read=read_rgltag(id)>;
     
-    struct party_record
+    typedef struct 
     {
         int32 	 	valid;
 
@@ -258,12 +259,12 @@ struct game_t
             int32 	 	id; //	valid == 1
             party 	 	party_;// 	valid == 1
         };
-    };
+    } party_record <read=Str("%u", valid)>;
     
     int32 	num_party_records;
     int32 	num_parties_created;
-    party_record 	 	party_records[num_party_records];
-    
+
+    party_record 	 	party_records[num_party_records] <optimize=false>;
     
     struct player_party_stack
     {
@@ -272,12 +273,11 @@ struct game_t
         int32 	 	troop_dnas[32] <format=hex>; // 	cur_stack_no < 32 && !(cur_stack_troop_flags & hero)
     };
     
-    
-    player_party_stack 	 	player_party_stack_additional_info[player_party.num_stacks];
+    player_party_stack 	 	player_party_stack_additional_info[game.party_records[0].party_.num_stacks]; // [player_party.num_stacks]
+
+
     int32 	num_map_event_records;
     int32 	num_map_events_created;
-    
-    
     
     struct map_event
     {
@@ -304,8 +304,7 @@ struct game_t
             map_event 	 	map_event_; // 	valid == 1
         }
     };
-    
-    
+  
     map_event_record 	 	map_event_records[num_map_event_records];
     int32 		num_troops;
     
@@ -344,7 +343,7 @@ struct game_t
     };
     
     troop 	 	troops[num_troops];
-    int32 	 	unused[42];
+    int32 	 	unused_d[42];
     
     struct  item_kind
     {

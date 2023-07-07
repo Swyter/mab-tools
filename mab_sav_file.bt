@@ -373,9 +373,21 @@ struct game_t
         if (flags & 0x00000040) buf += "tf_unkillable | ";
         if (flags & 0x00000080) buf += "tf_allways_fall_dead | ";
         if (flags & 0x00000100) buf += "tf_no_capture_alive | ";
-        if (flags & 0x00000400) buf += "tf_mounted | ";
+        if (flags & 0x00000400) buf += "tf_mntd | ";
         if (flags & 0x00001000) buf += "tf_is_merchant | ";
         if (flags & 0x00008000) buf += "tf_randomize_face | ";
+
+        if (flags & 0x00100000) buf += "tfg_boot | ";
+        if (flags & 0x00200000) buf += "tfg_armo | ";
+        if (flags & 0x00400000) buf += "tfg_hlm | ";
+        if (flags & 0x00800000) buf += "tfg_glv | ";
+        if (flags & 0x01000000) buf += "tfg_hor | ";
+        if (flags & 0x02000000) buf += "tfg_shld | ";
+        if (flags & 0x04000000) buf += "tfg_rngd | ";
+        if (flags & 0x08000000) buf += "tfg_pol | ";
+
+        if (flags) buf[Strlen(buf) - 2] = 0;
+
         if ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
         {
             uint32 	 	gold; // 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
@@ -391,15 +403,14 @@ struct game_t
             {
                 string 	 	name; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
                 string 	 	name_plural; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
-                int32 	 	class_no;
+                
 
                 buf += "renamed!";
             }
 
             buf += ":: " + read_rgltag(game.factions[faction_id].name);
         }
-        uint more; /* swy: what's this? padding? */
-
+        int32 	 	class_no;
         
         buf += " // " + read_rgltag(notes[0].text);
 

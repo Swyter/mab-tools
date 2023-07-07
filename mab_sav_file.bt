@@ -366,6 +366,7 @@ struct game_t
                 int32 	 	class_no;
             }
         }
+        uint more;
     };
     
     troop 	 	troops[num_troops] <optimize=false>;

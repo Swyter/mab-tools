@@ -14,7 +14,7 @@
 typedef byte bool;
 
 const uint tf_hero = 0x00000010;
-local uint dont_load_regular_troop_inventories = true;
+local uint dont_load_regular_troop_inventories = true; /* swy: change this to match your mod's module.ini if the template can't auto-find it on its own */
 
 typedef struct
 {
@@ -325,7 +325,6 @@ struct game_t
         int32 	 	defender_party_id;
         int64 	 	battle_simulation_timer;
         float 	 	next_battle_simulation;
-        //byte more[7];
     };
     
     typedef struct
@@ -386,6 +385,7 @@ struct game_t
         if (flags & 0x04000000) buf += "tfg_rngd | ";
         if (flags & 0x08000000) buf += "tfg_pol | ";
 
+        /* swy: remove the last, right-most | */
         if (flags) buf[Strlen(buf) - 2] = 0;
 
         /* swy: here are some heuristic strategies to auto-find if we need to do an extended hero-style struct for common troops or not */

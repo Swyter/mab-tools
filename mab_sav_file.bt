@@ -14,7 +14,7 @@
 typedef byte bool;
 
 const uint tf_hero = 0x00000010;
-const uint dont_load_regular_troop_inventories = true;
+local uint dont_load_regular_troop_inventories = true;
 
 typedef struct
 {
@@ -347,7 +347,7 @@ struct game_t
     {
         int32 	 	item_kind_id;
         int32 	 	item_flags <format=hex>; // 		modifier (LineNo - 1 from item_modifiers.txt) = (item_flags >> 24) & 0xFF, ammo = item_flags & 0xFF, hit_points = item_flags & 0xFFFF
-    } item <read=Str("%i", item_kind_id)>;
+    } item <read=Str("%i (modif: %u) (ammo: %u) (hit_poi: %u)", item_kind_id, (item_flags >> 24) & 0xFF, item_flags & 0xFF, item_flags & 0xFFFF)>;
     
     typedef struct
     {
@@ -388,6 +388,13 @@ struct game_t
 
         if (flags) buf[Strlen(buf) - 2] = 0;
 
+        //local int next_int = ReadInt();
+        // if (!(flags & tf_hero) && next_int > 0 && next_int == num_slots)
+        //{
+        //    Warning("Setting dont_load_regular_troop_inventories to `false`.");
+        //    dont_load_regular_troop_inventories = false;
+        //}
+
         if ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
         {
             uint32 	 	gold; // 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
@@ -419,11 +426,11 @@ struct game_t
     troop 	 	troops[num_troops] <optimize=false>;
     int32 	 	unused_d[42];
     
-    struct  item_kind
+    typedef struct
     {
         int32 	 	num_slots;
         int64 	 	slots 	[num_slots];
-    };
+    } item_kind <read=Str("%u", num_slots)>;
     
     int32 	num_item_kinds;
     item_kind 	 	item_kind_[num_item_kinds] <optimize=false>;

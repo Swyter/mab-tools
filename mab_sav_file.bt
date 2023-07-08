@@ -248,7 +248,8 @@ struct game_t
             float 	 	extra_map_icon_fade_frequency; //	game.header.game_version > 1136
         }
 
-        int32 _swy_fix_me_unk_pad; /* swy: (11 + 0xd) / 4 */
+        if (game.header.game_version > 1143) /* swy: probably something like this that was added after cmpxchg8b documented it in the wiki, check the actual initial version */
+            int32 _swy_fix_me_unk_pad; /* swy: (11 + 0xd) / 4 */
 
         int32 	 	attached_to_party_id;
         bool 	 	is_attached;
@@ -327,7 +328,7 @@ struct game_t
         //byte more[7];
     };
     
-    struct map_event_record
+    typedef struct
     {
         int32 	 	valid;
         if (valid)
@@ -335,7 +336,7 @@ struct game_t
             int32 	 	id; // 	valid == 1
             map_event_t 	 	map_event; // 	valid == 1
         }
-    };
+    } map_event_record <read=Str("valid: %u", valid)>;
   
     map_event_record 	 	map_event_records[num_map_event_records] <optimize=false>;
 
@@ -387,12 +388,20 @@ struct game_t
 
         if (flags) buf[Strlen(buf) - 2] = 0;
 
-        //local int next_int = ReadInt();
-        // if (!(flags & tf_hero) && next_int > 0 && next_int == num_slots)
-        //{
-        //    Warning("Setting dont_load_regular_troop_inventories to `false`.");
-        //    dont_load_regular_troop_inventories = false;
-        //}
+        if (!(flags & tf_hero) && dont_load_regular_troop_inventories)
+        {
+            /* swy: try to retrieve the next potential `num_slots` field, which the game should only enlarge in multiples of 2,
+                    if it's something different, then the field is actually `gold` */
+            local int next_num_slots = ReadInt(FTell() + 4);
+            if (next_num_slots % 2 != 0)
+            {
+                Warning(
+                    "Setting dont_load_regular_troop_inventories to `false` automatically for this file. " +
+                    "Seems like the right format given the troop data."
+                );
+                dont_load_regular_troop_inventories = false;
+            }
+        }
 
         if ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
         {

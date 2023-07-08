@@ -239,7 +239,7 @@ struct game_t
         int64 	 	ignore_player_timer;
         int32 	 	banner_map_icon_id;
 
-        if (0)//game.header.game_version > 1136)
+        if (game.header.game_version > 1136)
         {
             int32 	 	extra_map_icon_id; //	game.header.game_version > 1136
             float 	 	extra_map_icon_up_down_distance; //	game.header.game_version > 1136
@@ -248,11 +248,10 @@ struct game_t
             float 	 	extra_map_icon_fade_frequency; //	game.header.game_version > 1136
         }
 
+        int32 _swy_fix_me_unk_pad; /* swy: (11 + 0xd) / 4 */
+
         int32 	 	attached_to_party_id;
         bool 	 	is_attached;
-
-        uint32 _fix_me[6] <format=hex>; /* swy: (11 + 0xd) / 4 */
-
 
         int32 	 	num_attached_party_ids;
         if (num_attached_party_ids)

@@ -388,12 +388,31 @@ struct game_t
 
         if (flags) buf[Strlen(buf) - 2] = 0;
 
+        /* swy: here are some heuristic strategies to auto-find if we need to do an extended hero-style struct for common troops or not */
         if (!(flags & tf_hero) && dont_load_regular_troop_inventories)
         {
+            local bool toggle_it = false;
+
             /* swy: try to retrieve the next potential `num_slots` field, which the game should only enlarge in multiples of 2,
                     if it's something different, then the field is actually `gold` */
-            local int next_num_slots = ReadInt(FTell() + 4);
-            if (next_num_slots % 2 != 0)
+            local int next_num_slots = ReadInt(FTell() + (4 * 1));
+            if ((next_num_slots != 0 && next_num_slots % 2 != 0))
+                toggle_it = true;
+
+            //local int note_2_tableau_material_id = ReadInt(FTell() + (4 * (1 + next_num_slots + 4 + 7 + 6)));
+            //local int note_2_tableau_available   = ReadInt(FTell() + (4 * (7)));
+
+            //if (!(note_2_tableau_material_id == -1 && note_2_tableau_available == 0))
+            //    toggle_it = true;
+
+            /* swy: if the field at the potential `health` offset for this entry looks
+                    like a float, then it may be an extended hero entry */
+            local float next_health = ReadFloat(FTell() + (4 * 2));
+
+            if (next_health >= 1.f && next_health <= 9999.f)
+                toggle_it = true;
+
+            if (toggle_it)
             {
                 Warning(
                     "Setting dont_load_regular_troop_inventories to `false` automatically for this file. " +

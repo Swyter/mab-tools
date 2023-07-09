@@ -280,7 +280,7 @@ struct game_t
 
             buf = Str(" (%u, %u)", raw_id, id);
         };
-    } party_record <read=Str("%u - %s %s", valid, valid ? read_rgltag(party.id) : "<?>", buf)>;
+    } party_record <read=Str("%u - %s %s", valid, valid ? read_rgltag(party.id) + " [" + read_rgltag(party.name) + "]" : "<?>", buf)>;
     
     int32 	num_party_records;
     int32 	num_parties_created;

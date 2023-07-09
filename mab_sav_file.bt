@@ -158,9 +158,9 @@ struct game_t
         note 	 	notes[16] <optimize=false>;
 
         /* swy: turn the 0xAARRGGBB (RGB) color format into 010 Editor's preferred 0xBBGGRR (BGR) */
-        local uint32 display_rgb_color = ((color >> (0*8)) & 0xFF) << (2*8) |
-                                         ((color >> (1*8)) & 0xFF) << (1*8) |
-                                         ((color >> (2*8)) & 0xFF) << (0*8);
+        local uint32 display_rgb_color = ((color >> (0*8)) & 0xFF) << (2*8) | /* 0x....BB -> 0x....BB -> 0xBB.... */
+                                         ((color >> (1*8)) & 0xFF) << (1*8) | /* 0x..GG.. -> 0x....GG -> 0x..GG.. */
+                                         ((color >> (2*8)) & 0xFF) << (0*8);  /* 0xRR.... -> 0x....RR -> 0x....RR */
     } faction <read=read_rgltag(name), bgcolor=display_rgb_color>;
     
     int32 		num_factions;

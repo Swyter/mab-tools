@@ -386,7 +386,7 @@ struct game_t
         if (flags & 0x08000000) buf += "tfg_pol | ";
 
         /* swy: remove the last, right-most | */
-        if (flags) buf[Strlen(buf) - 2] = 0;
+        if (flags && Strlen(buf) > 3) buf[Strlen(buf) - 2] = 0;
 
         /* swy: here are some heuristic strategies to auto-find if we need to do an extended hero-style struct for common troops or not */
         if (!(flags & tf_hero) && dont_load_regular_troop_inventories)

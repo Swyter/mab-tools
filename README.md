@@ -12,6 +12,10 @@ The currently available `.bt` files are:
    * Some configurable gamekeys (like crouching or two extra order panel buttons) don't appear in the in-game options dialog, which also only lets you change the first slot.
    * The gamepad button bindings appear in the hidden, second one by default. But can be replaced without affecting the keyboard ones.
    * By editing through the template you can assign two different keys to the same action. You can also bind multiple actions to the same key, as well as remap most of the gamepad keys (unfortunately some of them are hardcoded).
+* `sg*.sav`: Savegame files. Storing a full snapshot of the game state.
+   * With player data, date and time, map cloud/haze, random seed, global variables, trigger timing and firing state, party records, factions, troops, quests, game text log, info-pages, slot values for items/parties/troops and more, map tracks, map events like battle encounters and statistics like the kill or wounded counts.
+   * Heavily based on the 1.143 save format documentation by @*cmpxchg8b* [here](https://mbmodwiki.github.io/Savegame).
+   * Warband-only, for now.
 
 
 Personally, I think it is a great way of seeing how the sausage is made, aiding in making other programs that read or write them. As well as a nifty way of making small, quick changes. ¯\\\_(ツ)_/¯

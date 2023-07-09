@@ -430,7 +430,13 @@ struct game_t
             int32 	 	faction_id; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
             item 	 	inventory_items[96]; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
             item 	 	equipped_items[10];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-            uint64 	 	face_keys[4] <format=hex>;// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+
+            /* swy: see here for the format: https://forums.taleworlds.com/index.php?threads/online-face-code-generator-tool-tweak-facekeys-and-see-how-they-work.453145/ */
+            struct // 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            {
+                uint64 a <format=hex>, b <format=hex>, c <format=hex>, d <format=hex>;
+            } face_keys <read=Str("%#010x%08x%08x%08x%08x%08x%08x%08x", a >> 32, a >> 0, b >> 32, b >> 0, c >> 32, c, d >> 32, d)>; /* swy: seems like %llx doesn't work here to print 64-bit numbers, so split it into two 32-bit ones per thing, first the top and then the bottom part */
+
             bool 	 	renamed; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
 
             if (renamed)
@@ -459,11 +465,15 @@ struct game_t
         int64 	 	slots 	[num_slots];
     } item_kind <read=Str("%u", num_slots)>;
     
-    int32 	num_item_kinds;
-    item_kind 	 	item_kind_[num_item_kinds] <optimize=false>;
-    uint64 player_face_keys[2] <format=hex>;
-    int32 	player_kill_count;
-    int32 	player_wounded_count;
-    int32 	player_own_troop_kill_count;
-    int32 player_own_troop_wounded_count;
+    int32 	    num_item_kinds;
+    item_kind   item_kind_[num_item_kinds] <optimize=false>;
+
+    struct
+    {
+        uint64 a <format=hex>, b <format=hex>;
+    } player_face_keys <read=Str("%#010x%08x%08x%08x%016x%016x", a >> 32, a >> 0, b >> 32, b >> 0, 0, 0)>; /* swy: seems like %llx doesn't work here to print 64-bit numbers, so split it into two 32-bit ones per thing, first the top and then the bottom part */
+    int32 	    player_kill_count;
+    int32 	    player_wounded_count;
+    int32 	    player_own_troop_kill_count;
+    int32       player_own_troop_wounded_count;
 } game <open=true, optimize=false>;

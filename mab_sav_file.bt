@@ -435,7 +435,7 @@ struct game_t
             struct // 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
             {
                 uint64 a <format=hex>, b <format=hex>, c <format=hex>, d <format=hex>;
-            } face_keys <read=Str("%#010x%08x%08x%08x%08x%08x%08x%08x", a >> 32, a >> 0, b >> 32, b >> 0, c >> 32, c, d >> 32, d)>; /* swy: seems like %llx doesn't work here to print 64-bit numbers, so split it into two 32-bit ones per thing, first the top and then the bottom part */
+            } face_keys <read=Str("0x%08x%08x%08x%08x%08x%08x%08x%08x", a >> 32, a,  b >> 32, b,  c >> 32, c,  d >> 32, d)>; /* swy: seems like %llx doesn't work here to print 64-bit numbers, so split it into two 32-bit ones per thing, first the top and then the bottom part */
 
             bool 	 	renamed; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
 
@@ -471,7 +471,7 @@ struct game_t
     struct
     {
         uint64 a <format=hex>, b <format=hex>;
-    } player_face_keys <read=Str("%#010x%08x%08x%08x%016x%016x", a >> 32, a >> 0, b >> 32, b >> 0, 0, 0)>; /* swy: seems like %llx doesn't work here to print 64-bit numbers, so split it into two 32-bit ones per thing, first the top and then the bottom part */
+    } player_face_keys <read=Str("0x%08x%08x%08x%08x%016x%016x", a >> 32, a,  b >> 32, b,  0, 0)>; /* swy: seems like %llx doesn't work here to print 64-bit numbers, so split it into two 32-bit ones per thing, first the top and then the bottom part */
     int32 	    player_kill_count;
     int32 	    player_wounded_count;
     int32 	    player_own_troop_kill_count;

@@ -153,10 +153,15 @@ struct game_t
         float 	 	relations[game.num_factions];
         rgltag 	 	name;
         bool 	 	renamed;
-        uint32 	 	color;
+        uint32 	 	color <format=hex>;
         int32 	 	unused;
         note 	 	notes[16] <optimize=false>;
-    } faction <read=read_rgltag(name)>;
+
+        /* swy: turn the 0xAARRGGBB (RGB) color format into 010 Editor's preferred 0xBBGGRR (BGR) */
+        local uint32 display_rgb_color = ((color >> (0*8)) & 0xFF) << (2*8) |
+                                         ((color >> (1*8)) & 0xFF) << (1*8) |
+                                         ((color >> (2*8)) & 0xFF) << (0*8);
+    } faction <read=read_rgltag(name), bgcolor=display_rgb_color>;
     
     int32 		num_factions;
     faction 	 	factions[num_factions] <optimize=false>;

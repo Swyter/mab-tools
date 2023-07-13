@@ -31,7 +31,10 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
             os.makedirs(output_folder, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
 
             magic = unpack('<I', f.read(4))[0]; assert(magic == 0xFFFFFD33)
-            versi = unpack('<I', f.read(4))[0]; assert(versi in (3, 4))
+            versi = unpack('<I', f.read(4))[0]; assert(versi in (2, 3, 4))
+
+            if versi < 4:
+                print(f"[!] careful: this SCO uses an older scene format version (v{versi})")
 
             object_count = unpack('<I', f.read(4))[0]
 
@@ -50,7 +53,13 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
 
                 entry_no     = unpack('<I',  f.read(4    ))[0]
                 menu_item_no = unpack('<I',  f.read(4    ))[0]
-                scale        = unpack('<3f', f.read(4 * 3))
+
+                # swy: scale seems to have been added in v3; see scn_random_scene.sco, scn_salt_mine.sco,
+                #      scn_town_1_siege.sco and scn_training_ground.sco from M&B 1.011 Native.
+                if versi > 2:
+                    scale    = unpack('<3f', f.read(4 * 3))
+                else:
+                    scale    = (1.0, 1.0, 1.0)
 
                 object = {
                     'type': object_type[type],

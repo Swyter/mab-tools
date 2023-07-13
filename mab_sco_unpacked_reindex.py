@@ -183,23 +183,29 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     prop_count_missing = 0
     objects_to_delete = []
 
+    def gen_prop_tag(prop_tag):
+        if opt_ignore_case:
+            return prop_tag.lower()
+
     for i, object in enumerate(mission_objects):
         prop_type = 'type' in object and object['type'] or None
         prop_tag  = 'str'  in object and object['str']  or None
 
         if not prop_type or not prop_tag:
             continue
-        
-        if opt_ignore_case:
-            prop_tag = prop_tag.lower()
+
+        # swy: make it lowercase, if needed; this version should be the case-insensitive
+        #      always-lowercase, look-up key in the --ignore-case mode
+        prop_tag = gen_prop_tag(prop_tag)
 
         # swy: rename our object's tag if it is part of the remapping table: old_name => new_name
         if prop_tag in mission_obj_remaps:
-            object['str'] = mission_obj_remaps[prop_tag]['new_str']
+            object_str_old = object['str']; object['str'] = mission_obj_remaps[prop_tag]['new_str']
+            prop_tag = gen_prop_tag(object['str'])
             if prop_tag not in mission_obj_remap_already_mentioned:
-                print(f"[.] renaming mission object from {prop_tag} to {object['str']}")
+                print(f"[.] renaming mission object from {object_str_old} to {object['str']}")
                 mission_obj_remap_already_mentioned.append(prop_tag)
-            prop_tag = object['str']; prop_count_renamed += 1
+            prop_count_renamed += 1
 
         # --
 
@@ -260,7 +266,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         object['id'] = cur_id; prop_count_changed += 1
 
         if prop_tag not in prop_already_mentioned:
-            print(f"[>] setting id of {prop_type} «{prop_tag}» to {cur_id}, it was {old_id}")
+            print(f"[>] setting id of {prop_type} «{object['str']}» to {cur_id}, it was {old_id}")
             prop_already_mentioned.append(prop_tag)
 
     # swy: add a nice summary at the end

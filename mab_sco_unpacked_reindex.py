@@ -54,8 +54,8 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         if opt_ignore_case:
             cur_name_key = cur_name_key.lower()
 
-        scene_prop_txt_entries[cur_name_key] = {'id': i, 'name': cur_name}  # swy: add a new prop entry; its index is its value. doing it as a hashtable makes it easier below
-        cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5])         # swy: advance the current line (1), plus the two compulsory trailing lines after each prop (2), plus the variable amount of lines; one per extra prop trigger.
+        scene_prop_txt_entries[cur_name_key] = {'id': i, 'str': cur_name}  # swy: add a new prop entry; its index is its value. doing it as a hashtable makes it easier below
+        cur_line += 1 + 2 + int(scene_props_txt_lines[cur_line][5])        # swy: advance the current line (1), plus the two compulsory trailing lines after each prop (2), plus the variable amount of lines; one per extra prop trigger.
 
     opt_flora_kinds_txt_lines = []
     opt_flora_kinds_txt_entries = {}
@@ -78,7 +78,8 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
 
                     if opt_ignore_case:
                         cur_name_key = cur_name_key.lower()
-                    opt_flora_kinds_txt_entries[cur_name_key] = {'id': i, 'name': cur_name} # swy: see the prop parser above
+
+                    opt_flora_kinds_txt_entries[cur_name_key] = {'id': i, 'str': cur_name} # swy: see the prop parser above
                     elem_flag          = int(opt_flora_kinds_txt_lines[cur_line][1])
                     elem_num_of_meshes = int(opt_flora_kinds_txt_lines[cur_line][2]) #
 
@@ -121,10 +122,11 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
             cur_line = 2
             for i in range(opt_item_kinds1_txt_count):
                 cur_name = opt_item_kinds1_txt_lines[cur_line][0]; cur_name_key = cur_name
+
                 if opt_ignore_case:
                     cur_name_key = cur_name_key.lower()
 
-                opt_item_kinds1_txt_entries[cur_name_key] = {'id': i, 'name': cur_name} # swy: see the prop parser above
+                opt_item_kinds1_txt_entries[cur_name_key] = {'id': i, 'str': cur_name} # swy: see the prop parser above
                 if item_file_version == 3: # swy: newer, more complex, Warband item format
                     var_line_list_count = int(opt_item_kinds1_txt_lines[cur_line + 1][0]) # swy: if this isn't zero there's another extra line underneath with X, space-separated elements
                     item_trigger_count  = int(opt_item_kinds1_txt_lines[cur_line + 1 + (var_line_list_count and 1 or 0) + 1][0]) # swy: if this isn't zero there are X extra lines, one with each item trigger
@@ -163,7 +165,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     if opt_ignore_case:
                         new_name_key = new_name_key.lower()
 
-                    mission_obj_remaps[new_name_key] = {'old_name': old_name, 'new_name': new_name}
+                    mission_obj_remaps[new_name_key] = {'old_str': old_name, 'new_str': new_name}
                     print(f"[+] added {old_name} as an older/mapped/renamed version of {new_name}")
 
         except OSError as e:
@@ -193,7 +195,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
 
         # swy: rename our object's tag if it is part of the remapping table: old_name => new_name
         if prop_tag in mission_obj_remaps:
-            object['str'] = mission_obj_remaps[prop_tag]['new_name']
+            object['str'] = mission_obj_remaps[prop_tag]['new_str']
             if prop_tag not in mission_obj_remap_already_mentioned:
                 print(f"[.] renaming mission object from {prop_tag} to {object['str']}")
                 mission_obj_remap_already_mentioned.append(prop_tag)
@@ -229,11 +231,12 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         # swy: 'scene_prop_txt_entries' contains the entries that we just parsed
         found_entry = entries_for_type()[object['str']]
 
+
         # swy: this is like a specific version of the manual remapping table functionality that finds matches
         #      between spr_CastleGate and spr_castlegate or vice-versa to save work; it's very-very common
         if opt_ignore_case:
             old_name =      object['str']
-            new_name = found_entry['name']
+            new_name = found_entry['str']
             
             if old_name != new_name:
                 object['str'] = new_name
@@ -241,6 +244,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     print(f"[:] renaming mission object with different casing from {old_name} to {new_name}")
                     mission_obj_remap_already_mentioned.append(prop_tag)
                 prop_count_renamed += 1
+
 
         # swy: now it's our turn to play with the identifiers
         old_id    =      object['id']

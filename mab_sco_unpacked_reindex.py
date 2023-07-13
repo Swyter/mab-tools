@@ -71,8 +71,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     print("[!] bad «flora_kinds.txt header; wrong file?")
                     raise OSError
 
-                opt_flora_kinds_txt_count = int(opt_flora_kinds_txt_lines[0][0])
-                cur_line = 1; cumular = 0
+                opt_flora_kinds_txt_count = int(opt_flora_kinds_txt_lines[0][0]); cur_line = 1
                 for i in range(opt_flora_kinds_txt_count):
                     cur_name = opt_flora_kinds_txt_lines[cur_line][0]; cur_name_key = cur_name
 
@@ -93,7 +92,8 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     #      update: it seems like it's not always zeroes, "mb_test1 tree_a" "mb_test1 tree_b" exist, so use something else
                     elem_has_wb_format = 1
                     if elem_is_flagged_as_tree and elem_num_of_meshes >= 1:
-                        if len(opt_flora_kinds_txt_lines[cur_line + 1 + elem_num_of_meshes]) == 3: # swy: in the M&B format this should be the first line of the next entry, which should have three elements
+                        if (cur_line + elem_num_of_meshes) >= (len(opt_flora_kinds_txt_lines) - 1) or ''' swy: special case for the last entry being a tree, if there are as many remaining lines as meshes, then this isn't a Warband thing, for sure, as they would take twice as many lines, we can't check for the next element, but we don't need to ''' and False or \
+                            len(opt_flora_kinds_txt_lines[cur_line + 1 + elem_num_of_meshes]) == 3:     # swy: in the M&B format this should be the first line of the next entry, which should have three elements
                             elem_has_wb_format = 0
 
                     cur_line += 1 + elem_num_of_meshes * (elem_is_flagged_as_tree and elem_has_wb_format and 2 or 1) # swy: in warband only, trees seem to have two lines per mesh variant, others just one line per mesh

@@ -34,12 +34,12 @@ jobs:
     - name: Pack things up
       id: pack
       run: |
-        git fetch --unshallow || git fetch --all
+        [[ `git rev-parse --is-shallow-repository` != 'false' ]] && git fetch --unshallow || git fetch --all
         # swy: find the previous run from the same type that is not us
-        prev_run_shas="`curl -s --location --fail 'https://api.github.com/repos/swyter/mab-tools/actions/runs' | jq -r '.workflow_runs[] | select(.name | test("Zip it up")) | select(.id != '$GITHUB_RUN_ID') | .head_sha'`"
+        prev_run_shas="`curl -s --location --fail 'https://api.github.com/repos/swyter/mab-tools/actions/runs' | jq -r '.workflow_runs[] | select(.name | test("Zip it up")) | select(.id != '"${GITHUB_RUN_ID}"') | .head_sha'`"
         echo -ne "[i] previous run revisions:\n$prev_run_shas\n\n"
         prev_run_sha="`echo "$prev_run_shas" | head -n1`"
-        echo "prev=$prev_run_sha cur=`git rev-parse --short HEAD`"
+        echo "prev=$prev_run_sha cur=`git rev-parse --short HEAD` run id=${GITHUB_RUN_ID}"
     
         # swy: only pack it when the folder has changed since the last time we ran a GitHub Actions job or there's a !force keyword in the last commit message
         if [[ ! -z "$(git diff --quiet HEAD "$prev_run_sha" -- mab_sco_*.py mab_sco_*.cmd  mab_sco_*.txt || echo changed)" || "$(git rev-list --format=%B --max-count=1 HEAD | grep --count --ignore-case --max-count=1 '!force')" -ge 1 ]]; then

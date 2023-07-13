@@ -229,7 +229,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
             continue
 
         # swy: 'scene_prop_txt_entries' contains the entries that we just parsed
-        found_entry = entries_for_type()[object['str']]
+        found_entry = entries_for_type()[prop_tag]
 
 
         # swy: this is like a specific version of the manual remapping table functionality that finds matches

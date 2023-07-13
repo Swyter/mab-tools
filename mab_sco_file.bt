@@ -106,13 +106,13 @@ struct
         uint32 entry_no;
         uint32 menu_item_no;
     
-        if (head.version > 2) /* swy: scale seems to have been added in v3, see scn_salt_mine.sco */
+        if (head.version > 2) /* swy: scale seems to have been added in v3; see scn_random_scene.sco, scn_salt_mine.sco, scn_town_1_siege.sco and scn_training_ground.sco from M&B 1.011 Native */
             float scale[3]; /* scaling multiplier, per axis; x, y, z */
     } objects[object_count] <optimize=false, read=sceneprop_read>;
 } mission_objects;
 
 
-if (head.version > 3) { /* swy: weird leftovers like scn_zendar_merchant.sco from Native use version 3 and don't have AI mesh section */
+if (head.version > 3 && !FEof()) { /* swy: weird leftovers like scn_zendar_merchant.sco from Native use version 3 and don't have AI mesh section */
 /* -- ai mesh vertices; probably */
 struct
 {

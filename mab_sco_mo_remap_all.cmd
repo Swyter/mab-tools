@@ -2,7 +2,6 @@
 
 setlocal enableextensions
 setlocal enabledelayedexpansion
-set /a count = 1
 
 :: swy: remaps any props in every .sco in this folder, like changing every spr_palisade_longer to spr_palisade_a;
 ::      just edit mab_sco_mo_remap.txt to set your own. Effectively renaming them mod-wide.

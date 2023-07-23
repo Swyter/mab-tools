@@ -26,11 +26,12 @@ for /f "tokens=1" %%a IN ('dir "scn_*.sco" /-C/S/A:-D') do @set scn_file_count=!
 set /a scn_cur_index = 1
 
 for %%f in (scn_*.sco) do (
+    set /a percentage=!scn_cur_index! * 100 / !scn_file_count!
     echo. 
-    echo -- processing %%f ^(!scn_cur_index!/!scn_file_count!^)
+    echo  --^> processing %%f ^(!scn_cur_index!/!scn_file_count!^) -- !percentage!%%
     set /a scn_cur_index += 1
 
-    mkdir _tmp_unpack_folder
+    mkdir _tmp_unpack_folder 2>nul && rem :: https://stackoverflow.com/a/44931843/674685
 
     rem swy: extract our current filename .sco into an empty _tmp_unpack_folder, only extract the mission_objects.json to save time, we don't need to
     rem      extract the terrain or AI mesh, we won't touch it, and if we repack it there can be differences.
@@ -57,4 +58,4 @@ for %%f in (scn_*.sco) do (
     echo.
 )
 
-echo *** hopefully finished && pause
+echo *** hopefully finished, press any key to exit... && pause

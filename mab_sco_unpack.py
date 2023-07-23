@@ -30,6 +30,8 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
         with open(input_sco_path, mode='rb') as f:
             os.makedirs(output_folder, exist_ok=True) # https://stackoverflow.com/a/41959938/674685
 
+            f.seek(0, os.SEEK_END); end_offset = f.tell(); f.seek(0, os.SEEK_SET) # swy: grab how big the file is in bytes
+
             magic = unpack('<I', f.read(4))[0]; assert(magic == 0xFFFFFD33)
             versi = unpack('<I', f.read(4))[0]; assert(versi in (2, 3, 4))
 
@@ -99,7 +101,10 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                     print(f"[e] couldn't open the JSON file: {e}", file=sys.stderr)
                 
             # swy: it seems like the AI mesh section was added with .SCO version 4; for a good example version 3 see scn_zendar_merchant.sco, from Native
-            if versi > 3:
+            #      in any case, if the file ends here, we should just ignore this section altogether
+            if versi < 3 or f.tell() >= end_offset:
+                print(f'[-] AI mesh section not present, weird, older SCO version or the file ends here')
+            else:
                 # swy: read the AI mesh data structures
                 ai_mesh = {'vertices': [], 'edges': [], 'faces': []}
 
@@ -138,7 +143,7 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                 #        for j, elem in enumerate(face_data):
                 #            a = face_data[j]; b = face_data[((j+1) % len(face_data))]
                 #            
-        #            
+                #            
                 #            
                 #            if f'{a}-{b}' in edgelist:
                 #                print(f'{a}-{b} detected non-manifold edge at face index {i} -- between {repr(ai_mesh["vertices"][a])} and {repr(ai_mesh["vertices"][b])}')
@@ -183,11 +188,8 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
             # swy: some SCO files end at this point, with the terrain/ground section being
             #      completely optional for interiors, which use a custom entity mesh
             cur_offset = f.tell()
-            end_offset = f.seek(0, io.SEEK_END)
-
-            f.seek(cur_offset, io.SEEK_SET)
             
-            if cur_offset == end_offset:
+            if cur_offset >= end_offset:
                 print(f'[-] terrain section not present, this may be an interior scene')
             elif skip_terrain:
                 print(f'[i] skipping terrain section')

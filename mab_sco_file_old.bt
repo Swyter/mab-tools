@@ -1,42 +1,46 @@
 //------------------------------------------------
 //--- 010 Editor v13.0.1 Binary Template
 //
-//      File: 
-//   Authors: 
-//   Version: 
-//   Purpose: 
-//  Category: 
-// File Mask: 
-//  ID Bytes: 
-//   History: 
+//      File: Mount&Blade Scene Objects file - Older version
+//   Authors: Swyter
+//    E-mail: swyterzone+mab@gmail.com
+//   Version: 2023.07.23
+//   Purpose: Opens classic scene files (SceneObj/scn_*.sco) on M&B 1.011 and Warband
+//  Category: Game
+// File Mask: *.sco
 //------------------------------------------------
 
 LittleEndian();
 
-uint count;
 
-typedef struct {
+/* -- scene objects */
+struct
+{
+    int object_count;  /* swy: number of scene/mission objects/props that follow */
 
-    enum <uint32> /* swy: as shown in the edit mode scene editor combobox; same order */
+    typedef struct
     {
-        Prop    = 0, /* Scene Prop */
-        Entry   = 1, /* Entry Point */
-        Item    = 2, /* Item Kind */
-        Unused  = 3,
-        Plant   = 4, /* Flora */
-        Passage = 5
-    } type <bgcolor=cBlue>;
+        enum <uint32> /* swy: as shown in the edit mode scene editor combobox; same order */
+        {
+            Prop    = 0, /* Scene Prop */
+            Entry   = 1, /* Entry Point */
+            Item    = 2, /* Item Kind */
+            Unused  = 3,
+            Plant   = 4, /* Flora */
+            Passage = 5
+        } type <bgcolor=cBlue>;
+    
+        uint id, unk;
+    
+        float mtx_row_a[3]; /* affine 3x3 row-major matrix; encodes rotation and maybe shearing (rglMat3) */
+        float mtx_row_b[3];
+        float mtx_row_c[3];
+    
+        float pos[4]; /* translation; x, y, z, w (always zero) */
+    
+        uint32 entry_no;
+    } obj <optimize=false, read=Str("%s %i %i %i %f/%f/%f", EnumToString(type), entry_no, id, unk, pos[0], pos[1], pos[2])>;
 
-    uint32 unk;
-    uint c;
+    obj objects[object_count];
 
-    float mtx_row_a[3]; /* affine 3x3 row-major matrix; encodes rotation and maybe shearing (rglMat3) */
-    float mtx_row_b[3];
-    float mtx_row_c[3];
-
-    float pos[3]; /* translation; x, y, z */
-
-    uint32 unk;
-    uint32 entry_no;
-} elem <optimize=false, read=Str("%s %i %i %f/%f/%f", EnumToString(type), entry_no, unk,  pos[0], pos[1], pos[2])>; elem a [count];
-//struct { uint a[68 / 4]; } a [count];
+} mission_objects <open=true>;

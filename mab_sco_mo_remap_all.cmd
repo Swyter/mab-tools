@@ -42,7 +42,7 @@ for %%f in (scn_*.sco) do (
     rem      _tmp_unpack_folder/mission_objects.json and do the replacements. You can add --scenepropstxt scene_props.txt to make it look up that
     rem      file somewhere else when we're not in a SceneObj folder. Remove --dont-reindex to make it update the IDs/numbers after the rename.
     if !ERRORLEVEL! == 0 (
-        echo. && echo ** 2^) reindx &&  mab_sco_unpacked_reindex  --dont-reindex  --ignore-case  --remappingfile mab_sco_mo_remap.txt  _tmp_unpack_folder
+        echo. && echo ** 2^) reindx &&  mab_sco_unpacked_reindex  --dont-reindex  --remappingfile mab_sco_mo_remap.txt  _tmp_unpack_folder
     )
 
     rem swy: use the extracted _tmp_unpack_folder as input, use the original filename .sco as output. only use/read the mission_objects.json from that

@@ -4,7 +4,7 @@ import json, os
 import sys; from sys import exit
 import argparse
 
-def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_missing = False, opt_remapping_file = '', opt_flora_kinds_txt = '', opt_item_kinds1_txt = '', opt_dont_reindex = False, opt_ignore_case = False):
+def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_missing = False, opt_remapping_file = '', opt_flora_kinds_txt = '', opt_item_kinds1_txt = '', opt_dont_reindex = False, opt_dont_replace_case = False):
     if not os.path.isdir(input_folder):
         print(f"[e] the unpacked «{input_folder}» SCO folder doesn't seem to exist")
         exit(1)
@@ -51,7 +51,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     for i in range(scene_prop_txt_count):
         cur_name = scene_props_txt_lines[cur_line][0]; cur_name_key = cur_name
 
-        if opt_ignore_case:
+        if not opt_dont_replace_case:
             cur_name_key = cur_name_key.lower()
 
         scene_prop_txt_entries[cur_name_key] = {'id': i, 'str': cur_name}  # swy: add a new prop entry; its index is its value. doing it as a hashtable makes it easier below
@@ -75,7 +75,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                 for i in range(opt_flora_kinds_txt_count):
                     cur_name = opt_flora_kinds_txt_lines[cur_line][0]; cur_name_key = cur_name
 
-                    if opt_ignore_case:
+                    if not opt_dont_replace_case:
                         cur_name_key = cur_name_key.lower()
 
                     opt_flora_kinds_txt_entries[cur_name_key] = {'id': i, 'str': cur_name} # swy: see the prop parser above
@@ -123,7 +123,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
             for i in range(opt_item_kinds1_txt_count):
                 cur_name = opt_item_kinds1_txt_lines[cur_line][0]; cur_name_key = cur_name
 
-                if opt_ignore_case:
+                if not opt_dont_replace_case:
                     cur_name_key = cur_name_key.lower()
 
                 opt_item_kinds1_txt_entries[cur_name_key] = {'id': i, 'str': cur_name} # swy: see the prop parser above
@@ -162,7 +162,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
 
                     new_name_key = new_name
 
-                    if opt_ignore_case:
+                    if not opt_dont_replace_case:
                         new_name_key = new_name_key.lower()
 
                     mission_obj_remaps[new_name_key] = {'old_str': old_name, 'new_str': new_name}
@@ -184,8 +184,9 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     objects_to_delete = []
 
     def gen_prop_tag(prop_tag):
-        if opt_ignore_case:
+        if not opt_dont_replace_case:
             return prop_tag.lower()
+        return prop_tag
 
     for i, object in enumerate(mission_objects):
         prop_type = 'type' in object and object['type'] or None
@@ -195,7 +196,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
             continue
 
         # swy: make it lowercase, if needed; this version should be the case-insensitive
-        #      always-lowercase, look-up key in the --ignore-case mode
+        #      always-lowercase, look-up key in the --replace-case mode
         prop_tag = gen_prop_tag(prop_tag)
 
         # swy: rename our object's tag if it is part of the remapping table: old_name => new_name
@@ -240,7 +241,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
 
         # swy: this is like a specific version of the manual remapping table functionality that finds matches
         #      between spr_CastleGate and spr_castlegate or vice-versa to save work; it's very-very common
-        if opt_ignore_case:
+        if not opt_dont_replace_case:
             old_name =      object['str']
             new_name = found_entry['str']
             
@@ -348,13 +349,13 @@ A: You can probably quickly chain or combine the small tools into small scripts
 ''')
 
     parser.add_argument('input', metavar='<unpacked-sco-folder>', help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')
-    parser.add_argument('-sc', '--scenepropstxt', dest='opt_scene_props_txt', default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='by default it will guess that we are under <mod folder>/SceneObj/scn_... and use the parent folder, which should be where the mod .txt files are')
-    parser.add_argument('-rm', '--removemissing', dest='opt_remove_missing',  action='store_true', required=False, help='automatically delete any props in the scene not part of the provided scene_props.txt, instead of skipping them')
-    parser.add_argument('-re', '--remappingfile', dest='opt_remapping_file',  default='', metavar='<path-to-the-_mab_sco_mo_remap.txt-file>', help='provide the tool with a plain text file with lines like «spr_old_name_in_sco = spr_new_name_in_mod», the tool will rename each mission object name acording to your rules. also useful to potentially swap props in batch')
-    parser.add_argument('-fl', '--florakindstxt', dest='opt_flora_kinds_txt', default='', metavar='<path-to-the-updated-flora_kinds.txt-file>', required=False, help='also reindexes mission objects of type «plant» via a provided flora_kinds.txt, by default «../Data/flora_kinds.txt»')
-    parser.add_argument('-it', '--itemkinds1txt', dest='opt_item_kinds1_txt', default='', metavar='<path-to-the-updated-item_kinds.txt-file>', required=False, help='also reindexes mission objects of type «item» via a provided item_kinds1.txt, by default «../item_kinds1.txt»')
-    parser.add_argument('-nx', '--dont-reindex',  dest='opt_dont_reindex',    action='store_true', required=False, help='this can be useful when you only want to delete obsolete objects or use the replacement functionality without changing anything else, reindexing can be noisy and modify too many files that otherwise work fine')
-    parser.add_argument('-ic', '--ignore-case',   dest='opt_ignore_case',     action='store_true', required=False, help='if your prop was called spr_CastleGate now is spr_castlegate in your msys, this will still detect it and fix the name in the .SCO (and ID) to match, making the game load the props correctly')
+    parser.add_argument('-sc', '--scenepropstxt',      dest='opt_scene_props_txt',    default='', metavar='<path-to-the-updated-scene_props.txt-file>', required=False, help='by default it will guess that we are under <mod folder>/SceneObj/scn_... and use the parent folder, which should be where the mod .txt files are')
+    parser.add_argument('-rm', '--removemissing',      dest='opt_remove_missing',     action='store_true', required=False, help='automatically delete any props in the scene not part of the provided scene_props.txt, instead of skipping them')
+    parser.add_argument('-re', '--remappingfile',      dest='opt_remapping_file',     default='', metavar='<path-to-the-_mab_sco_mo_remap.txt-file>', help='provide the tool with a plain text file with lines like «spr_old_name_in_sco = spr_new_name_in_mod», the tool will rename each mission object name acording to your rules. also useful to potentially swap props in batch')
+    parser.add_argument('-fl', '--florakindstxt',      dest='opt_flora_kinds_txt',    default='', metavar='<path-to-the-updated-flora_kinds.txt-file>', required=False, help='also reindexes mission objects of type «plant» via a provided flora_kinds.txt, by default «../Data/flora_kinds.txt»')
+    parser.add_argument('-it', '--itemkinds1txt',      dest='opt_item_kinds1_txt',    default='', metavar='<path-to-the-updated-item_kinds.txt-file>', required=False, help='also reindexes mission objects of type «item» via a provided item_kinds1.txt, by default «../item_kinds1.txt»')
+    parser.add_argument('-nx', '--dont-reindex',       dest='opt_dont_reindex',       action='store_true', required=False, help='this can be useful when you only want to delete obsolete objects or use the replacement functionality without changing anything else, reindexing can be noisy and modify too many files that otherwise work fine')
+    parser.add_argument('-nc', '--dont-replace-case',  dest='opt_dont_replace_case',  action='store_true', required=False, help='disable the new auto-renaming feature that is toggled on by default; if your prop was originally called e.g. spr_CastleGate when you added it to the scene, but now is spr_castlegate in your msys, the feature will still detect it and fix the name in the .SCO (and ID) to match, making the (case-sensitive) game load the props correctly. this is the most common mode of replacement, and now it can be automatic, no manual replacements. but you can disable it to avoid polluting the files with unwanted changes.')
 
     args = parser.parse_args()
 
@@ -379,5 +380,5 @@ A: You can probably quickly chain or combine the small tools into small scripts
                     opt_flora_kinds_txt=args.opt_flora_kinds_txt,
                     opt_item_kinds1_txt=args.opt_item_kinds1_txt,
                     opt_dont_reindex=args.opt_dont_reindex,
-                    opt_ignore_case=args.opt_ignore_case
+                    opt_dont_replace_case=args.opt_dont_replace_case
     )

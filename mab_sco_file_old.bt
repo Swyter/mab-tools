@@ -15,9 +15,28 @@ LittleEndian();
 
 uint count;
 
-struct {
-    uint a,b,c;
-    float rot_matrix[3 * 3], position[3];
-    uint zer, count;
-} a [count];
+typedef struct {
+
+    enum <uint32> /* swy: as shown in the edit mode scene editor combobox; same order */
+    {
+        Prop    = 0, /* Scene Prop */
+        Entry   = 1, /* Entry Point */
+        Item    = 2, /* Item Kind */
+        Unused  = 3,
+        Plant   = 4, /* Flora */
+        Passage = 5
+    } type <bgcolor=cBlue>;
+
+    uint32 unk;
+    uint c;
+
+    float mtx_row_a[3]; /* affine 3x3 row-major matrix; encodes rotation and maybe shearing (rglMat3) */
+    float mtx_row_b[3];
+    float mtx_row_c[3];
+
+    float pos[3]; /* translation; x, y, z */
+
+    uint32 unk;
+    uint32 entry_no;
+} elem <optimize=false, read=Str("%s %i %i %f/%f/%f", EnumToString(type), entry_no, unk,  pos[0], pos[1], pos[2])>; elem a [count];
 //struct { uint a[68 / 4]; } a [count];

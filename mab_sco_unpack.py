@@ -32,8 +32,8 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
 
             f.seek(0, os.SEEK_END); end_offset = f.tell(); f.seek(0, os.SEEK_SET) # swy: grab how big the file is in bytes
 
-            magic = unpack('<I', f.read(4))[0]; assert(magic == 0xFFFFFD33)
-            versi = unpack('<I', f.read(4))[0]; assert(versi in (2, 3, 4))
+            magic = unpack('<I', f.read(4))[0]; assert magic == 0xFFFFFD33, f'Unsupported header magic value ({magic:x}); older SCO versions with just scene objects are unsupported for now here. Re-save in the in-game editor to update the version and be able to unpack it.'
+            versi = unpack('<I', f.read(4))[0]; assert versi in (2, 3, 4),  f'Unsupported SCO version format ({versi:x}), report to Swyter and send a sample file.'
 
             if versi < 4:
                 print(f"[!] careful: this SCO uses an older scene format version (v{versi})")
@@ -195,7 +195,7 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                 print(f'[i] skipping terrain section')
             else:
                 # swy: read the terrain/ground layer data structures
-                terrain_magic = unpack('<I', f.read(4))[0]; assert(terrain_magic == 0xFF4AD1A6)
+                terrain_magic = unpack('<I', f.read(4))[0]; assert terrain_magic == 0xFF4AD1A6, f'The magic constant value used to mark the start of the terrain section does not seem to match ({terrain_magic:x})'
                 terrain_section_size = unpack('<I', f.read(4))[0]
                 num_layers = unpack('<I', f.read(4))[0]
                 scene_width = unpack('<I', f.read(4))[0]

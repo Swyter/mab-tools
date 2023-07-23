@@ -23,8 +23,10 @@ def write_over_from(output_f, donor, write_mission_objects = False, write_ai_mes
 
     donor_file_data = donor['donor_file_data']
     with io.BytesIO(donor_file_data) as donor_f:
-        magic = unpack('<I', donor_f.read(4))[0]; assert(magic == 0xFFFFFD33)
-        versi = unpack('<I', donor_f.read(4))[0]; assert(versi == 4)
+        donor_f.seek(0, os.SEEK_END); end_offset = donor_f.tell(); donor_f.seek(0, os.SEEK_SET) # swy: grab how big the file is in bytes
+
+        magic = unpack('<I', donor_f.read(4))[0]; assert magic == 0xFFFFFD33, f"Unsupported header magic value ({magic:x}); older SCO versions with just scene objects are unsupported for now here. Re-save the donor file in the in-game editor to update the version and being able to unpack it."
+        versi = unpack('<I', donor_f.read(4))[0]; assert versi in (3, 4),     f"Unsupported SCO version format ({versi:x}), re-save the donor file in the in-game editor to update the version and be able to unpack it."
 
         mission_obj_start_pos = donor_f.tell()
 
@@ -42,7 +44,11 @@ def write_over_from(output_f, donor, write_mission_objects = False, write_ai_mes
         print(f"[i] AI mesh of donor starts at offset {hex(donor_f.tell())}; copying from here onwards")
         
         ai_mesh_start_pos = donor_f.tell()
-        ai_mesh_section_size = unpack('<I', donor_f.read(4))[0] + 4 # swy: the section size does not include the size field itself
+
+        if donor_f.tell() == end_offset: # swy: if we are already at the file ending just silently ignore any further sections, we'll copy zero bytes
+            ai_mesh_section_size = 0
+        else:
+            ai_mesh_section_size = unpack('<I', donor_f.read(4))[0] + 4 # swy: the section size does not include the size field itself
 
         mission_obj_section_size = ai_mesh_start_pos - mission_obj_start_pos
         terrain_start_pos        = ai_mesh_start_pos + ai_mesh_section_size
@@ -308,7 +314,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                                 print(f'[i] found layer_{ground_layer}; type {magic}, {width} x {height}')
 
                                 if magic == 'P5' and ext == 'pgm':
-                                    assert(maxval == 255)
+                                    assert maxval == 255
                                     cells_to_read = width * height
                                     bytes_to_read = cells_to_read * 1; assert(cells_to_read == bytes_remain)
                                     contents_orig = []; contents_orig = unpack(f'<{cells_to_read}B', f_image.read(bytes_to_read))
@@ -318,9 +324,9 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                                         contents += contents_orig[i*last_scene_width : (i*last_scene_width) + last_scene_width][::-1]
 
                                 elif magic == 'P6' and ext == 'ppm':
-                                    assert(maxval == 255)
+                                    assert maxval == 255
                                     cells_to_read = width * height
-                                    bytes_to_read = cells_to_read * 3; assert(bytes_to_read == bytes_remain)
+                                    bytes_to_read = cells_to_read * 3; assert bytes_to_read == bytes_remain
                                     contents_orig = []; contents_orig_rgb_bytes = unpack(f'<{cells_to_read*3}B', f_image.read(bytes_to_read))
 
                                     for i in range(cells_to_read):
@@ -336,9 +342,9 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                                         contents += contents_orig[i*last_scene_width : (i*last_scene_width) + last_scene_width][::-1]
 
                                 elif magic == 'Pf' and ext == 'pfm':
-                                    assert(maxval in [-1.0, 1.0])
+                                    assert maxval in [-1.0, 1.0]
                                     cells_to_read = width * height
-                                    bytes_to_read = cells_to_read * 4; assert(bytes_to_read == bytes_remain)
+                                    bytes_to_read = cells_to_read * 4; assert bytes_to_read == bytes_remain
                                     contents_orig = []; contents_orig = unpack(f'{maxval < 0.0 and "<" or ">"}{cells_to_read}f', f_image.read(bytes_to_read)) # swy: handle both big (1.0, '>f') and little-endian (-1.0, '<f') floats; just in case
 
                                     # swy: reverse the row ordering because the PFM format is from bottom to top, unlike every other NetPBM one, of course :)
@@ -520,12 +526,12 @@ Quick examples:
 
         # swy: use the output file as donor file, this is just quicker to type
         if option == 'keep':
-            option = args.output
+            option = args.output; assert args.output != None, 'To use the «keep» option you need to also specify some already-existing output .sco filename to get the partial data from. Use the --output <name> option.'
 
         try:
             with open(option, mode='rb') as donor_f:
                 file_data = donor_f.read()
-                print(f"[i] reading the donor file: {option} ({donor_f.tell() // 1024} KiB)")
+                print(f"[i] reading the donor file: {option} ({donor_f.tell() // 1024} KiB)"); write_over_from(None, {'donor_file_data': file_data}) # swy: call the write_over() function here with a dummy output to validate that the donor file is correct before replacing/overwriting it
                 return {'donor_file_data': file_data, 'donor_filename': option}
         except OSError as e:
             print(f"[e] couldn't open the donor file: {e}", file=sys.stderr)

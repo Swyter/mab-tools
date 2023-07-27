@@ -3,6 +3,10 @@
 setlocal enableextensions
 setlocal enabledelayedexpansion
 
+:: swy: fix displaying the «» Unicode characters; otherwise it shows mojibake; force python to use utf-8 encoded output:
+::      https://old.reddit.com/r/scripting/comments/oncm5q/python_batch_script_encoding_problem_while_saving/h8e9lfb/
+set PYTHONIOENCODING=UTF-8
+
 :: swy: remaps any props in every .sco in this folder, like changing every spr_palisade_longer to spr_palisade_a;
 ::      just edit mab_sco_mo_remap.txt to set your own. Effectively renaming them mod-wide.
 ::

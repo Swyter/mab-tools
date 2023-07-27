@@ -160,12 +160,12 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
                     old_name = line[0] # swy: find this tag in our SCO, probably obsolete, maybe we want to turn two props into one
                     new_name = line[1] # swy: replace it by this one; doesn't matter if it exists at all in the files or it's a plant; we don't check
 
-                    new_name_key = new_name
+                    old_name_key = old_name
 
                     if not opt_dont_replace_case:
-                        new_name_key = new_name_key.lower()
+                        old_name_key = old_name_key.lower()
 
-                    mission_obj_remaps[new_name_key] = {'old_str': old_name, 'new_str': new_name}
+                    mission_obj_remaps[old_name_key] = {'old_str': old_name, 'new_str': new_name}
                     print(f"[+] added {old_name} as an older/mapped/renamed version of {new_name}")
 
         except OSError as e:

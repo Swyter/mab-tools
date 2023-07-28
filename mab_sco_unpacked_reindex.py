@@ -284,11 +284,13 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     else: # swy: if nothing to delete and no mission objects have been altered then we'll just spit the same thing; skip that
         if prop_count_changed <= 0 and prop_count_renamed <= 0:
             print("[i] no need to overwrite the unchanged JSON file, we're done here")
-            exit(0)
+            exit(99) # swy: if we exit with a non-zero ERRORLEVEL code, we can skip running the repacker as the next step in the .cmd batch file
 
     # swy: save again as an updated JSON file, in-place
     js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
     js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look
+
+    print("[i] overwriting, saving the modified JSON file")
 
     try:
         with open(f"{input_folder}/mission_objects.json", mode='w', encoding='utf-8') as fw:

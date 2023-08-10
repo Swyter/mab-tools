@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<!-- MADE BY SWYTER ON THE FIRST QUARTER OF 2012
+  -- MAKES USE OF A HTML5 COMPLIANT BROWSER, NO EXTERNALS -- HAVE FUN
+  -- References: <http://mbmodwiki.ollclan.eu/SceneObj>
+  -- Programs used: Notepad++ 5.9.8 with NppFTP, Chromium Dev Tools.
+  -->
+<html lang="en-EN"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta charset="UTF-8">
+	<title>Swyter's Mount&amp;Blade Terrain Hash Generator | Just great.</title>
+	<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAG1BMVEUAAAAmJiZNTVRhXV9rZFt4ZmZ2dG2NcXqIioGHzHJjAAAAAXRSTlMAQObYZgAAAG5JREFUeNo1jdEJgDAMRNMNeqULeN1AEb8jRdzABUT8LriBg5so5ifHPV4iggBkRPF1AxBoXRSEhHxWZYPkfGpib6geyjJZs+4zizVhqYmlRYERDpuhO5GjW+aU7Q1Oml/mMF2dWSaR/uub+Ad5AL4eE+r2NulVAAAAAElFTkSuQmCC">
+	<style type="text/css">
+	html{
+		background-color:#998;
+		user-select:none;
+		-webkit-user-select:none;
+		-m//oz-user-select:none; /* if we use this one firefox makes buggy all our input boxes, meh */
+		-o-user-select:none;
+	}
+	body{
+		width: 600px;
+		white-space: pre-line;
+		margin: 0 auto;
+		padding:45px;
+		/*box-shadow:0 0 6px gray;*/
+		box-shadow: 0 0 140px #776;
+		
+		background-color:#554;
+		color:#eee;
+		font-size:95%;
+		font-family:serif;
+		letter-spacing: 2px;
+		
+		border: 4px double #997;
+		border-color:rgba(153, 153, 119, 0.73);
+		border-top: 0;
+
+		/* Colorzilla gradient */
+		background: #777766;
+		background: -moz-linear-gradient(-45deg, #777766 5%, #6d675e 100%);
+		background: -webkit-gradient(linear, left top, right bottom, color-stop(5%,#777766), color-stop(100%,#6d675e));
+		background: -webkit-linear-gradient(-45deg, #777766 5%,#6d675e 100%);
+		background: -o-linear-gradient(-45deg, #777766 5%,#6d675e 100%);
+		background: -ms-linear-gradient(-45deg, #777766 5%,#6d675e 100%);
+		background: linear-gradient(-45deg, #777766 5%,#6d675e 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#777766', endColorstr='#6d675e',GradientType=1 );
+	}
+	
+	label{
+		/*width:95px;
+		display: inline-block;
+		text-align:right;
+		text-shadow:1px 1px black;*/
+		
+		width: 114px;
+		display: inline-block;
+		text-align: right;
+		text-shadow: 1px 1px black;
+		margin-left: 88px;
+		-moz-user-select:none; /* firefux clumsy behavior fix */
+	}
+	
+	input,select{
+		width:230px;
+		-webkit-user-select:all;
+		-m//oz-user-select:all;
+		-o-user-select:all;
+		
+		font-family:times,serif;
+		text-transform: lowercase;
+	}
+	
+	input#thash{
+		width:100%;
+		text-align:center;
+		font-size:140%;
+		font-family:times,serif;
+		font-style: oblique;
+		text-transform: lowercase;
+		box-shadow: 0 0 114px #89A;
+	}
+	
+	input[type=checkbox]{
+		width:0/*initial*/;
+		padding-right:60px;
+		color:gold;
+		
+		/*width: 46px;
+		padding-right: 18px;
+		color: gold;
+		font-family: serif;
+		letter-spacing: 1px;
+		text-align: right;
+		display: inline-block;
+		text-shadow: 1px 1px 0 black;*/	
+		
+		padding-right: 28px;
+		color: goldenrod;
+		font-family: serif;
+		letter-spacing: 1px;
+		text-align: right;
+		display: inline-block !important;
+		text-shadow: 1px 1px 0 black;
+		
+		}input[type=checkbox]:after{
+		content:'disabled';
+		
+		}input[type=checkbox]:checked:after{
+		content:'enabled' !important;
+		color: gold;
+	}
+	
+	h1,h2,h3{
+		font-weight: 100;
+		text-shadow: 2px 1px black;
+		margin:0;
+		cursor:default;
+		-moz-user-select:none; /* firefux clumsy behavior fix */
+	}
+	h3{margin-bottom: -29px;}
+	h1{
+		font-size: 3.6em;
+		-webkit-mask: -webkit-linear-gradient(white,rgba(0,0,0,.5) 70%);
+		-moz-mask: -moz-linear-gradient(white,rgba(0,0,0,.5) 70%);
+	}
+	h2{
+		border-top: 1px solid #775;
+		border-color:rgba(153, 153, 119, 0.42);
+		margin-top: -32px;
+		letter-spacing: .4em;
+		padding-top: 9px;
+		
+		}h2>span{
+		position:absolute;
+		/*color:#BE4343;*/
+		color:#DB6565;
+		-webkit-transform: rotate(9deg); 
+		   -moz-transform: rotate(9deg);
+		font-size: 15px;
+		letter-spacing: 0/*initial*/;
+		text-shadow: 0 0 14px red;
+		margin-left: -194px;
+		margin-top: -58px;
+		font-weight: 700;
+		opacity: .9;
+		text-transform: uppercase;
+		
+		-webkit-animation-name: pulse; 
+		-webkit-animation-duration: 0.5s; 
+		-webkit-animation-iteration-count: 100; 
+		white-space: nowrap;
+		-moz-user-select:none; /* firefux clumsy behavior fix */
+	}
+	
+	img[src*="w3"]{
+		width:140px;
+	}
+	
+	@-webkit-keyframes pulse {
+	  from {
+		opacity: 1;
+	  }
+	  50% {
+		opacity: .75;
+	  }
+	  to { 
+		opacity: 1;
+	  }
+	}
+	
+	#pol>option:after{
+		content:' meters';
+	}
+	
+	select,option{
+		font-family: serif;
+		letter-spacing: 1px;
+	}
+	
+	input#thash{
+		border: double 4px #89A;
+	}
+	
+	input[type=range]:after{
+	 content:"{"attr(value)"}";
+		color: #eee;
+		display:inline;
+		text-align:center;
+		font-family:times,serif;
+		font-style: oblique;
+		text-transform: lowercase;
+		text-shadow: 1px 1px black;
+	}
+	</style>
+</head>
+<body>
+	<h3>— the one and only —</h3>
+	<h1>terrain code generator</h1>
+	<h2>who needs the game, anyway?<span>Now with 21.78% more size!</span></h2>
+	<input id="thash" type="text" placeholder="~Paste your hash here~" data-kpxc-id="thash" value="0x00000001324a9cba0005194a000041ef00005ae800003c55">
+	
+	<label for="riv">place river</label> <input type="checkbox" id="riv" value="0"> <label for="sha">shade occlude</label><input type="checkbox" id="sha" value="0">
+	<label for="dee">deep water</label>  <input type="checkbox" id="dee" value="0"> <label for="gra">disable grass</label><input type="checkbox" id="gra" value="0">
+	
+	<label for="pol">polygon size</label> <select name="" id="pol" data-kpxc-id="kpxcpw342845639">
+		<option value="3">5</option>
+		<option value="2">4</option>
+		<option value="1" selected="selected">3</option>
+		<option value="0">2</option>
+	</select>
+	<label for="ter">terrain</label> <select name="" id="ter" data-kpxc-id="kpxcpw342845640">
+		<option value="13">desert palms </option>
+		<option value="10">steppe forest</option>
+		<option value="12">snow forest  </option>
+		<option value="11">plain forest </option>
+		<option value="5">desert</option>
+		<option value="4">snow  </option>
+		<option value="3" selected="selected">plain </option>
+		<option value="2">steppe</option>
+	</select>
+	
+	<!--input type="range" min="0" max="50" value="25" step="5" /-->
+	<label for="veg">vegetation </label>  <input id="veg" type="range" min="0" max="127" value="18">
+	<label for="rug">ruggedness </label>  <input id="rug" type="range" min="0" max="127" value="42">
+	<label for="val">valley     </label>  <input id="val" type="range" min="0" max="127" value="58">
+	<label for="hil">hill height</label>  <input id="hil" type="range" min="0" max="127" value="57">
+	<label for="siy">size y     </label>  <input id="siy" type="range" min="0" max="1023" value="326">
+	<label for="six">size x     </label>  <input id="six" type="range" min="0" max="1023" value="330">
+	
+	<p style="cursor:default;user-select:none;-webkit-user-select:none;-moz-user-select:none;width: 194px;vertical-align: bottom;position: absolute;margin-left: 447px;transform: rotate(-14deg);-moz-transform: rotate(-14deg);-webkit-transform: rotate(-14deg);text-shadow: 0 0 13px #111;margin-top: -9px;color: gold;"><em style="font-size: 500%;display: inline-block;margin-bottom: -30px;">↜</em> don't forget that you can randomize by pressing {enter} when you have one of these focused...</p>
+	<label for="flseed">flora seed  </label> <input id="flseed" max="2147483647" type="number" data-kpxc-id="flseed" value="16879">
+	<label for="riseed">river seed  </label> <input id="riseed" max="2147483647" type="number" data-kpxc-id="riseed" value="23272">
+	<label for="teseed">terrain seed</label> <input id="teseed" max="2147483647" type="number" data-kpxc-id="teseed" value="15445">
+	
+	<script type="text/javascript">
+	/* basic helpers */
+	app = document;
+	function _(e){return console.log(e);}
+	function $(e){return app.getElementById(e);} //who needs jquery anyways? :P
+	
+	//! http://stackoverflow.com/a/202627
+	String.prototype.repeat=function( num ){ return new Array( num + 1 ).join( this );}
+	
+	//! http://www.2ality.com/2012/02/js-integers.html
+	String.prototype.frombin = function ( ) { return parseInt(this, 2);};
+	String.prototype.fromhex = function ( ) { return parseInt(this, 16);};
+    Number.prototype.tobin   = function ( ) { var sign = (this < 0 ? "-" : "");var result = Math.abs(this).toString(2);while(result.length < 32) {result = "0" + result;}return sign + result;}
+    Number.prototype.tohex   = function ( ) { return this.toString(16);};
+	String.prototype.pad     = function (n) { var result=this;while(result.length < n) {result = "0" + result;} return result;}
+	
+	/* get elements */
+	thash=$('thash');
+	
+	riv=$('riv');
+	sha=$('sha');
+	dee=$('dee');
+	gra=$('gra');
+	
+	pol=$('pol');
+	ter=$('ter');
+	
+	veg=$('veg');
+	rug=$('rug');
+	val=$('val');
+	hil=$('hil');
+	siy=$('siy');
+	six=$('six');
+	
+	flseed=$('flseed');
+	riseed=$('riseed');
+	teseed=$('teseed');
+	
+	/* basic functions */
+	
+	var hash   = {}
+	var struct = {
+    //value       //key no. //shift //num bits     //input        //WORKING FINE?
+	seed_1         : [0,      0,     31,           teseed      ], //yay -
+	seed_2         : [1,      0,     31,           riseed      ], //yay -
+	deep_water     : [1,     31,      1,           dee         ], //bugged !! -later test: now okay! hackfix works... yay!
+	seed_3         : [2,      0,     31,           flseed      ], //yay -
+	size_x         : [3,      0,     10,           six         ], //yay - 
+	size_y         : [3,     10,     10,           siy         ], //yay - 
+	shade_occluded : [3,     30,      1,           sha         ], //bugged !! -later test: now okay! hackfix works... yay!
+	place_river    : [3,     31,      1,           riv         ], //bugged !! -later test: now okay! hackfix works... yay!
+	valley         : [4,      0,      7,           val         ], //yay -
+	hill_height    : [4,      7,      7,           hil         ], //yay -
+	ruggedness     : [4,     14,      7,           rug         ], //yay -
+	vegetation     : [4,     21,      7,           veg         ], //yay - 
+	region_type    : [4,     28,      4,           ter         ], //bugged with more than 1 hex digit -later test: now okay! hackfix works... yay!
+	region_detail  : [5,      0,      2,           pol         ], //yay -
+	disable_grass  : [5,      2,      2,           gra         ]  //bugged - activates shade occluded!! :( -later test: now okay! hackfix works... yay!
+	}
+	
+	/* handlers */
+	
+	app.onchange=function(e){
+	
+	switch (e.target){
+		case thash: 
+			_('a new hash has arrived!');
+			_parse(thash.value);
+			break;
+			
+		//case flseed:		
+		//case riseed: 
+		//case teseed:
+		//break;
+		
+		default:
+			_(e.target.id+" has changed");
+	}
+	
+			for (var key in struct) {
+					if (e.target == struct[key][3]){
+								if(e.target.type=="checkbox"){
+										if(e.target.checked){
+												_out=1;
+										}else{
+												_out=0;
+										}
+								}else{
+										_out=e.target.value;
+								}
+								_("I've found a new value to change: "+_out);
+								
+								key_no   = struct[key][0];
+								shift    = struct[key][1];
+								num_bits = struct[key][2];
+								
+								
+								_outbin = String(_out).fromhex().tobin();
+								//_outbin = String('00000000000000000000000000000000'+_outbin
+								//	).slice(-num_bits);
+
+								_bin = String(hash[ key_no ]).fromhex().tobin();
+								//_bin = String('00000000000000000000000000000000'+_bin
+								//	).slice(_bin.length);
+								
+								_cut = _bin.substr( -(shift+num_bits), num_bits );
+								
+								base= _bin.length;
+								basb= _cut.length;
+								
+								_("//key no. //shift //num bits");
+								_("|| Struct: "+struct[key]);
+								_("     base: "+base);
+								_("    shift: "+shift);
+								_('||    Do:  '  + ('-').repeat( (32-base) ) + _bin );
+		
+		
+								_(' |  Mask:  '  + ('-').repeat( 32-(num_bits)-(shift) ) + ('X').repeat( (num_bits) ) );
+								_(' | Final:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _outbin.substr(-num_bits) );
+								_(' |  Prev:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _cut );
+								
+								//Reset the enabled bitmask values by XOR'ing them with themselves...
+								/*-->
+								
+								_reset= ( _bin.frombin() ) ^ ( _cut.frombin() << shift );
+								_(' | Reset:  '  + _reset.tobin() );
+
+								//Add the new values by OR'ing them with the noew blank shift range/scope...
+								_added= ( _reset | _out << shift);
+								_(' | Added:  '  + _added.tobin() );
+								
+								<--*/
+								
+								//There's a limitation in bitwise operations in js: 32 bit signed integers, so if we set the last bit it turns out negative :/
+								//_outhack = (_out << shift).tobin().substr( -(shift+num_bits), num_bits );
+								
+								
+								
+								_("----------");
+								_("    out:"+_out);
+								_outhack = Number(_out).tobin().substr( -(num_bits), num_bits );
+								_("outhack:"+_outhack);
+								//_reshack = _reset.tobin().substr( -(shift+num_bits), num_bits );
+								//_("reshack:"+_reshack);
+								//_("out|res:"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits) )
+								//_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+( _outhack.frombin() | _reshack.frombin() ).tobin().substr(-num_bits)+"|"+_bin.substr(-shift,shift))
+								_("togther:"+_bin.substr(0, 32-(num_bits+shift) )+"|"+_outhack.substr(-num_bits)+"|"+_bin.substr(-shift,shift))
+								_("----------");
+								
+								//hash[key_no]= String('00000000000000000000000000000000'+_added.tohex()
+								//	).slice(-8);
+								//hash[key_no]= _added.tohex().pad(8);
+								hash[key_no]=(
+										/* 1st orig. chunk */		_bin.substr(0, 32-(num_bits+shift) ) +
+										/* our modif. part */	_outhack.substr(-num_bits) +
+										/* 2nd orig. chunk */	    _bin.substr(-shift,shift)
+												
+											 ).frombin().tohex().pad(8);
+											 
+								if (e.target.attributes[4]){
+									e.target.attributes[4].value=_out; //manages the display of the values in sliders
+								}
+								
+								thash.value='0x'+(hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
+								//_parse(thash.value);
+								break;
+					}
+			}
+	
+	}
+	
+	app.onkeydown=function(e){
+	
+		if (e.keyIdentifier == 'Enter' || e.keyCode == 13){ //firefux doesn't supprts keyIdentifier, of course :(
+		if (e.target!=flseed && e.target!=riseed && e.target!=teseed){return 0;}
+		_("boom");
+		//! http://stackoverflow.com/a/6005163
+		e.target.value = Math.floor(Math.random() * ( 65535 /* even better, 4 ones, as the game does 1048575/* use half of the bitmask instead 2147483647*/ + 1));
+		app.onchange(e); // we've to force a new state so the app knows that the randomization has been launched by the user :)
+		}
+	}
+	
+	//00000001324a9cba0005194a000041ef00005ae800003c55
+	function _parse(e){
+		e=e.replace('0x','');
+		if (e.length!=48){
+			_("badly formatted hash :(");
+			return false; //doesn't validates
+		}
+		
+		for (var i=1; i<=6; i++){
+			hash[i-1] = /*parseInt(*/e.substr(-8*i,8)/*, 16).toString(2)*/;
+			
+			//hash[i] = String('00000000000000000000000000000000'+
+			
+			//parseInt(e.substr((-1*i*8)-8,8), 16).toString(2)
+			
+			//).slice(-32);
+			
+			
+			//hash[i-1] = String('00000000000000000000000000000000'+hash[i-1]
+			//											).slice(hash[i-1].length);
+			
+						//hash[i] = String('00000000000000000000000000000000'+
+			
+			//parseInt(e.substr((-1*i*8)-8,8), 16).toString(2)
+			
+			//).slice(-32);
+			
+		}
+		//https://ricochen.wordpress.com/2010/04/24/javascript-zero-padding-numbers/
+		//String('00000'+n).slice(-5);
+		_(e);
+		_(hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
+		
+		
+		for (var key in struct) {
+		 _("---");
+		 _("||    Key: "+key);
+			_("//key no. //shift //num bits");
+ 		_("|| Struct: "+struct[key]);
+ 		 
+ 		 key_no   = struct[key][0];
+ 		 shift    = struct[key][1];
+ 		 num_bits = struct[key][2];
+ 		 
+ 		//shift * key, num_bits // no! :X
+		
+		
+ 	
+		//_bin = parseInt(hash[ key_no ], 16).toString(2);
+		//_bin = hash[i-1] = String('00000000000000000000000000000000'+_bin
+		//							).slice(_bin.length);
+		_bin = hash[ key_no ].fromhex().tobin()
+		_bin = _bin.pad(_bin.length);
+		
+		_cut = _bin.substr( -(shift+num_bits), num_bits );
+		
+		base= _bin.length;
+		basb= _cut.length;
+		_("     base: "+base);
+		_("    shift: "+shift);
+		//_("bas-shift: "+(base-shift));
+		//_(" pad: "+(32-basb));
+		//_(32-base);
+		//_(32-shift);
+		//_((32-_bin.length)-(32-shift));
+		//_(base+" base - shift "+shift);
+		
+		
+		_('||    Do:  '  + ('-').repeat( (32-base) ) + _bin );
+		
+		
+		_(' |  Mask:  '  + ('-').repeat( 32-(num_bits)-(shift) ) + ('X').repeat( (num_bits) ) );
+		//_('||       '  + ('-').repeat( (32-base) ) + ('.').repeat( (32-base)+(32-basb)-2 ) + _cut );
+		_(' | Final:  '  + (' ').repeat( 32-(num_bits)-(shift) ) + _cut );
+	
+		_dec = _cut.frombin();
+		_('');
+		_('|| Decim: '+_dec);
+		_bool= ((_dec==0) ? false : true );
+		_('||  Bool: '+_bool);
+		
+		_( struct[key][1]*struct[key][0]+" / size: " + struct[key][2]);
+		
+		//update our controls
+		struct[key][3].value=_dec;
+		if (struct[key][3].attributes[4]){
+			struct[key][3].attributes[4].value=_dec; //manages the display of the values in sliders
+		}
+		//if (_bool){
+			struct[key][3].checked=_bool;
+		//}
+		
+		//if (key=="seed_3"){
+		//	flseed.value=_dec;
+		//}
+		//if (key=="seed_2"){
+		//	riseed.value=_dec;
+		//}
+		//if (key=="seed_1"){
+		//	teseed.value=_dec;
+		//}
+		
+		}
+		
+		//for(var i=0; i<e.length; i+8){
+			//_(e.substr(-1*i,8));
+			
+
+			
+		//}
+		
+	}
+	//0x555555554444444433333333222222221111111100000000
+	
+	//0x00000001 324a9cba 0005194a 000041ef 00005ae8 00003c55
+	
+	//hexString = yourNumber.toString(16);
+	//yourNumber = parseInt(hexString, 16);
+
+
+	/*
+	//! turns decimal numbers into hexacecimal notation used by the terrain keys
+	function _hex(thingie){
+		return parseInt(thingie).toString(16);
+	}
+	//! turns hexadecimal numbers into decimal notation
+	function _dec(thingie){
+		return parseInt(thingie, 16);
+	}
+	*/
+	
+	//! dbg----
+	window.onload=function(){
+		if(window.location.hash==''){
+			def='0x00000001324a9cba0005194a000041ef00005ae800003c55';
+			thash.value=def;
+			_parse(def);
+		}else{
+			window.onhashchange();
+		}
+	}
+	
+	//! permalink
+	window.onhashchange=function(){
+		def=window.location.hash.replace('#','');
+		thash.value=def;
+		_parse(def);
+	}
+	</script>
+	
+	
+	<a hr="" ef="http://www.w3.org/html/logo/" style="position:fixed;bottom:0;right:0;">
+		<!--/img sr//c="http://www.w3.org/html/logo/badge/html5-badge-h-css3-semantics-storage.png" alt="HTML5 Powered with CSS3 / Styling, Semantics, and Offline &amp; Storage" title="HTML5 Powered with CSS3 / Styling, Semantics, and Offline &amp; Storage"-->
+	</a>
+
+</body></html>

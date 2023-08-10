@@ -14,8 +14,12 @@
 		background-color:#998;
 		user-select:none;
 		-webkit-user-select:none;
-		-m//oz-user-select:none; /* if we use this one firefox makes buggy all our input boxes, meh */
+		/*-m//oz-user-select:none; /* if we use this one firefox makes buggy all our input boxes, meh */
 		-o-user-select:none;
+	}
+
+	input[type=checkbox], input[type=range], option {
+  		appearance: initial; /* swy: make the :after selector work on <input> elements on Firefox: https://stackoverflow.com/a/59591634/674685 */
 	}
 	body{
 		width: 600px;

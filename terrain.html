@@ -62,6 +62,7 @@
 		text-shadow: 1px 1px black;
 		margin-left: 88px;
 		-moz-user-select:none; /* firefux clumsy behavior fix */
+		vertical-align: top; /* swy: https://stackoverflow.com/a/52985450/674685 */
 	}
 	
 	input,select{
@@ -206,7 +207,7 @@
 	<label for="riv">place river</label> <input type="checkbox" id="riv" value="0"> <label for="sha">shade occlude</label><input type="checkbox" id="sha" value="0">
 	<label for="dee">deep water</label>  <input type="checkbox" id="dee" value="0"> <label for="gra">disable grass</label><input type="checkbox" id="gra" value="0">
 	
-	<label for="pol">polygon size</label> <select name="" id="pol" data-kpxc-id="kpxcpw342845639">
+	<label for="pol">polygon size</label> <select size="4" name="" id="pol" data-kpxc-id="kpxcpw342845639">
 		<option value="3">5</option>
 		<option value="2">4</option>
 		<option value="1" selected="selected">3</option>

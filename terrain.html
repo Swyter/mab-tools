@@ -207,7 +207,12 @@
 
     /* swy: make it clear when the input code is wrong by reddening the input background,
             see the pattern and maxlength/minlength attributes in thash <input> */
-			:invalid { background: rgb(238, 203, 203); }
+	:invalid { background: rgb(238, 203, 203); }
+
+	output#ingamesizedesc {
+		display: inline-block;
+		width: 149px;
+	}
 	</style>
 </head>
 <body>
@@ -224,7 +229,7 @@
 		<option value="2">4</option>
 		<option value="1" selected="selected">3</option>
 		<option value="0">2</option>
-	</select>
+	</select> <output id="ingamesizedesc">In-game size: </output>
 	<label for="ter">terrain</label> <select name="" id="ter" data-kpxc-id="kpxcpw342845640">
 		<option value="13">desert palms </option>
 		<option value="10">steppe forest</option>
@@ -287,6 +292,8 @@
 	riseed=$('riseed');
 	teseed=$('teseed');
 	
+	ingamesizedesc=$('ingamesizedesc');
+
 	/* basic functions */
 	
 	var hash   = {}
@@ -557,6 +564,12 @@
 			
 		//}
 		
+		sco_size_x = parseInt(struct['size_x'][3].value) + 1
+		sco_size_y = parseInt(struct['size_y'][3].value) + 1
+
+		polygon_size = parseInt(struct['region_detail'][3].value) + 2
+
+		ingamesizedesc.textContent = `In-game size: ${sco_size_x} x ${sco_size_y} meters at ${polygon_size}, SCO size: ${(sco_size_x / polygon_size) + 1 | 0} x ${(sco_size_y / polygon_size) + 1 | 0}`;
 	}
 	//0x555555554444444433333333222222221111111100000000
 	

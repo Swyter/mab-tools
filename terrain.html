@@ -433,7 +433,7 @@
 	}
 	
 	//0000000000001d63c005114300006228000053bf00004eb9
-	function _parse(e){
+	function _parse(e, dont_update_hash){
 		e=e.replace('0x','');
 		
 		/* swy: let codes without left zero padding like 0x00001d63c005114300006228000053bf00004eb9 work, let's pad it ourselves */
@@ -447,7 +447,7 @@
 
 		thash.value = '0x' + e;
 
-		if (window.location.hash != thash.value)
+		if (window.location.hash != thash.value && !dont_update_hash)
 			window.location.hash  = thash.value; /* swy: refresh the # in the URL bar so that we can use the history API as a handy re-do/undo, for easy bookmarking and sharing of specific codes */
 
 		for (var i=1; i<=6; i++){
@@ -580,7 +580,7 @@
 	//! dbg----
 	window.onload=function() {
 		def='0x00000001324a9cba0005194a000041ef00005ae800003c55';
-		_parse(def);
+		_parse(def, true);
 
 		if (window.location.hash != '')
 			window.onhashchange();

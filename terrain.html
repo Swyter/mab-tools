@@ -564,12 +564,32 @@
 			
 		//}
 		
-		sco_size_x = parseInt(struct['size_x'][3].value) + 1
-		sco_size_y = parseInt(struct['size_y'][3].value) + 1
+		/* swy: M&B terrain generator algorithm reverse-engineered and documented by @cmpxchg8b:
+		        https://github.com/Swyter/warband-terraingen/blob/41e221857a55/TerrainGenerator.cpp#L277-L281 */
+		sco_size_x = parseInt(struct['size_x'][3].value)
+		sco_size_y = parseInt(struct['size_y'][3].value)
 
-		polygon_size = parseInt(struct['region_detail'][3].value) + 2
+		sco_polygon_size = parseInt(struct['region_detail'][3].value) + 2
 
-		ingamesizedesc.textContent = `In-game size: ${sco_size_x} x ${sco_size_y} meters at ${polygon_size}, SCO size: ${(sco_size_x / polygon_size) + 1 | 0} x ${(sco_size_y / polygon_size) + 1 | 0}`;
+		const MIN_NUM_TERRAIN_FACES_PER_AXIS =  40
+		const MAX_NUM_TERRAIN_FACES_PER_AXIS = 250
+
+		/* swy: a face, I would call it more like a cell, or a pixel in the heightmap; it tells you how detailed or dense the scene is, like the amount of pixels per meter */
+		terraingen_num_faces_x = Math.min(Math.max(sco_size_x / sco_polygon_size | 0, MIN_NUM_TERRAIN_FACES_PER_AXIS), MAX_NUM_TERRAIN_FACES_PER_AXIS)
+		terraingen_num_faces_y = Math.min(Math.max(sco_size_y / sco_polygon_size | 0, MIN_NUM_TERRAIN_FACES_PER_AXIS), MAX_NUM_TERRAIN_FACES_PER_AXIS)
+
+		/* swy: the actual size in M&B virtual meters; 1 in-game unit = 1 meter */
+		terraingen_size_x = terraingen_num_faces_x * sco_polygon_size
+		terraingen_size_y = terraingen_num_faces_y * sco_polygon_size
+
+		/* swy: old notes, disregard :)
+			2m - 251x251 -  502 x  502 meters
+			3m - 251x251 -  753 x  753 meters
+			4m - 
+			5m - 205X205 - 1255 x 1255 meters
+		*/
+
+		ingamesizedesc.textContent = `In-game size: ${terraingen_size_x} x ${terraingen_size_y} meters at ${sco_polygon_size} meter per face, SCO face count: ${terraingen_num_faces_x} x ${terraingen_num_faces_y}`;
 	}
 	//0x555555554444444433333333222222221111111100000000
 	

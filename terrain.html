@@ -214,7 +214,7 @@
 	<h3>— the one and only —</h3>
 	<h1>terrain code generator</h1>
 	<h2>who needs the game, anyway?<span>Now with 21.78% more size!</span></h2>
-	<input id="thash" type="text" placeholder="~Paste your hash here~" data-kpxc-id="thash" value="0x0000000001324a9cba0005194a000041ef00005ae800003c55" autofocus maxlength=50 minlength=42 pattern='0x[0-9a-f]{40,50}' title='Insert some hexadecimal 48-digit terrain code starting with the «0x» prefix.'>
+	<input id="thash" type="text" placeholder="~Paste your hash here~" data-kpxc-id="thash" value="0x0000000001324a9cba0005194a000041ef00005ae800003c55" autofocus maxlength=50 minlength=42 pattern='0x[0-9a-f]{40,48}' title='Insert some hexadecimal 48-digit terrain code starting with the «0x» prefix.'>
 	
 	<label for="riv">place river</label> <input type="checkbox" id="riv" value="0"> <label for="sha">shade occlude</label><input type="checkbox" id="sha" value="0">
 	<label for="dee">deep water</label>  <input type="checkbox" id="dee" value="0"> <label for="gra">disable grass</label><input type="checkbox" id="gra" value="0">
@@ -574,18 +574,18 @@
 	*/
 	
 	//! dbg----
-	window.onload=function(){
-		if(window.location.hash==''){
-			def='0x00000001324a9cba0005194a000041ef00005ae800003c55';
-			_parse(def);
-		}else{
+	window.onload=function() {
+		def='0x00000001324a9cba0005194a000041ef00005ae800003c55';
+		_parse(def);
+
+		if (window.location.hash != '')
 			window.onhashchange();
-		}
 	}
 	
 	//! permalink
 	window.onhashchange=function(){
 		def=window.location.hash.replace('#','');
+		thash.value = def; /* swy: paste it into the code box, even if it's wrong; it will show up in red; but it won't be used for computing the values, let the user fix it */
 		_parse(def);
 	}
 

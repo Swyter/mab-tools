@@ -413,6 +413,7 @@
 								}
 								
 								thash.value='0x'+(hash[5]+hash[4]+hash[3]+hash[2]+hash[1]+hash[0]);
+								window.location.hash = thash.value; /* swy: refresh the # in the URL bar so that we can use the history API as a handy re-do/undo, for easy bookmarking and sharing of specific codes */
 								//_parse(thash.value);
 								break;
 					}
@@ -445,6 +446,9 @@
 		}
 
 		thash.value = '0x' + e;
+
+		if (window.location.hash != thash.value)
+			window.location.hash  = thash.value; /* swy: refresh the # in the URL bar so that we can use the history API as a handy re-do/undo, for easy bookmarking and sharing of specific codes */
 
 		for (var i=1; i<=6; i++){
 			hash[i-1] = /*parseInt(*/e.substr(-8*i,8)/*, 16).toString(2)*/;

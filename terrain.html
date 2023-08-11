@@ -204,13 +204,17 @@
 	output:after {
 	 	content: "}";
 	}
+
+    /* swy: make it clear when the input code is wrong by reddening the input background,
+            see the pattern and maxlength/minlength attributes in thash <input> */
+			:invalid { background: rgb(238, 203, 203); }
 	</style>
 </head>
 <body>
 	<h3>— the one and only —</h3>
 	<h1>terrain code generator</h1>
 	<h2>who needs the game, anyway?<span>Now with 21.78% more size!</span></h2>
-	<input id="thash" type="text" placeholder="~Paste your hash here~" data-kpxc-id="thash" value="0x00000001324a9cba0005194a000041ef00005ae800003c55">
+	<input id="thash" type="text" placeholder="~Paste your hash here~" data-kpxc-id="thash" value="0x0000000001324a9cba0005194a000041ef00005ae800003c55" autofocus maxlength=50 minlength=50 pattern='0x[0-9a-f]{48}' title='Insert some hexadecimal 48-digit terrain code starting with the «0x» prefix.'>
 	
 	<label for="riv">place river</label> <input type="checkbox" id="riv" value="0"> <label for="sha">shade occlude</label><input type="checkbox" id="sha" value="0">
 	<label for="dee">deep water</label>  <input type="checkbox" id="dee" value="0"> <label for="gra">disable grass</label><input type="checkbox" id="gra" value="0">

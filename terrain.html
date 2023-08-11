@@ -18,7 +18,7 @@
 		-o-user-select:none;
 	}
 
-	input[type=checkbox], input[type=range], option {
+	input[type=checkbox], option {
   		appearance: initial; /* swy: make the :after selector work on <input> elements on Firefox: https://stackoverflow.com/a/59591634/674685 */
 	}
 	body{
@@ -186,15 +186,23 @@
 		border: double 4px #89A;
 	}
 	
-	input[type=range]:after{
-	 content:"{"attr(value)"}";
+	output {
 		color: #eee;
-		display:inline;
+		display: inline-block;
 		text-align:center;
 		font-family:times,serif;
 		font-style: oblique;
 		text-transform: lowercase;
 		text-shadow: 1px 1px black;
+		position: relative;
+		vertical-align: top;
+	}
+	output:before {
+	 	content: "{";
+	}
+
+	output:after {
+	 	content: "}";
 	}
 	</style>
 </head>
@@ -225,12 +233,12 @@
 	</select>
 	
 	<!--input type="range" min="0" max="50" value="25" step="5" /-->
-	<label for="veg">vegetation </label>  <input id="veg" type="range" min="0" max="127" value="18">
-	<label for="rug">ruggedness </label>  <input id="rug" type="range" min="0" max="127" value="42">
-	<label for="val">valley     </label>  <input id="val" type="range" min="0" max="127" value="58">
-	<label for="hil">hill height</label>  <input id="hil" type="range" min="0" max="127" value="57">
-	<label for="siy">size y     </label>  <input id="siy" type="range" min="0" max="1023" value="326">
-	<label for="six">size x     </label>  <input id="six" type="range" min="0" max="1023" value="330">
+	<label for="veg">vegetation </label>  <input id="veg" type="range" min="0" max="127" value="18">   <output for="veg"></output>
+	<label for="rug">ruggedness </label>  <input id="rug" type="range" min="0" max="127" value="42">   <output for="rug"></output>
+	<label for="val">valley     </label>  <input id="val" type="range" min="0" max="127" value="58">   <output for="val"></output>
+	<label for="hil">hill height</label>  <input id="hil" type="range" min="0" max="127" value="57">   <output for="hil"></output>
+	<label for="siy">size y     </label>  <input id="siy" type="range" min="0" max="1023" value="326"> <output for="siy"></output>
+	<label for="six">size x     </label>  <input id="six" type="range" min="0" max="1023" value="330"> <output for="six"></output>
 	
 	<p style="cursor:default;user-select:none;-webkit-user-select:none;-moz-user-select:none;width: 194px;vertical-align: bottom;position: absolute;margin-left: 447px;transform: rotate(-14deg);-moz-transform: rotate(-14deg);-webkit-transform: rotate(-14deg);text-shadow: 0 0 13px #111;margin-top: -9px;color: gold;"><em style="font-size: 500%;display: inline-block;margin-bottom: -30px;">↜</em> don't forget that you can randomize by pressing {enter} when you have one of these focused...</p>
 	<label for="flseed">flora seed  </label> <input id="flseed" max="2147483647" type="number" data-kpxc-id="flseed" value="16879">
@@ -507,6 +515,10 @@
 		if (struct[key][3].attributes[4]){
 			struct[key][3].attributes[4].value=_dec; //manages the display of the values in sliders
 		}
+
+		if (elem = document.querySelector(`output[for=${struct[key][3].id}]`)) /* swy: update the matching <output> container, for those bar inputs who have it */
+			elem.value = _dec;
+
 		//if (_bool){
 			struct[key][3].checked=_bool;
 		//}
@@ -567,8 +579,14 @@
 		thash.value=def;
 		_parse(def);
 	}
-	</script>
+
+	window.oninput = function(e)
+	{
+		if (elem = document.querySelector(`output[for=${e.target.id}]`)) /* swy: update the matching <output> container, for those bar inputs who have it */
+			elem.value = e.target.value;
+	}
 	
+	</script>
 	
 	<a hr="" ef="http://www.w3.org/html/logo/" style="position:fixed;bottom:0;right:0;">
 		<!--/img sr//c="http://www.w3.org/html/logo/badge/html5-badge-h-css3-semantics-storage.png" alt="HTML5 Powered with CSS3 / Styling, Semantics, and Offline &amp; Storage" title="HTML5 Powered with CSS3 / Styling, Semantics, and Offline &amp; Storage"-->

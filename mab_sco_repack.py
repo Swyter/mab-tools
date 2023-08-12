@@ -261,6 +261,11 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                     layer_name = ground_layer.split('.')[0].lower()
                     ext        = ground_layer.split('.')[1].lower()
                     ground[layer_name] = []; contents = []
+
+                    # swy: as a bit of retro-compatible usability improvement, accept «layer_ground_tinting.ppm» as a stand-in filename for TaleWorld's «layer_ground_leveling.ppm»
+                    #      which as a layer name sucks and is practically misleading, as people confuse this RGB color tinting data with the «ground_elevation» gray heightmap
+                    if ground_layer == 'ground_leveling.ppm' and os.path.exists(f"{input_folder}/layer_ground_tinting.ppm"):
+                        ground_layer = 'ground_tinting.ppm'
                     
                     if not terrain_from == 'empty':
                         try:

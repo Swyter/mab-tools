@@ -273,7 +273,7 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                         # swy: Red/Green/Blue vertex coloring/terrain tinting
                         elif layer_str == 'ground_leveling':
                             try:
-                                with open(f"{output_folder}/layer_{layer_str}.ppm", mode='wb') as fw:
+                                with open(f"{output_folder}/layer_ground_tinting.ppm", mode='wb') as fw: # swy: use `ground_tinting` on export from now on instead of the confusing/original `ground_leveling` name, screw TaleWorlds
                                     # swy: format spec at http://netpbm.sourceforge.net/doc/ppm.html; scanlines from left to right, from TOP to bottom
                                     #      small three-line ASCII header with binary floats afterwards. e.g.: 
                                     #      P6

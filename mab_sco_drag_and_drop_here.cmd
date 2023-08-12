@@ -17,8 +17,8 @@ if "%~1"=="" (
 )
 
 MODE CON: COLS=180
-if exist  "%~1/"                          goto :repack
 if       "%~x1" ==                 ".sco" goto :unpack
+if exist  "%~1/"                          goto :repack
 if      "%~nx1" == "mission_objects.json" goto :unpacked_reindex
 
 goto :show_help

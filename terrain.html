@@ -574,9 +574,15 @@
 		const MIN_NUM_TERRAIN_FACES_PER_AXIS =  40
 		const MAX_NUM_TERRAIN_FACES_PER_AXIS = 250
 
-		/* swy: a face, I would call it more like a cell, or a pixel in the heightmap; it tells you how detailed or dense the scene is, like the amount of pixels per meter */
+		/* swy: a face, I would call it more like a cell, each face has four edges and four vertices, three of them probably shared with neighboring faces; note: the `| 0` removes the decimals
+		        https://github.com/Swyter/warband-terraingen/blob/41e221857a55/TerrainGenerator.h#L110-L111 */
 		terraingen_num_faces_x = Math.min(Math.max(sco_size_x / sco_polygon_size | 0, MIN_NUM_TERRAIN_FACES_PER_AXIS), MAX_NUM_TERRAIN_FACES_PER_AXIS)
 		terraingen_num_faces_y = Math.min(Math.max(sco_size_y / sco_polygon_size | 0, MIN_NUM_TERRAIN_FACES_PER_AXIS), MAX_NUM_TERRAIN_FACES_PER_AXIS)
+
+		/* swy: in the .sco file we are actually storing the height and colors for each of the four vertices that compose a terrain face, for that subtle blending effect, it's not like each face has a single color/material.
+		        I would call it more like a pixel in the heightmap; it tells you how detailed or dense the scene is, like the amount of pixels per meter */
+		terraingen_num_vertices_x = terraingen_num_faces_x + 1
+		terraingen_num_vertices_y = terraingen_num_faces_y + 1
 
 		/* swy: the actual size in M&B virtual meters; 1 in-game unit = 1 meter */
 		terraingen_size_x = terraingen_num_faces_x * sco_polygon_size
@@ -589,7 +595,8 @@
 			5m - 205X205 - 1255 x 1255 meters
 		*/
 
-		ingamesizedesc.textContent = `In-game size: ${terraingen_size_x} x ${terraingen_size_y} meters at ${sco_polygon_size} meter per face, SCO face count: ${terraingen_num_faces_x} x ${terraingen_num_faces_y}`;
+		ingamesizedesc.textContent = `In-game size: ${terraingen_size_x} x ${terraingen_size_y} meters at ${sco_polygon_size} meters-per-face, ` +
+		                             `SCO vertex/pixel count: ${terraingen_num_vertices_x} x ${terraingen_num_vertices_y}`;
 	}
 	//0x555555554444444433333333222222221111111100000000
 	

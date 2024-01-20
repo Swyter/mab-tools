@@ -74,7 +74,7 @@ jobs:
           cp mab_sco_unpacked_reindex.dist/mab_sco_unpacked_reindex.exe dist
           cp mab_sco_repack.dist/mab_sco_repack.exe                     dist
 
-          pushd dist && rm api-*.dll ucrt*.dll *.pyd vcruntime*.dll || true
+          pushd dist && rm api-*.dll ucrt*.dll *.pyd vcruntime*.dll libcrypto-*.dll || true
 
           # swy: PyInstaller drops the final .exe in a ./dist subfolder, go inside, zip them and go back
           7z -mm=Deflate -mfb=258 -mpass=15 a "../swy-sco-tools-${cur_date_ver_long}.zip" mab_sco_*.exe *.dll ../mab_sco_drag_and_drop_here.cmd ../mab_sco_mo_remap*

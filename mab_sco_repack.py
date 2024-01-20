@@ -100,7 +100,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
 
                 if not mission_objects_from == 'empty':
                     try:
-                        with open(f"{input_folder}/mission_objects.json") as f_json:
+                        with open(f"{input_folder}/mission_objects.json", encoding='utf-8-sig') as f_json:
                             mission_objects = json.load(f_json)
                     except OSError as e:
                         print(f"[!] skipping mission objects/scene props: {e}", file=sys.stderr)
@@ -151,7 +151,7 @@ def sco_repack(input_folder, output_sco, mission_objects_from = False, ai_mesh_f
                             return line
                 if not ai_mesh_from == 'empty':
                     try:
-                        with open(f"{input_folder}/ai_mesh.obj") as f_obj:
+                        with open(f"{input_folder}/ai_mesh.obj", encoding='utf-8-sig') as f_obj:
                             for i, line in enumerate(f_obj):
                                 # swy: strip anything to the right of a line comment marker
                                 line = getleftpart(line, '#' )

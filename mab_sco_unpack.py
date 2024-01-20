@@ -95,7 +95,7 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                 js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look
 
                 try:
-                    with open(f"{output_folder}/mission_objects.json", mode='w') as fw:
+                    with open(f"{output_folder}/mission_objects.json", mode='w', encoding='utf-8') as fw:
                         fw.write(js)
                 except OSError as e:
                     print(f"[e] couldn't open the JSON file: {e}", file=sys.stderr)
@@ -170,7 +170,7 @@ def sco_unpack(input_sco_path, output_folder, skip_mission_objects = False, skip
                 else:
                     print(f'[>] unpacking AI mesh with {vertex_count} vertices, {edge_count} edges and {face_count} faces into a Wavefront OBJ file')
 
-                    with open(f"{output_folder}/ai_mesh.obj", mode='w') as fw:
+                    with open(f"{output_folder}/ai_mesh.obj", mode='w', encoding='utf-8') as fw:
                         fw.write(f'# Mount&Blade AI mesh exported by Swyter\'s SCO unpacker from\n# <{scene_file}.sco> on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
                         for elem in ai_mesh['vertices']:
                             floats_as_text = " ".join([repr(fnum)  for fnum in elem])

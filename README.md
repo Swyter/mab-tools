@@ -23,15 +23,15 @@ Personally, I think it is a great way of seeing how the sausage is made, aiding 
 Interoperability is important.
 
 <table><tr>
-  <td><img src='https://cdn.discordapp.com/attachments/411286129317249038/745348802780856450/unknown.png' /> </td>
-  <td><img src='https://cdn.discordapp.com/attachments/411286129317249038/745349467154415737/unknown.png' /> </td>
-  <td><img src='https://cdn.discordapp.com/attachments/411286129317249038/745349843735674924/unknown.png' /> </td>
-  <td><img src='https://cdn.discordapp.com/attachments/411291053702774784/955618600771813446/unknown.png' /> </td>
+  <td><img src='https://web.archive.org/web/20231207010822if_/https://camo.githubusercontent.com/cdfde511d6820d71d60038a8a9c5691a4e95cdba5c126f518b309b5f4ef7028f/68747470733a2f2f63646e2e646973636f72646170702e636f6d2f6174746163686d656e74732f3431313238363132393331373234393033382f3734353334383830323738303835363435302f756e6b6e6f776e2e706e67' /> </td>
+  <td><img src='https://web.archive.org/web/20231206213957if_/https://camo.githubusercontent.com/d4286b79372763e185d368f60482545901ecd0479cef3d48435d5f56bdf01448/68747470733a2f2f63646e2e646973636f72646170702e636f6d2f6174746163686d656e74732f3431313238363132393331373234393033382f3734353334393436373135343431353733372f756e6b6e6f776e2e706e67' /> </td>
+  <td><img src='https://web.archive.org/web/20231206203209if_/https://camo.githubusercontent.com/1b80966d45bc66ca313c6e8d9302e3ac1d73602cf6779cd5585d13aaa868594e/68747470733a2f2f63646e2e646973636f72646170702e636f6d2f6174746163686d656e74732f3431313238363132393331373234393033382f3734353334393834333733353637343932342f756e6b6e6f776e2e706e67' /> </td>
+  <td><img src='http://web.archive.org/web/20231206224407if_/https://camo.githubusercontent.com/7d62f8fda48c8c9461f1059548fd2433a6f7159296c5919738599bb6bc32c3c7/68747470733a2f2f63646e2e646973636f72646170702e636f6d2f6174746163686d656e74732f3431313239313035333730323737343738342f3935353631383630303737313831333434362f756e6b6e6f776e2e706e67' /> </td>
 </tr>
 </table>
 
 ## Future improvements
 
-* Add a small tool to generate and reimport 16-bit linear PGM (grayscale) heightmap images from SCOs.
+* ~~Add a small tool to generate and reimport 16-bit linear PGM (grayscale) heightmap images from SCOs.~~
 * Maybe export the props in a scene as a Wavefront OBJ, by parsing the mods' `.brf` and `.txt` files.
 * Make a external scene editor, a bit late, but never say never.

@@ -46,9 +46,12 @@ struct game_t
     uint64 game_time;
     uint random_seed, save_mode;
     
-    uint combat_difficulty, combat_difficulty_friendlies;
-    uint reduce_combat_ai, reduce_campaign_ai;
-    uint combat_speed;
+    if (game.header.game_version > 1136)
+    {
+        uint combat_difficulty, combat_difficulty_friendlies;
+        uint reduce_combat_ai, reduce_campaign_ai;
+        uint combat_speed;
+    }
     
     uint64 date_timer;
     
@@ -69,7 +72,8 @@ struct game_t
     int32 	 	rest_time_speed;
     int32 	 	rest_is_interactive;
     int32 	rest_remain_attackable;
-    rgltag 	class_names[9] <optimize=false>;
+    if (game.header.game_version > 1011)
+        rgltag 	class_names[9] <optimize=false>;
     int32 	num_global_variables;
     int64 	 	global_variables[num_global_variables];
     
@@ -100,7 +104,8 @@ struct game_t
         rgltag 	 	text;
         char 	 	value[4]; /* swy: NOTE: int32, but contains four characters of string garbage data */
         int32 	 	tableau_material_id;
-        bool 	 	available;
+        if (game.header.game_version > 1011)
+            bool 	 	available;
     } note <read=value>;
     
     typedef struct
@@ -112,11 +117,11 @@ struct game_t
         rgltag 	 	title;
         rgltag 	 	text;
         rgltag 	 	giver;
-        note 	 	notes[16] <optimize=false>;
+        note 	 	notes[(game.header.game_version > 1011) ? 16 : 8] <optimize=false>;
         int32 	 	num_slots;
         if (num_slots)
-            int64 	 	slots[num_slots];
-    } quest <read=read_rgltag(title)>;
+           int64 	 	slots[num_slots];
+    } quest <read=Str("%s, %u, %i", read_rgltag(title), progression, giver_troop_id)>;
     
     
     int32 		num_quests;
@@ -129,9 +134,11 @@ struct game_t
     };
     
     
-    int32 		num_info_pages;
-    info_page 	 	info_pages[num_info_pages] <optimize=false>;
-    
+    if (game.header.game_version > 1011)
+    {
+        int32 		num_info_pages;
+        info_page 	 	info_pages[num_info_pages] <optimize=false>;
+    }
     
     typedef struct
     {
@@ -155,7 +162,7 @@ struct game_t
         bool 	 	renamed;
         uint32 	 	color <format=hex>;
         int32 	 	unused;
-        note 	 	notes[16] <optimize=false>;
+        note 	 	notes[(game.header.game_version > 1011) ? 16 : 8] <optimize=false>;
 
         /* swy: turn the 0xAARRGGBB (RGB) color format into 010 Editor's preferred 0xBBGGRR (BGR) */
         local uint32 display_rgb_color = ((color >> (0*8)) & 0xFF) << (2*8) | /* 0x....BB -> 0x....BB -> 0xBB.... */
@@ -256,7 +263,8 @@ struct game_t
         if (game.header.game_version > 1143) /* swy: probably something like this that was added after cmpxchg8b documented it in the wiki, check the actual initial version */
             int32 _swy_fix_me_unk_pad; /* swy: (11 + 0xd) / 4 */
 
-        int32 	 	attached_to_party_id;
+        if (game.header.game_version > 1011) /* swy: FIXME: probably picked the wrong field, investigate a bit */
+            int32 	 	attached_to_party_id;
         bool 	 	is_attached;
 
         int32 	 	num_attached_party_ids;
@@ -265,7 +273,7 @@ struct game_t
         int32 	 	num_particle_system_ids;
         if (num_particle_system_ids)
             int32 	 	particle_system_ids[num_particle_system_ids] <optimize=false>;
-        note 	 	notes[16] <optimize=false>;
+        note 	 	notes[(game.header.game_version > 1011) ? 16 : 8] <optimize=false>;
         int32 	 	num_slots;
         if (num_slots)
             int64 	 	slots[num_slots];

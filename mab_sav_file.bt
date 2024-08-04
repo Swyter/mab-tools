@@ -300,13 +300,29 @@ struct game_t
 
     party_record 	 	party_records[num_party_records] <optimize=false>;
     
+    local uint offset_end_of_party_records = FTell();
+    local int j = 0, offset = FTell(), data=0, prevdata;
+    
+    for (j=0; j<1768; j++, offset+=4)
+    {
+        prevdata = data; data = ReadUInt(offset);
+        Printf("%x: %x\n", offset, data);
+        
+        if (data == 64 || data == 128 || data == 256 || data == 512)
+            if (prevdata > 2 && prevdata < 8000)
+            {
+                Printf("<- found num_troops at %x\n", offset - 4);
+                break;
+            }
+    }
+    
 
     local uint i = 0;
 
     struct player_party_stack
     {
         local uint cur_stack_no = i; i++;
-        local uint64 cur_stack_troop_flags = 0x00000010;//game.party_records[0].party.stacks[cur_stack_no].flags;
+        local uint64 cur_stack_troop_flags = game.party_records[0].party.stacks[cur_stack_no].flags;
         const uint hero = 0x00000010;
 
         if (!(cur_stack_troop_flags & hero))
@@ -318,11 +334,11 @@ struct game_t
             int32 	 	troop_dnas[32] <format=hex>; // 	cur_stack_no < 32 && !(cur_stack_troop_flags & hero)
     };
     
-    player_party_stack 	 	player_party_stack_additional_info[game.party_records[0].party.num_stacks] <optimize=false>; // [player_party.num_stacks]
+    //player_party_stack 	 	player_party_stack_additional_info[game.party_records[0].party.num_stacks] <optimize=false>; // [player_party.num_stacks]
 
 
-    int32 	num_map_event_records;
-    int32 	num_map_events_created;
+    //int32 	num_map_event_records;
+    //int32 	num_map_events_created;
     
     struct map_event_t
     {
@@ -350,9 +366,14 @@ struct game_t
         }
     } map_event_record <read=Str("valid: %u", valid)>;
   
-    map_event_record 	 	map_event_records[num_map_event_records] <optimize=false>;
+    //map_event_record 	 	map_event_records[10];//num_map_event_records] <optimize=false>;
 
-
+    //char unkoo[(1407981) - FTell()]; FSeek(1407981);
+    //char unkoo[120];
+    //char unkoo[176 - 12]; map_event_record 	 	map_event_records[10] <optimize=false>;
+    //char unkoo[176 - 12 - (4*6)]; map_event_record 	 	map_event_records[16] <optimize=false>;
+    char unknown[(offset - 4) - FTell()]<bgcolor=cRed>;
+    FSeek(offset - 4);
     int32 		num_troops;
     
     typedef struct
@@ -369,13 +390,15 @@ struct game_t
         int32 	 	attributes[4];
         float 	 	proficiencies[7];
         uint32 	 	skills[6];
-        note 	 	notes[16] <optimize=false>;
+        if (game.header.game_version > 1011)
+            note 	 	notes[(game.header.game_version > 1011) ? 16 : 8] <optimize=false>;
         uint64 	 	flags <format=hex>;
         int32 	 	site_id_and_entry_no;
         int32 	 	skill_points;
         int32 	 	attribute_points;
         int32 	 	proficiency_points;
-        int32 	 	level;
+        if (game.header.game_version > 1011)
+            int32 	 	level;
 
         local string buf = "";
 
@@ -418,12 +441,25 @@ struct game_t
             //if (!(note_2_tableau_material_id == -1 && note_2_tableau_available == 0))
             //    toggle_it = true;
 
-            /* swy: if the field at the potential `health` offset for this entry looks
-                    like a float, then it may be an extended hero entry */
-            local float next_health = ReadFloat(FTell() + (4 * 2));
 
-            if (next_health >= 1.f && next_health <= 9999.f)
-                toggle_it = true;
+            if (game.header.game_version > 1011)
+            {
+                /* swy: if the field at the potential `health` offset for this entry looks
+                        like a float, then it may be an extended hero entry */
+                local float next_health = ReadFloat(FTell() + (4 * 2));
+    
+                if (next_health >= 1.f && next_health <= 9999.f)
+                    toggle_it = true;
+            }
+            else
+            {
+                /* swy: if the field at the potential `faction_id` offset for this entry looks
+                        like a small integer, then it may be an extended hero entry */
+                local float next_faction_id = ReadUInt(FTell() + (4 * 2));
+    
+                if (next_faction_id < 64)
+                    toggle_it = true;
+            }
 
             if (toggle_it)
             {
@@ -437,12 +473,17 @@ struct game_t
 
         if ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
         {
-            uint32 	 	gold; // 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-            int32 	 	experience; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-            float 	 	health; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-            int32 	 	faction_id; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            if (game.header.game_version <= 1011)
+                int32 	 	faction_id;
+            uint32 	 	gold;                // (flags & tf_hero) || dont_load_regular_troop_inventories == false
+            int32 	 	experience;          //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            float 	 	health;              //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            if (game.header.game_version <= 1011)
+                int32 	 	level;          //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            else
+                int32 	 	faction_id; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
             item 	 	inventory_items[96]; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-            item 	 	equipped_items[10];// 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+            item 	 	equipped_items[10];  // (flags & tf_hero) || dont_load_regular_troop_inventories == false
 
             /* swy: see here for the format: https://forums.taleworlds.com/index.php?threads/online-face-code-generator-tool-tweak-facekeys-and-see-how-they-work.453145/ */
             struct // 	(flags & tf_hero) || dont_load_regular_troop_inventories == false
@@ -450,26 +491,36 @@ struct game_t
                 uint64 a <format=hex>, b <format=hex>, c <format=hex>, d <format=hex>;
             } face_keys <read=Str("0x%08x%08x%08x%08x%08x%08x%08x%08x", a >> 32, a,  b >> 32, b,  c >> 32, c,  d >> 32, d)>; /* swy: seems like %llx doesn't work here to print 64-bit numbers, so split it into two 32-bit ones per thing, first the top and then the bottom part */
 
-            bool 	 	renamed; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
-
-            if (renamed)
+            if (game.header.game_version > 1011)
             {
-                string 	 	name; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
-                string 	 	name_plural; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
-                
-
-                buf += "renamed!";
+                bool 	 	renamed; //	(flags & tf_hero) || dont_load_regular_troop_inventories == false
+    
+                if (renamed)
+                {
+                    rgltag 	 	name; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
+                    rgltag 	 	name_plural; //	renamed == true && ((flags & tf_hero) || dont_load_regular_troop_inventories == false)
+                    
+    
+                    buf += "renamed to " + name.s + " ";
+                }
             }
 
-            buf += ":: " + read_rgltag(game.factions[faction_id].name);
+            //buf += ":: " + read_rgltag(game.factions[faction_id].name);
+            
+            if (game.header.game_version <= 1011)
+                note 	 	notes[(game.header.game_version > 1011) ? 16 : 8] <optimize=false>;
         }
-        int32 	 	class_no;
+        if (game.header.game_version > 1011)
+            int32 	 	class_no;
         
-        buf += " // " + read_rgltag(notes[0].text);
+        if (game.header.game_version > 1011 || (flags & tf_hero))
+            buf += " // " + read_rgltag(notes[0].text);
 
     } troop <read=Str("%s %s", (flags & tf_hero) ? "[h-]" : "[-]", buf)>;
     
     troop 	 	troops[num_troops] <optimize=false>;
+    
+    ///FSeek(4539149);
     int32 	 	unused_d[42];
     
     typedef struct

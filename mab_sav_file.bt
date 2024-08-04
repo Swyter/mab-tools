@@ -300,6 +300,11 @@ struct game_t
 
     party_record 	 	party_records[num_party_records] <optimize=false>;
     
+    
+    /* swy: use some heuristics to skip the player_party_stack chunk by reading ahead:
+            > Well, found a funky workaround by searching for known hex patterns; slot_counts (the first field of each troop) always get allocated in powers of two (256/512/...), and the
+            > 32-bit integers of these fields line up in multiples of four from the previous fields, so they are easy to find by scanning forward, and then the troop_count
+            > field (that we're interested in) has a not-too-big value bigger than zero but probably smaller than ~8000 that precedes it. */
     local uint offset_end_of_party_records = FTell();
     local int j = 0, offset = FTell(), data=0, prevdata;
     
@@ -308,8 +313,8 @@ struct game_t
         prevdata = data; data = ReadUInt(offset);
         Printf("%x: %x\n", offset, data);
         
-        if (data == 64 || data == 128 || data == 256 || data == 512)
-            if (prevdata > 2 && prevdata < 8000)
+        if (data == 64 || data == 128 || data == 256 || data == 512) /* swy: known slot_count values/sizes, always powers of two */
+            if (prevdata > 2 && prevdata < 8000)                     /* swy: constraint the possible num_troops to a reasonable range for a mod */
             {
                 Printf("<- found num_troops at %x\n", offset - 4);
                 break;
@@ -368,12 +373,10 @@ struct game_t
   
     //map_event_record 	 	map_event_records[10];//num_map_event_records] <optimize=false>;
 
-    //char unkoo[(1407981) - FTell()]; FSeek(1407981);
-    //char unkoo[120];
-    //char unkoo[176 - 12]; map_event_record 	 	map_event_records[10] <optimize=false>;
-    //char unkoo[176 - 12 - (4*6)]; map_event_record 	 	map_event_records[16] <optimize=false>;
-    char unknown[(offset - 4) - FTell()]<bgcolor=cRed>;
-    FSeek(offset - 4);
+    /* swy: skip the complex structures (map_event_record and especially player_party_stack, which
+            depends on knowing which troop IDs are heroes) and go to the troop array directly */
+    char unknown[(offset - 4) - FTell()]<bgcolor=cRed>; FSeek(offset - 4);
+    
     int32 		num_troops;
     
     typedef struct
@@ -442,7 +445,7 @@ struct game_t
             //    toggle_it = true;
 
 
-            if (game.header.game_version > 1011)
+            if (game.header.game_version > 1011) /* swy: check for the Warband field */
             {
                 /* swy: if the field at the potential `health` offset for this entry looks
                         like a float, then it may be an extended hero entry */
@@ -451,7 +454,7 @@ struct game_t
                 if (next_health >= 1.f && next_health <= 9999.f)
                     toggle_it = true;
             }
-            else
+            else /* swy: check for M&B the 1.011 field */
             {
                 /* swy: if the field at the potential `faction_id` offset for this entry looks
                         like a small integer, then it may be an extended hero entry */
@@ -520,7 +523,6 @@ struct game_t
     
     troop 	 	troops[num_troops] <optimize=false>;
     
-    ///FSeek(4539149);
     int32 	 	unused_d[42];
     
     typedef struct

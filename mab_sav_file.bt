@@ -109,7 +109,13 @@ struct game_t
     } note <read=value>;
     
     typedef struct
-    {
+    {   /* swy: researched the flags and documented them here: https://mbcommands.fandom.com/wiki/Template:Op_quests#Quest_management :) */
+        const uint qust_active    = 0b0000000100000000; // quest is active
+        const uint qust_finished  = 0b0000001000000000; // quest is finished (???)
+        const uint qust_succeeded = 0b0000010000000000; // quest has succeeded
+        const uint qust_failed    = 0b0000100000000000; // quest has failed
+        const uint qust_concluded = 0b0001000000000000; // quest has concluded (often paired w/ fail/succeed or both)
+
         int32 	 	progression;
         int32 	 	giver_troop_id;
         int32 	 	number;
@@ -121,7 +127,20 @@ struct game_t
         int32 	 	num_slots;
         if (num_slots)
            int64 	 	slots[num_slots];
-    } quest <read=Str("%s, %u, %i", read_rgltag(title), progression, giver_troop_id)>;
+         
+        local string str_state = "";
+        if (progression & qust_active   ) str_state +=    "active, ";
+        if (progression & qust_finished ) str_state +=  "finished, ";
+        if (progression & qust_succeeded) str_state += "succeeded, ";
+        if (progression & qust_failed   ) str_state +=    "failed, ";
+        if (progression & qust_concluded) str_state += "concluded, ";
+        if (str_state != "")
+        {
+            str_state = SubStr(str_state, 0, Strlen(str_state) - 2); /* swy: remove the last/trailing ", " if any */
+            str_state = " -- [" + str_state + "]";
+        }
+        
+    } quest <read=Str("%s, %u, %i %s", read_rgltag(title), progression, giver_troop_id, str_state)>;
     
     
     int32 		num_quests;

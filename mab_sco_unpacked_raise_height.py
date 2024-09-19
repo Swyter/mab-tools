@@ -28,17 +28,16 @@ def sco_unpacked_raise_height(input_folder, height):
         if not prop_pos or len(prop_pos) > 3:
             continue
 
-        # swy: 'scene_prop_txt_entries' contains the entries that we just parsed
+        # swy: raise the Z coordinate of the scene object position by the provided number
         object['pos'][2] += height
-
-    # swy: add a nice summary at the end
-    print(f"[/] finished; adjusted the height of {len(mission_objects)} mission objects")
 
     # swy: save again as an updated JSON file, in-place
     js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
     js = re.sub(r'\[\n\s+(.+)\n\s+(.+)\n\s+(.+)\n\s+(.+)\]', r'[\1 \2 \3]', js) # swy: quick and dirty way of making the arrays of numbers how in a single line, for a more compact look
 
-    print("[i] overwriting, saving the modified JSON file")
+    # swy: add a nice summary at the end
+    print(f"[/] finished; adjusted the height of {len(mission_objects)} mission objects")
+    print( "    saving the modified JSON file")
 
     try:
         with open(f"{input_folder}/mission_objects.json", mode='w', encoding='utf-8') as fw:
@@ -68,18 +67,21 @@ def sco_unpacked_raise_height(input_folder, height):
     
                 if line[0] == 'v':
                     elem = [float(token)  for token in line[1:]]
+                    # swy: raise the Z coordinate of this AI mesh vertex by the provided number
                     elem[2] += height
 
                     floats_as_text = " ".join([repr(fnum)  for fnum in elem])
                     lines[i] = f'v {floats_as_text}\n'
+
+            print(f"[/] adjusted the height of the AI mesh vertices; saving updated OBJ file")
+            try:
+                with open(f"{input_folder}/ai_mesh.obj", mode='w', encoding='utf-8') as fw:
+                    fw.write(''.join(lines))
+            except OSError as e:
+                print(f"[e] couldn't open the JSON file: {e}", file=sys.stderr)
+
     except OSError as e:
         print(f"[!] skipping AI mesh: {e}", file=sys.stderr)
-
-    try:
-        with open(f"{input_folder}/ai_mesh.obj", mode='w', encoding='utf-8') as fw:
-            fw.write(''.join(lines))
-    except OSError as e:
-        print(f"[e] couldn't open the JSON file: {e}", file=sys.stderr)
 
 
 if __name__ == "__main__":

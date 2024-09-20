@@ -149,9 +149,13 @@ def sco_unpacked_raise_height(input_folder, input_elevation):
             else:
                 print(f'[e] Unknown NetPBM format, {magic}: use Pf.'); exit(1)
 
-            # swy: elevate each point of the terrain by the provided number
+            # --
+
+            # swy: elevate each point of the terrain by the provided number; this is the real meat
             for i, val in enumerate(ground[layer_name]):
                 ground[layer_name][i] += input_elevation
+
+            # --
 
             # swy: write it back
             scene_width   = last_scene_width
@@ -183,21 +187,26 @@ def sco_unpacked_raise_height(input_folder, input_elevation):
         print(f'[!]    no layer_{ground_layer} here, skipping...')
 
 
-
-
 if __name__ == "__main__":
     # swy: add some helpful commands and their documentation
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
-                                     description='''Updates mission object indices in Mount&Blade SceneObj files using mod .txt data. Detects and removes obsolete objects, and allows easy prop swapping. Created by Swyter in 2022.''',
+                                     description='''This reads unpacked Mount&Blade SceneObj files and elevates all the terrain, AI mesh and objects up to a certain point; used to avoid the water plane, which is always at zero, and being able to dig without side effects. Created by Swyter in 2024.''',
                                      epilog='''\
+Q: My border mesh now appears all wonky after trying this! What now?
+A: Took me a while to find how much you need to raise the border mesh in OpenBRF,
+   turns out that as it gets scaled up by the terrain size you need to find how big that
+   is with this tool and your terrain code: https://swyter.github.io/mab-tools/terrain#0x000000013000050000034cd300003efe00004b34000059be (210x210 meters in this case)
+   and then divide the chosen height (e.g. 120 m) by that, 120/210 = 0.57142, which is
+   what you need to actually use in OpenBRF's roto-translate tool dialog.
 
+   Very tiny change in the Y dimension.
 ''')
 
     parser.add_argument('input',  metavar='<unpacked-sco-folder>',       help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')
-    parser.add_argument('height', metavar='<height-offset>', type=float, help='by default it will guess that we are under <mod folder>/SceneObj/scn_... and use the parent folder, which should be where the mod .txt files are')
+    parser.add_argument('height', metavar='<height-offset>', type=float, help='how many meters should the scene be raised vertically, use negative numbers to lower it, with decimals')
 
-    #args = parser.parse_args(['C:\\Program Files (x86)\\Mount&Blade\\Modules\\Native - copia\\SceneObj\\scn_castle_1_exterior'])
-    args = parser.parse_args(['C:/Users/Usuario/Documents/github/tldmod/_wb/SceneObj/scn_advcamp_gondor_siege', '120'])
+    #args = parser.parse_args(['C:/Users/Usuario/Documents/github/tldmod/_wb/SceneObj/scn_advcamp_gondor_siege', '120'])
+    args = parser.parse_args()
 
     sco_unpacked_raise_height(
         args.input, args.height

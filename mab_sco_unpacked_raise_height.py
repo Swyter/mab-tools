@@ -202,11 +202,20 @@ A: Took me a while to find how much you need to raise the border mesh in OpenBRF
    Very tiny change in the Y dimension.
 ''')
 
-    parser.add_argument('input',  metavar='<unpacked-sco-folder>',       help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')
-    parser.add_argument('height', metavar='<height-offset>', type=float, help='how many meters should the scene be raised vertically, use negative numbers to lower it, with decimals')
+    parser.add_argument('input',  metavar='<unpacked-sco-folder>',                             help='the source folder; for a «scn_advcamp_dale.sco» it will read the unpacked data from a «scn_advcamp_dale» directory in the same folder as this script')
+    parser.add_argument('height', metavar='<height-offset>', type=float, default=0, nargs='?', help='how many meters should the scene be raised vertically, use negative numbers to lower it, with decimals')
 
     #args = parser.parse_args(['C:/Users/Usuario/Documents/github/tldmod/_wb/SceneObj/scn_advcamp_gondor_siege', '120'])
     args = parser.parse_args()
+
+    # swy: let the user type their own value when dragging-and-dropping a folder in there
+    while not args.height:
+        try:
+            args.height = float(input("Enter the elevation you want, in meters: "))
+        except ValueError:
+            continue
+        except:
+            exit(3)
 
     sco_unpacked_raise_height(
         args.input, args.height

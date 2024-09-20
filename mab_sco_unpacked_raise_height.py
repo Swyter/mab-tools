@@ -155,6 +155,8 @@ def sco_unpacked_raise_height(input_folder, input_elevation):
             for i, val in enumerate(ground[layer_name]):
                 ground[layer_name][i] += input_elevation
 
+            print(f"[/] adjusted the height of the heightmap vertices; saving updated PFM file")
+
             # --
 
             # swy: write it back
@@ -208,6 +210,12 @@ A: Took me a while to find how much you need to raise the border mesh in OpenBRF
     #args = parser.parse_args(['C:/Users/Usuario/Documents/github/tldmod/_wb/SceneObj/scn_advcamp_gondor_siege', '120'])
     args = parser.parse_args()
 
+    # swy: if the second argument wasn't provided then we probably should wait at the end
+    #      so that the user who dragged the unpacked folder into it can see the results
+    manual_mode = False
+    if not args.height:
+        manual_mode = True
+
     # swy: let the user type their own value when dragging-and-dropping a folder in there
     while not args.height:
         try:
@@ -220,3 +228,6 @@ A: Took me a while to find how much you need to raise the border mesh in OpenBRF
     sco_unpacked_raise_height(
         args.input, args.height
     )
+
+    if manual_mode:
+        input("Press any key to close...")

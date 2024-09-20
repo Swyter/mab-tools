@@ -5,12 +5,12 @@ import sys; from sys import exit
 import argparse
 import io
 
-def sco_unpacked_raise_height(input_folder, height):
+def sco_unpacked_raise_height(input_folder, input_elevation):
     if not os.path.isdir(input_folder):
         print(f"[e] the unpacked «{input_folder}» SCO folder doesn't seem to exist")
         exit(1)
 
-    print(f'[i] raising the height of the scene data in the «{input_folder}» folder to {height}')
+    print(f'[i] raising the height of the scene data in the «{input_folder}» folder to {input_elevation}')
 
     # swy: /part a/ raise the scene props, items and flora level in the scene objects JSON file
     try:
@@ -27,7 +27,7 @@ def sco_unpacked_raise_height(input_folder, height):
                     continue
 
                 # swy: raise the Z coordinate of the scene object position by the provided number
-                object['pos'][2] += height
+                object['pos'][2] += input_elevation
 
             # swy: save again as an updated JSON file, in-place
             js = json.dumps(obj=mission_objects, indent=2, ensure_ascii=False)
@@ -70,7 +70,7 @@ def sco_unpacked_raise_height(input_folder, height):
                 if line[0] == 'v':
                     elem = [float(token)  for token in line[1:]]
                     # swy: raise the Z coordinate of this AI mesh vertex by the provided number
-                    elem[2] += height
+                    elem[2] += input_elevation
 
                     floats_as_text = " ".join([repr(fnum)  for fnum in elem])
                     lines[i] = f'v {floats_as_text}\n'
@@ -86,7 +86,7 @@ def sco_unpacked_raise_height(input_folder, height):
         print(f"[!] skipping AI mesh: {e}", file=sys.stderr)
 
     # swy: /part c/ elevate the heightmap vertices/pixels in the NetPBM portable float map (PFM) file
-    ground = {}
+    ground = {}; contents = []
     ground_layer = 'ground_elevation.pfm'
     layer_name = ground_layer.split('.')[0].lower()
     ext        = ground_layer.split('.')[1].lower()
@@ -126,6 +126,12 @@ def sco_unpacked_raise_height(input_folder, height):
             # swy: grab how far away we are from the start after reading the ASCII part, use it to compute how many bytes the rest of the data takes
             f_image.seek(0, io.SEEK_END); bytes_remain = f_image.tell() - header_end_byte_offset; f_image.seek(header_end_byte_offset)
 
+            if not last_scene_width:
+                last_scene_width = width
+
+            if not last_scene_height:
+                last_scene_height = height
+
             # swy: actually read and interpret the binary data after the header, depending on the format/sub-variant
             print(f'[i] found layer_{ground_layer}; type {magic}, {width} x {height}')
 
@@ -143,8 +149,11 @@ def sco_unpacked_raise_height(input_folder, height):
             else:
                 print(f'[e] Unknown NetPBM format, {magic}: use Pf.'); exit(1)
 
-            exit(0)
-            # swy: write it
+            # swy: elevate each point of the terrain by the provided number
+            for i, val in enumerate(ground[layer_name]):
+                ground[layer_name][i] += input_elevation
+
+            # swy: write it back
             scene_width   = last_scene_width
             scene_height  = last_scene_height
             output_folder = input_folder
@@ -158,7 +167,7 @@ def sco_unpacked_raise_height(input_folder, height):
                     #      -1.000
                     fw.write(f'Pf\n{scene_width} {scene_height}\n-1.000\n'.encode('utf-8')) # swy: PF has RGB color, Pf is grayscale. align the first binary bytes to 16 bytes with the extra padded .000 in the ASCII part, make the number negative to let the program know that we're using little-endian floats
 
-                    flattened_list = [value for sub_list in ground[layer_str] for value in sub_list]
+                    flattened_list = ground[layer_str]
                     reversed_list = []
 
                     # swy: reverse the row ordering because the PFM format is from bottom to top, unlike every other NetPBM one, of course :)

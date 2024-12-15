@@ -4,7 +4,7 @@ import json, os
 import sys; from sys import exit
 import argparse
 
-def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_missing = False, opt_remapping_file = '', opt_flora_kinds_txt = '', opt_item_kinds1_txt = '', opt_dont_reindex = False, opt_dont_replace_case = False):
+def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_missing = False, opt_remapping_file = '', opt_flora_kinds_txt = '', opt_item_kinds1_txt = '', opt_dont_reindex = False, opt_dont_replace_case = False, opt_dont_change_type = False):
     if not os.path.isdir(input_folder):
         print(f"[e] the unpacked «{input_folder}» SCO folder doesn't seem to exist")
         exit(1)
@@ -183,6 +183,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     prop_count_fine = 0
     prop_count_changed = 0
     prop_count_renamed = 0
+    prop_count_retyped = 0
     prop_count_missing = 0
     objects_to_delete = []
 
@@ -212,17 +213,36 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
             prop_count_renamed += 1
 
         # --
+        
+        def entries_for_type():
+            if   prop_type == 'prop' : return scene_prop_txt_entries
+            elif prop_type == 'plant': return opt_flora_kinds_txt_entries
+            elif prop_type == 'item' : return opt_item_kinds1_txt_entries
+
+        def search_for_type_in_all_lists(prop_tag):
+            for idx, (key, val) in enumerate({'prop' : scene_prop_txt_entries,
+                                              'plant': opt_flora_kinds_txt_entries,
+                                              'item' : opt_item_kinds1_txt_entries}.items()):
+                if len(val) > 0 and prop_tag in val:
+                    return key
+            return None
+
+        # swy: detect if the object is invalid but not as a different type in a different list, and fix that
+        #      (e.g. no plant of that name exists, but there's a scene prop named like that, it was
+        #            probably renamed manually by using the search-and-replace functionality)
+        if not opt_dont_change_type:
+            if prop_tag not in entries_for_type():
+                new_prop_type = search_for_type_in_all_lists(prop_tag)
+                if new_prop_type:
+                    print(f"[¿] «{prop_tag}» does not exist as {prop_type} but is listed in the mod's .txt files as {new_prop_type}; probably renamed, changing type to that")
+                    prop_type = new_prop_type; object['type'] = prop_type; prop_count_retyped += 1
+        # --
 
         # swy: skip any unsupported entry/type
         if (len(     scene_prop_txt_entries) <= 0 and prop_type == 'prop' ) or \
            (len(opt_flora_kinds_txt_entries) <= 0 and prop_type == 'plant') or \
            (len(opt_item_kinds1_txt_entries) <= 0 and prop_type == 'item' ):
             continue
-        
-        def entries_for_type():
-            if   prop_type == 'prop' : return scene_prop_txt_entries
-            elif prop_type == 'plant': return opt_flora_kinds_txt_entries
-            elif prop_type == 'item' : return opt_item_kinds1_txt_entries
 
         # swy: in case this SCO is obsolete and has older props that are no longer part of the mod
         if prop_tag not in entries_for_type():
@@ -277,7 +297,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
     prop_count_total = prop_count_fine + prop_count_changed + prop_count_missing
     mission_objects_that_are_not_props = len(mission_objects) - prop_count_total
 
-    print(f"\n[/] finished; {prop_count_fine} mission objects were fine, {prop_count_changed} objects were reindexed, {prop_count_renamed} renamed and {prop_count_missing} missing" +
+    print(f"\n[/] finished; {prop_count_fine} mission objects were fine, {prop_count_changed} objects were reindexed, {prop_count_renamed} renamed, {prop_count_retyped} retyped and {prop_count_missing} missing" +
           f"\n    ({prop_count_total} in total, plus {mission_objects_that_are_not_props} asorted mission objects that are not props/plants/items)")
 
     # swy: we shouldn't pull the rug and delete elements above while we are still looping through indices
@@ -285,7 +305,7 @@ def sco_unpacked_reindex(input_folder, opt_scene_props_txt = '', opt_remove_miss
         for obj in objects_to_delete:
             mission_objects.remove(obj)
     else: # swy: if nothing to delete and no mission objects have been altered then we'll just spit the same thing; skip that
-        if prop_count_changed <= 0 and prop_count_renamed <= 0:
+        if prop_count_changed <= 0 and prop_count_renamed <= 0 and prop_count_retyped <= 0:
             print("[i] no need to overwrite the unchanged JSON file, we're done here")
             exit(99) # swy: if we exit with a non-zero ERRORLEVEL code, we can skip running the repacker as the next step in the .cmd batch file
 
@@ -307,6 +327,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                      description='''Updates mission object indices in Mount&Blade SceneObj files using mod .txt data. Detects and removes obsolete objects, and allows easy prop swapping. Created by Swyter in 2022.''',
                                      epilog='''\
+| Quick-ish help, explain what it does and how to use it /
+\_______________________________________________________/
+
 Q: What is this for? I don't get it. :(
 A: Are your props suddenly all messed up? Even if each mission object entry includes a name for each prop
    instance, the game only ever uses the numeric index to match it against a mod's scene_props.txt file.
@@ -361,6 +384,7 @@ A: You can probably quickly chain or combine the small tools into small scripts
     parser.add_argument('-it', '--itemkinds1txt',      dest='opt_item_kinds1_txt',    default='', metavar='<path-to-the-updated-item_kinds.txt-file>', required=False, help='also reindexes mission objects of type «item» via a provided item_kinds1.txt, by default «../item_kinds1.txt»')
     parser.add_argument('-nx', '--dont-reindex',       dest='opt_dont_reindex',       action='store_true', required=False, help='this can be useful when you only want to delete obsolete objects or use the replacement functionality without changing anything else, reindexing can be noisy and modify too many files that otherwise work fine')
     parser.add_argument('-nc', '--dont-replace-case',  dest='opt_dont_replace_case',  action='store_true', required=False, help='disable the new auto-renaming feature that is toggled on by default; if your prop was originally called e.g. spr_CastleGate when you added it to the scene, but now is spr_castlegate in your msys, the feature will still detect it and fix the name in the .SCO (and ID) to match, making the (case-sensitive) game load the props correctly. this is the most common mode of replacement, and now it can be automatic, no manual replacements. but you can disable it to avoid polluting the files with unwanted changes.')
+    parser.add_argument('-nt', '--dont-change-type',   dest='opt_dont_change_type',   action='store_true', required=False, help='disable the new feature (that is toggled on by default) that finds if the name exists for a different kind of object and fixes it; so if you used the replace functionality (to e.g. turn a plant into a scene prop) it would only change its name but internally the object would still be tagged as a plant type and be broken. this auto-finds and fixes that by setting and updating it into the right kind, as long as it exists in the current .txt files, otherwise it cannot be validated. if this whole functionality is undesirable you can avoid it by using the option. Keep in mind that no effort is made to convert any of the secondary parameter fields that have special uses depending on the type of the object, so be careful about that.')
 
     args = parser.parse_args()
 
@@ -385,5 +409,6 @@ A: You can probably quickly chain or combine the small tools into small scripts
                     opt_flora_kinds_txt=args.opt_flora_kinds_txt,
                     opt_item_kinds1_txt=args.opt_item_kinds1_txt,
                     opt_dont_reindex=args.opt_dont_reindex,
-                    opt_dont_replace_case=args.opt_dont_replace_case
+                    opt_dont_replace_case=args.opt_dont_replace_case,
+                    opt_dont_change_type=args.opt_dont_change_type
     )

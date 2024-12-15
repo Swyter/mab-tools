@@ -326,7 +326,7 @@ if __name__ == "__main__":
     # swy: add some helpful commands and their documentation
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                      description='''Updates mission object indices in Mount&Blade SceneObj files using mod .txt data. Detects and removes obsolete objects, and allows easy prop swapping. Created by Swyter in 2022.''',
-                                     epilog='''\
+                                     epilog=r'''
 | Quick-ish help, explain what it does and how to use it /
 \_______________________________________________________/
 

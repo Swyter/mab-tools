@@ -491,7 +491,11 @@ if __name__ == "__main__":
     # swy: add some helpful commands and their documentation
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                      description='Repacks and intermixes Mount&Blade SceneObj files. Created by Swyter in 2022.',
-                                     epilog='''This is very powerful and allows you to repack a file partially, sourcing each of the three blocks/parts of an SCO file (mission objects/AI mesh/terrain-ground layers) from different SCO files.
+                                     epilog=r'''
+| Quick-ish help and how to restore already-unpacked versions of scene objects /
+\_____________________________________________________________________________/
+
+This is very powerful and allows you to repack a file partially, sourcing each of the three blocks/parts of an SCO file (mission objects/AI mesh/terrain-ground layers) from different SCO files.
 
 Quick examples:
    mab_sco_repack ./scn_advcamp_dale                                                # this will generate some «scn_advcamp_dale.sco», it can be used for drag-and-dropping the folder directly over this tool.

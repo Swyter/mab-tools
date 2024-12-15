@@ -193,7 +193,10 @@ if __name__ == "__main__":
     # swy: add some helpful commands and their documentation
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                      description='''This reads unpacked Mount&Blade SceneObj files and elevates all the terrain, AI mesh and objects up to a certain point; used to avoid the water plane, which is always at zero, and being able to dig without side effects. Created by Swyter in 2024.''',
-                                     epilog='''\
+                                     epilog=r'''
+| Quick-ish help, and how to use it /
+\__________________________________/
+
 Q: My border mesh now appears all wonky after trying this! What now?
 A: Took me a while to find how much you need to raise the border mesh in OpenBRF,
    turns out that as it gets scaled up by the terrain size you need to find how big that

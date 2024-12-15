@@ -322,7 +322,7 @@ if __name__ == "__main__":
     # swy: add some helpful commands and their documentation
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                      description='Unpacks Mount&Blade SceneObj files into a folder of loose files. Created by Swyter in 2022.',
-                                     epilog='''\
+                                     epilog=r'''
 | Quick-ish help and how to open extracted terrain images /
 \________________________________________________________/
 

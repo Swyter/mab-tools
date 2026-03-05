@@ -208,8 +208,12 @@
         padding-top: 2px;
 
         /* swy: poor man's recentering */
-        position: relative;
+        position: sticky;
         left: -6px;
+        /* swy: make the face code box visible when scrolling down,
+                stick it to the top when out of view */
+        top: 3px;
+        z-index: 1;
     }
 
     div#droparea {
